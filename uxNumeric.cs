@@ -28,25 +28,23 @@ namespace Scada
 
             DataAccessLayer MyDataAccessLayer = new DataAccessLayer();
             
-                var ItemValuesBtn = MyDataAccessLayer.ReadItemValues(scb.ItemID);
-                int idxSvg = 0;
-                foreach (var item in ItemValuesBtn)
+            var ItemValuesBtn = MyDataAccessLayer.ReadItemValues(scb.ItemID);
+            int i = 0;
+            foreach (var item in ItemValuesBtn)
+            {
+                if (i == 0)
                 {
-                    if (idxSvg == 0)
-                    {
-                        scb.PV.TagID = item.TagID;
-                        scb.PV.Value = item.Value;
-                    }
-
-                    idxSvg++;
+                    scb.PV.TagID = item.TagID;
+                    scb.PV.Value = item.Value;
                 }
+                i++;
+            }
             
-
-
             scb.IsEnabled = true;
             scb.IsVisible = true;
             scb.EnableTouchEvents = true;
             scb.InputTransparent = false;
+            scb.Start();
             return (scb);
         }
 

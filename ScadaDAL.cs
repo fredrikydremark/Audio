@@ -7,8 +7,7 @@ using static Scada.ScadaClasses;
 namespace Scada
 {
     public class DataAccessLayer
-    {
-      
+    {    
         public string LoadLibItem(string Name, int TypeInLib)
         {
             try

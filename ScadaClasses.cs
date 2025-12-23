@@ -79,6 +79,15 @@ namespace Scada
         public const int Cmdgriddata = 41;
         public const int Cmdendofpackets = 99;
 
+
+        public static int Currentpage = 1;
+        public static int CurrentScadaPopup = ScadaClasses.uxTagsGrid;
+        public static int CurrentItem = 0;
+        public static int CurrentRow = 0;
+        public static int CurrentType = 0;
+        public static int CurrentTag = 0;
+        public static int Previouspage = -1;
+
         /*
 
         public class Param

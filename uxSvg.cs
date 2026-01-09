@@ -8,6 +8,35 @@ namespace Scada
 {
     public class ScadaSvg : SKCanvasView
     {
+
+
+        public ScadaSvg Init(double w, double h, ScadaSvg scb, ScadaClasses.Telegram Item, ScadaClasses.Colors Color)
+        {
+            scb.AnchorX = 0;
+            scb.AnchorY = 0;
+            scb.CornerRadius = 10;
+            scb.BarBackgroundColor = Color.uxBackGroundColor;
+            scb.BackgroundColor = Color.uxPanelColor.ToMauiColor();
+            scb.GradientStartColor = Color.uxGradientStartColor;
+            scb.GradientEndColor = Color.uxGradientEndColor;
+            scb.WidthRequest = w * Item.Width;
+            scb.HeightRequest = h  * Item.Height;
+
+            scb.ItemID = Item.ItemID;
+            scb.StyleId = Item.ItemID.ToString();
+          
+            DataAccessLayer MyDataAccessLayer = new DataAccessLayer();
+ 
+            scb.SvgBase64 = MyDataAccessLayer.LoadLibItem(Item.Action, 1);
+
+            scb.IsEnabled = true;
+            scb.IsVisible = true;
+            scb.EnableTouchEvents = true;
+            scb.InputTransparent = false;
+        
+            return (scb);
+        }
+
         public static BindableProperty ItemIDProperty = BindableProperty.Create(nameof(ItemID), typeof(int),
        typeof(ScadaSvg), 0, BindingMode.OneWay,
            validateValue: (_, value) => value != null,

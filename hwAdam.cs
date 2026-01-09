@@ -15,8 +15,7 @@ namespace Scada
         static int baudRate = 9600;
 
         SerialPort sp = new SerialPort(myPortName, baudRate);
-
-       
+    
         int StoreDigital(string sBinaryValue, int Adress)
         {
             var myConnection = new Microsoft.Data.SqlClient.SqlConnection

@@ -10,6 +10,45 @@ namespace Scada
 
     public class Scada3D : SKCanvasView
     {
+        public Scada3D Init(double w, double h, Scada3D scb, ScadaClasses.Telegram Item, ScadaClasses.Colors Color)
+        {
+            scb.AnchorX = 0;
+            scb.AnchorY = 0;
+            scb.CornerRadius = 10;
+            scb.BarBackgroundColor = Color.uxBackGroundColor;
+            scb.BackgroundColor = Color.uxPanelColor.ToMauiColor();
+            scb.GradientStartColor = Color.uxGradientStartColor;
+            scb.GradientEndColor = Color.uxGradientEndColor;
+            scb.WidthRequest = (w / 100) * Item.Width;
+            scb.HeightRequest = (h / 100) * Item.Height;
+            scb.AlternativeTextColor = Color.uxTextColor;
+            scb.TextColor = Color.uxTextColor;
+            scb.ItemID = Item.ItemID;
+            scb.StyleId = Item.ItemID.ToString();
+            scb.FontSize = 18.5F;
+            scb.PV = new ItemValue();
+            DataAccessLayer MyDataAccessLayer = new DataAccessLayer();
+            var ItemValues = MyDataAccessLayer.ReadItemValues(scb.ItemID);
+            int i = 0;
+            foreach (var item in ItemValues)
+            {
+                if (i == 0)
+                {
+                    scb.PV.TagID = item.TagID;
+                    scb.PV.Value = item.Value;
+                    scb.PV.Unit = item.Unit;
+                    scb.PV.StatusQuality = item.StatusQuality;
+                }
+                i++;
+            }
+            scb.IsEnabled = true;
+            scb.IsVisible = true;
+            scb.EnableTouchEvents = true;
+            scb.InputTransparent = false;
+            scb.Start();
+            return (scb);
+        }
+
 
         public static BindableProperty ItemIDProperty = BindableProperty.Create(nameof(ItemID), typeof(int),
         typeof(Scada3D), 0, BindingMode.OneWay,

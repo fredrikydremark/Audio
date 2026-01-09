@@ -4,9 +4,9 @@ using SkiaSharp;
 using SkiaSharp.Views.Maui;
 using SkiaSharp.Views.Maui.Controls;
 using System.Globalization;
-
 using System.Text.RegularExpressions;
 using static Scada.DataAccessLayer;
+
 namespace Scada;
 
 public partial class MainPage : ContentPage
@@ -26,7 +26,10 @@ public partial class MainPage : ContentPage
 
     ScadaClasses.Colors ScadaColor = new ScadaClasses.Colors();
 
-    private static System.Timers.Timer timer = new System.Timers.Timer();
+    public System.Timers.Timer bcktimer = new System.Timers.Timer();
+    public System.Timers.Timer uxtimer = new System.Timers.Timer();
+
+
     //private static WebSocket client;
     DataAccessLayer MyDataAccessLayer = new DataAccessLayer();
     ScadaPopups MyPopups = new ScadaPopups();
@@ -42,7 +45,6 @@ public partial class MainPage : ContentPage
     double OldXpos = 0, OldYpos = 0;
     double LastXpos = 0, LastYpos = 0;
 
- 
 
     string sFilter = "";
     int iMenuOffsetRows = 0;
@@ -69,9 +71,13 @@ public partial class MainPage : ContentPage
         {
             MyDataAccessLayer.SetTagStatus(1, 1);
         }
-        timer.Interval = 2000;
-        timer.Elapsed += Update;
-        timer.Start();
+        bcktimer.Interval = 2000;
+        bcktimer.Elapsed += bckUpdate;
+        bcktimer.Start();
+
+        uxtimer.Interval = 100;
+        uxtimer.Elapsed += uxUpdate;
+        uxtimer.Start();
     }
 
 
@@ -134,12 +140,11 @@ public partial class MainPage : ContentPage
     }
 
   
-    void Update(object sender, EventArgs e)
+    void bckUpdate(object sender, EventArgs e)
     {
         MainThread.BeginInvokeOnMainThread(() =>
         {
-            if (!Moving)
-            {
+          
                 if (MyDataAccessLayer.GetTagValueByName("System_EnableADAM") > 0.5)
                 {
                     Adam AdamLayer = new Adam();
@@ -186,10 +191,27 @@ public partial class MainPage : ContentPage
                     MyDataAccessLayer.StoreTagValue(Tag.TagID, Tag.Value);
                 }
 
-                var Items = MyDataAccessLayer.getItems(ScadaClasses.Currentpage); 
-               
-                UpdateGui(Items);
-                timer.Interval = 10000;
+                var Items = MyDataAccessLayer.getItems(ScadaClasses.Currentpage);
+
+                ScadaClasses.Refresh = true;
+                bcktimer.Interval = 10000;
+           
+        });
+    }
+
+    void uxUpdate(object sender, EventArgs e)
+    {
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            if (!Moving)
+            {
+                if (ScadaClasses.Refresh == true)
+                {
+                    ScadaClasses.Refresh = false;
+                    var Items = MyDataAccessLayer.getItems(ScadaClasses.Currentpage);
+                    UpdateGui(Items);
+                   
+                }
             }
         });
     }
@@ -342,21 +364,9 @@ public partial class MainPage : ContentPage
             switch (args.ActionType)
             {
                 case SKTouchAction.Released:
-                    /*
-                    ScadaControlTelegram oTelegram = new ScadaControlTelegram()
-                    {
-                        MessageType = 22,
-                        Page = ScadaClasses.Currentpage,
-                        ItemType = 3,
-                        ItemID = 1,
-                        TagID = 1,
-                        TagName = "",
-                        Action = " ",
-                    };
-                    */
                     ScadaClasses.Previouspage = -1;
                     ScadaClasses.CurrentScadaPopup = -1;
-                    Update(this, null);
+                    ScadaClasses.Refresh = true;
                     break;
 
                 case SKTouchAction.Pressed:
@@ -406,7 +416,7 @@ public partial class MainPage : ContentPage
                 case SKTouchAction.Pressed:
                     ScadaClasses.Previouspage = -1;
                     ScadaClasses.CurrentScadaPopup = -1;
-                    Update(this, null);
+                    ScadaClasses.Refresh = true;
                     break;
 
                 case SKTouchAction.Released:
@@ -526,7 +536,7 @@ public partial class MainPage : ContentPage
                      */
                     ScadaClasses.Previouspage = -1;
                     ScadaClasses.CurrentScadaPopup = -1;
-                    Update(this, null);
+                    ScadaClasses.Refresh = true;
                     break;
 
                 case SKTouchAction.Pressed:
@@ -579,7 +589,7 @@ public partial class MainPage : ContentPage
                     string sBase64 = Base64Encode(edtSvgEditor.Text);
                     MyDataAccessLayer.DeleteLibItem(edtSvgName.Text);
                     MyDataAccessLayer.SaveLibItem(edtSvgName.Text, 1, sBase64);
-                    Update(this, null);
+                    ScadaClasses.Refresh = true;
                     break;
 
                 case SKTouchAction.Released:
@@ -665,7 +675,7 @@ public partial class MainPage : ContentPage
                 case SKTouchAction.Pressed:
                     ScadaClasses.Previouspage = -1;
                     MyDataAccessLayer.UpdateTagName(ScadaClasses.CurrentTag, edtInputText.Text);
-                    Update(this, null);
+                    ScadaClasses.Refresh = true;
                     break;
 
                 case SKTouchAction.Released:
@@ -802,7 +812,7 @@ public partial class MainPage : ContentPage
                         tgDesign.PV.Value = 0;
                     }
                     ScadaClasses.Previouspage = -1;
-                    Update(this, null);
+                    ScadaClasses.Refresh = true;
                     break;
             }
             args.Handled = true;
@@ -930,7 +940,7 @@ public partial class MainPage : ContentPage
                     };*/
                     ScadaClasses.Previouspage = -1;
                     ScadaClasses.CurrentScadaPopup = -1;
-                    Update(this, null);
+                    ScadaClasses.Refresh = true;
                     break;
 
                 case SKTouchAction.Pressed:
@@ -1007,7 +1017,7 @@ public partial class MainPage : ContentPage
                     ScadaClasses.Previouspage = -1;
                     ScadaClasses.CurrentScadaPopup = ScadaClasses.uxPagesMenu;
                     //addPage
-                    Update(this, null);
+                    ScadaClasses.Refresh = true;
                     break;
 
                 case SKTouchAction.Pressed:
@@ -1082,7 +1092,7 @@ public partial class MainPage : ContentPage
                     };*/
                     ScadaClasses.Previouspage = -1;
                     ScadaClasses.CurrentScadaPopup = ScadaClasses.uxUploadMenu;
-                    Update(this, null);
+                    ScadaClasses.Refresh = true;
                     break;
 
                 case SKTouchAction.Pressed:
@@ -1159,7 +1169,7 @@ public partial class MainPage : ContentPage
                     };*/
                     ScadaClasses.Previouspage = -1;
                     ScadaClasses.CurrentScadaPopup = ScadaClasses.uxTagsGrid;
-                    Update(this, null);
+                    ScadaClasses.Refresh = true;
                     break;
 
                 case SKTouchAction.Pressed:
@@ -1319,7 +1329,7 @@ public partial class MainPage : ContentPage
                     */
                     ScadaClasses.Previouspage = -1;
                     ScadaClasses.CurrentScadaPopup = ScadaClasses.uxTagsGrid;
-                    Update(this, null);
+                    ScadaClasses.Refresh = true;
                     break;
 
                 case SKTouchAction.Pressed:
@@ -1433,7 +1443,7 @@ public partial class MainPage : ContentPage
                         Action = " "
                     };
                     MyDataAccessLayer.confirmAlarm(oTelegram);
-                    Update(this, null);
+                    ScadaClasses.Refresh = true;
 
                     //SendMessage(JsonSerializer.Serialize(oTelegram));
                     break;
@@ -1493,7 +1503,7 @@ public partial class MainPage : ContentPage
                     MyDataAccessLayer.confirmAlarm(oTelegram);
                     MyDataAccessLayer.deleteAlarm(oTelegram);
                     //SendMessage(JsonSerializer.Serialize(oTelegram));
-                    Update(this, null);
+                    ScadaClasses.Refresh = true;
                     break;
 
 
@@ -1544,7 +1554,7 @@ public partial class MainPage : ContentPage
                     };*/
                     ScadaClasses.Previouspage = -1;
                     ScadaClasses.CurrentScadaPopup = -1;
-                    Update(this, null);
+                    ScadaClasses.Refresh = true;
                     break;
 
                 case SKTouchAction.Pressed:
@@ -1695,8 +1705,6 @@ public partial class MainPage : ContentPage
 
 
 
-
-
     public SKCanvasView AttachDesignEvents(SKCanvasView sn, ScadaClasses.Telegram ScadaItem)
     {
         sn.Touch += (sender, args) =>
@@ -1743,7 +1751,7 @@ public partial class MainPage : ContentPage
                     MyDataAccessLayer.moveItem(oTelegram);
 
                     ScadaClasses.Previouspage = -1;
-                    Update(this, null);
+                    ScadaClasses.Refresh = true;
                     break;
 
                 case SKTouchAction.Moved:
@@ -1825,7 +1833,7 @@ public partial class MainPage : ContentPage
                                 case SKTouchAction.Pressed:
                                     ScadaClasses.CurrentScadaPopup = -1;
                                     ScadaClasses.Previouspage = -1;
-                                    Update(this, null);
+                                    ScadaClasses.Refresh = true;
                                     break;
 
                                 case SKTouchAction.Moved:
@@ -1887,7 +1895,7 @@ public partial class MainPage : ContentPage
                     ScadaClasses.CurrentTag = MyDataAccessLayer.AddTag(newTag);
                     ScadaClasses.CurrentScadaPopup = ScadaClasses.uxTagSettings;
                     ScadaClasses.Previouspage = -1;
-                    Update(this, null);
+                    ScadaClasses.Refresh = true;
                     break;
 
                 case SKTouchAction.Moved:
@@ -1939,7 +1947,7 @@ public partial class MainPage : ContentPage
                     MyDataAccessLayer.DeleteTagFromUxItem(ItemID, TagID);
                     ScadaClasses.CurrentScadaPopup = -1;
                     ScadaClasses.Previouspage = -1;
-                    Update(this, null);
+                    ScadaClasses.Refresh = true;
                     break;
 
                 case SKTouchAction.Moved:
@@ -1990,7 +1998,7 @@ public partial class MainPage : ContentPage
                     //CurrentScadaPopup = -1;
                     ScadaClasses.Previouspage = -1;
                     iMenuOffsetRows = iMenuOffsetRows + 5;
-                    Update(this, null);
+                    ScadaClasses.Refresh = true;
                     break;
 
                 case SKTouchAction.Moved:
@@ -2041,7 +2049,7 @@ public partial class MainPage : ContentPage
                     //CurrentScadaPopup = -1;
                     ScadaClasses.Previouspage = -1;
                     iMenuOffsetRows = iMenuOffsetRows - 5;
-                    Update(this, null);
+                    ScadaClasses.Refresh = true;
                     break;
 
                 case SKTouchAction.Moved:
@@ -2063,7 +2071,7 @@ public partial class MainPage : ContentPage
     }
 
 
-    private void UpdateGui(List<ScadaClasses.Telegram> ScadaItems)
+    public void UpdateGui(List<ScadaClasses.Telegram> ScadaItems)
     {
         double x = 0, y = 0, w = 0, h = 0;   
         double wScale = Width / 100;
@@ -2102,8 +2110,6 @@ public partial class MainPage : ContentPage
             ScadaColor.uxLightColor = RGBStringToColor("rgba(200,200,200,100)");
 
 
-
-
             SKCanvasPopupViews.Clear();
             SKCanvasViews.Clear();
             //ContentViews.Clear();
@@ -2139,10 +2145,7 @@ public partial class MainPage : ContentPage
                     case ScadaClasses.uxPanel:
                         ScadaButton SKPanel = new ScadaButton();
                         SKPanel.Init(wScale, hScale, SKPanel, ScadaItem, ScadaColor);
-                        SKPanel.IndicatorType = 1;
-                        SKPanel.GradientStartColor = ScadaColor.uxPanelColor;
-                        SKPanel.GradientEndColor = ScadaColor.uxPanelColor;
-                        SKPanel.EnableTouchEvents = false;
+                     
                         if (Designing == true)
                         {
                             SKPanel = (ScadaButton)AttachDesignEvents(SKPanel, ScadaItem);
@@ -2152,120 +2155,54 @@ public partial class MainPage : ContentPage
                         AbsoluteLayout.SetLayoutBounds(SKPanel, new Rect(wScale * ScadaItem.Left, hScale * ScadaItem.Top, wScale * ScadaItem.Width, hScale * ScadaItem.Height));
                         AbsoluteLayout.SetLayoutFlags(SKPanel, AbsoluteLayoutFlags.None);
                         SKCanvasViews.Add(SKPanel);
-
-
-
-
-                        /*
-
-                        gp = CreateScadaButton(gp, ScadaItem);
-                        gp.ItemID = ScadaItem.ItemID;
-                        gp.StyleId = ScadaItem.ItemID.ToString();
-                        gp.AnchorX = 0;
-                        gp.AnchorY = 0;
-                        gp.CornerRadius = 10;
-                        gp.BarBackgroundColor = uxPanelColor;
-                        gp.BackgroundColor = uxPanelColor.ToMauiColor();
-                        gp.GradientStartColor = uxPanelColor;
-                        gp.GradientEndColor = uxPanelColor;
-                        gp.IndicatorColor = uxPanelColor;
-                        gp.IndicatorType = 1;
-                        gp.WidthRequest = (Width / 100) * ScadaItem.Width; 
-                        gp.HeightRequest = (Height / 100) * ScadaItem.Height;
-                        gp.AlternativeTextColor = uxPanelColor;
-                        gp.TextColor = uxTextColor;
-                       
-                        gp.IsEnabled = true;
-                        gp.IsVisible = true;
-
-                        if (Designing == true)
-                        {
-                            gp.EnableTouchEvents = true;
-                            gp.InputTransparent = false;
-                            gp = (ScadaButton)AttachDesignEvents(gp, ScadaItem);
-                        }
-
-                    
-                        AbsoluteLayout.SetLayoutBounds(gp, new Rect(
-                                (Width / 100) * ScadaItem.Left,
-                                (Height / 100) * ScadaItem.Top,
-                                (Width / 100) * ScadaItem.Width,
-                                (Height / 100) * ScadaItem.Height));
-                        AbsoluteLayout.SetLayoutFlags(gp, AbsoluteLayoutFlags.None);
-
-                        SKCanvasViews.Add(gp);
-                        */
                         break;
-
 
                     case ScadaClasses.uxNumeric:
                         var SKNumeric = new ScadaNumeric();
-                        SKNumeric.Init(Width, Height, SKNumeric, ScadaItem, ScadaColor);
-   
+                        SKNumeric.Init(wScale, hScale, SKNumeric, ScadaItem, ScadaColor);
                         if (Designing == true)
                         {
                             SKNumeric = (ScadaNumeric)AttachDesignEvents(SKNumeric, ScadaItem);
                         }
-
-                        AbsoluteLayout.SetLayoutBounds(SKNumeric, new Rect(
-                                               (Width / 100) * ScadaItem.Left,
-                                               (Height / 100) * ScadaItem.Top,
-                                               (Width / 100) * ScadaItem.Width,
-                                               (Height / 100) * ScadaItem.Height));
+                        AbsoluteLayout.SetLayoutBounds(SKNumeric, new Rect(wScale * ScadaItem.Left,hScale * ScadaItem.Top,wScale * ScadaItem.Width,hScale * ScadaItem.Height));
                         AbsoluteLayout.SetLayoutFlags(SKNumeric, AbsoluteLayoutFlags.None);
                         SKCanvasViews.Add(SKNumeric);
                         break;
-
-                    case ScadaClasses.ux3D:
-                        var sd = new Scada3D();
-                        sd.AnchorX = 0;
-                        sd.AnchorY = 0;
-                        sd.ItemID = ScadaItem.ItemID;
-                        sd.StyleId = ScadaItem.ItemID.ToString();
-
-                        sd.CornerRadius = 10;
-                        sd.BarBackgroundColor = uxItemColor;
-                        sd.BackgroundColor = uxItemColor.ToMauiColor();
-                        sd.GradientStartColor = uxItemColor;
-                        sd.GradientEndColor = uxItemColor;
-                        sd.WidthRequest = (Width / 100) * ScadaItem.Width;
-                        sd.HeightRequest = (Height / 100) * ScadaItem.Height;
-                        sd.AlternativeTextColor = uxTextColor;
-                        sd.TextColor = uxTextColor;
-
-                        sd.PV = new ItemValue();
-                        var ItemValues3D = MyDataAccessLayer.ReadItemValues(sd.ItemID);
-                        int idx3D = 1;
-                        foreach (var item in ItemValues3D)
-                        {
-                            if (idx3D == 1)
-                            {
-                                sd.PV.TagID = item.TagID;
-                                sd.PV.Value = item.Value;
-                                sd.PV.Unit = item.Unit;
-                                sd.PV.StatusQuality = item.StatusQuality;
-                            }
-                        }
-                        sd.IsEnabled = true;
-                        sd.IsVisible = true;
-                        sd.EnableTouchEvents = true;
-                        sd.InputTransparent = false;
-                        sd.Start();
-
+                    case ScadaClasses.uxCircularProgress:
+                        var SKCircularGauge = new CircularGauge();
+                        SKCircularGauge.Init(wScale, hScale, SKCircularGauge, ScadaItem, ScadaColor);
                         if (Designing == true)
                         {
-                            sd = (Scada3D)AttachDesignEvents(sd, ScadaItem);
+                            SKCircularGauge = (CircularGauge)AttachDesignEvents(SKCircularGauge, ScadaItem);
                         }
-
-                        AbsoluteLayout.SetLayoutBounds(sd, new Rect(
-                                               (Width / 100) * ScadaItem.Left,
-                                               (Height / 100) * ScadaItem.Top,
-                                               (Width / 100) * ScadaItem.Width,
-                                               (Height / 100) * ScadaItem.Height));
-                        AbsoluteLayout.SetLayoutFlags(sd, AbsoluteLayoutFlags.None);
-                        SKCanvasViews.Add(sd);
+                        AbsoluteLayout.SetLayoutBounds(SKCircularGauge, new Rect(wScale * ScadaItem.Left, hScale * ScadaItem.Top, wScale * ScadaItem.Width, hScale * ScadaItem.Height));
+                        AbsoluteLayout.SetLayoutFlags(SKCircularGauge, AbsoluteLayoutFlags.None);
+                        SKCanvasViews.Add(SKCircularGauge);
                         break;
 
+                    case ScadaClasses.uxBarGraph:
+                        var SKBarGraph = new ScadaBarGraph();
+                        SKBarGraph.Init(wScale, hScale, SKBarGraph, ScadaItem, ScadaColor);
+                        if (Designing == true)
+                        {
+                            SKBarGraph = (ScadaBarGraph)AttachDesignEvents(SKBarGraph, ScadaItem);
+                        }
+                        AbsoluteLayout.SetLayoutBounds(SKBarGraph, new Rect(wScale * ScadaItem.Left, hScale * ScadaItem.Top, wScale * ScadaItem.Width, hScale * ScadaItem.Height));
+                        AbsoluteLayout.SetLayoutFlags(SKBarGraph, AbsoluteLayoutFlags.None);
+                        SKCanvasViews.Add(SKBarGraph);
+                        break;
+
+                    case ScadaClasses.ux3D:
+                        var SK3D = new Scada3D();
+                        SK3D.Init(wScale, hScale, SK3D, ScadaItem, ScadaColor);             
+                        if (Designing == true)
+                        {
+                            SK3D = (Scada3D)AttachDesignEvents(SK3D, ScadaItem);
+                        }
+                        AbsoluteLayout.SetLayoutBounds(SK3D, new Rect(wScale * ScadaItem.Left, hScale * ScadaItem.Top, wScale * ScadaItem.Width, hScale * ScadaItem.Height));
+                        AbsoluteLayout.SetLayoutFlags(SK3D, AbsoluteLayoutFlags.None);                   
+                        SKCanvasViews.Add(SK3D);
+                        break;
 
                     case ScadaClasses.uxAlarmGrid:
                         var AlarmPanel = new ScadaButton();
@@ -2430,7 +2367,7 @@ public partial class MainPage : ContentPage
                         TagsPanel.BackgroundColor = uxPanelColor.ToMauiColor();
                         TagsPanel.GradientStartColor = uxItemBackGroundColor;
                         TagsPanel.GradientEndColor = uxItemBackGroundColor;
-                        TagsPanel.IndicatorColor = uxPanelColor; ;
+                        TagsPanel.IndicatorColor = uxPanelColor; 
                         TagsPanel.IndicatorType = 0;
                         TagsPanel.WidthRequest = (Width / 100) * ScadaItem.Width;
                         TagsPanel.HeightRequest = (Height / 100) * ScadaItem.Height;
@@ -2538,7 +2475,7 @@ public partial class MainPage : ContentPage
                                         ScadaClasses.Previouspage = -1;
                                         ScadaClasses.CurrentScadaPopup = ScadaClasses.uxTagSettings;
                                         ScadaClasses.CurrentTag = myRowButton.ButtonRow.TagID;
-                                        Update(this, null);
+                                        ScadaClasses.Refresh = true;
                                         break;
 
                                     case SKTouchAction.Entered:
@@ -2697,7 +2634,7 @@ public partial class MainPage : ContentPage
                                         edtInputText.Text = TagParams[myRowButton.ButtonRow.Row].col2text;
                                         ScadaClasses.CurrentRow = myRowButton.ButtonRow.Row;
 
-                                        Update(this, null);
+                                        ScadaClasses.Refresh = true;
                                         break;
 
                                     case SKTouchAction.Entered:
@@ -2737,299 +2674,45 @@ public partial class MainPage : ContentPage
                         break;
 
                     case ScadaClasses.uxSvg:
-                        var svg = new ScadaButton();
-                        /*
-                        svg = CreateScadaButton(svg, ScadaItem);
-                        svg.IndicatorType = 3;
-                        svg.SvgBase64 = MyDataAccessLayer.LoadLibItem(ScadaItem.Action, 1);
-
-                        svg.ItemID = ScadaItem.ItemID;
-                        svg.StyleId = ScadaItem.ItemID.ToString();
-                        svg.ButtonText = ScadaItem.Text;
-                        svg.FontSize = 18.5F;
-                        svg.PV = new ItemValue();
-                        svg.SV = new ItemValue();
-
-                        var SvgValuesBtn = MyDataAccessLayer.ReadItemValues(svg.ItemID);
-                        int idxBtn = 0;
-                        foreach (var item in SvgValuesBtn)
-                        {
-                            if (idxBtn == 0)
-                            {
-                                svg.PV.TagID = item.TagID;
-                                svg.PV.Value = item.Value;
-                            }
-                            if (idxBtn == 1)
-                            {
-                                svg.SV.TagID = item.TagID;
-                                svg.SV.Value = item.Value;
-                            }
-                            idxBtn++;
-                        }
-
-                        svg.EnableTouchEvents = true;
-                        svg.InputTransparent = false;
-
+                        var SKSvg = new ScadaSvg();
+                        SKSvg.Init(wScale, hScale, SKSvg, ScadaItem, ScadaColor);
                         if (Designing == true)
                         {
-                            svg = (ScadaButton)AttachDesignEvents(svg, ScadaItem);
+                            SKSvg = (ScadaSvg)AttachDesignEvents(SKSvg, ScadaItem);
                         }
-                        else
-                        {
-                            svg.Touch += (sender, args) =>
-                            {
-                                switch (args.ActionType)
-                                {
-                                    case SKTouchAction.Released:
-                                        if (Designing == true)
-                                        {
-                                            svg = (ScadaButton)AttachDesignEvents(svg, ScadaItem);
-                                        }
-                                        break;
-                                    case SKTouchAction.Pressed:
-
-                                        break;
-
-                                    case SKTouchAction.Moved:
-                                        svg.GradientStartColor = uxTouchColor;
-                                        svg.GradientEndColor = uxTouchColor;
-
-                                        break;
-
-                                    case SKTouchAction.Exited:
-                                        svg.GradientStartColor = uxItemColor;
-                                        svg.GradientEndColor = uxItemColor;
-
-                                        break;
-                                }
-                                args.Handled = true;
-                            };
-                        }
-                        AbsoluteLayout.SetLayoutBounds(svg, new Rect(
-                                                                (Width / 100) * ScadaItem.Left,
-                                                                (Height / 100) * ScadaItem.Top,
-                                                                (Width / 100) * ScadaItem.Width,
-                                                                (Height / 100) * ScadaItem.Height));
-                        AbsoluteLayout.SetLayoutFlags(svg, AbsoluteLayoutFlags.None);
-                        SKCanvasViews.Add(svg);
-                        */
+                        AbsoluteLayout.SetLayoutBounds(SKSvg, new Rect(wScale * ScadaItem.Left, hScale * ScadaItem.Top, wScale * ScadaItem.Width, hScale * ScadaItem.Height));
+                        AbsoluteLayout.SetLayoutFlags(SKSvg, AbsoluteLayoutFlags.None);
+                        SKCanvasViews.Add(SKSvg);                    
                         break;
 
-                    case ScadaClasses.uxButton:
-                       
+                    case ScadaClasses.uxText:
+                        var SKText = new ScadaText();
+                        SKText.Init(wScale, hScale, SKText, ScadaItem, ScadaColor);
+                        if (Designing == true)
+                        {
+                            SKText = (ScadaText)AttachDesignEvents(SKText, ScadaItem);
+                        }
+                        AbsoluteLayout.SetLayoutBounds(SKText, new Rect(wScale * ScadaItem.Left, hScale * ScadaItem.Top, wScale * ScadaItem.Width, hScale * ScadaItem.Height));
+                        AbsoluteLayout.SetLayoutFlags(SKText, AbsoluteLayoutFlags.None);
+                        SKCanvasViews.Add(SKText);
+                        break;
+
+                    case ScadaClasses.uxButton:                      
                         var SKButton = new ScadaButton();
                         SKButton.Init(wScale, hScale, SKButton, ScadaItem, ScadaColor);
                         if (Designing == true)
                         {
                             SKButton = (ScadaButton)AttachDesignEvents(SKButton, ScadaItem);
                         }
-
-                        AbsoluteLayout.SetLayoutBounds(SKButton, new Rect(
-                                               (Width / 100) * ScadaItem.Left,
-                                               (Height / 100) * ScadaItem.Top,
-                                               (Width / 100) * ScadaItem.Width,
-                                               (Height / 100) * ScadaItem.Height));
+                        AbsoluteLayout.SetLayoutBounds(SKButton, new Rect(wScale * ScadaItem.Left, hScale * ScadaItem.Top, wScale * ScadaItem.Width, hScale * ScadaItem.Height));
                         AbsoluteLayout.SetLayoutFlags(SKButton, AbsoluteLayoutFlags.None);
                         SKCanvasViews.Add(SKButton);
-
-
-                        //gpb = CreateScadaButton(gpb, ScadaItem);
-                        /*
-                        if (ScadaItem.ItemType == ScadaClasses.uxSvg)
-                        {
-                            gpb.SvgBase64 = MyDataAccessLayer.LoadLibItem(ScadaItem.Action, 1);
-                            gpb.IndicatorType = 3;
-                        }
-
-                        gpb.ItemID = ScadaItem.ItemID;
-                        gpb.StyleId = ScadaItem.ItemID.ToString();
-                        gpb.ButtonText = ScadaItem.Text;
-                        gpb.FontSize = 18.5F;
-                        gpb.PV = new ItemValue();
-                        gpb.SV = new ItemValue();
-
-                        var ItemValuesBtn = MyDataAccessLayer.ReadItemValues(gpb.ItemID);
-                        int idxSvg = 0;
-                        foreach (var item in ItemValuesBtn)
-                        {
-                            if (idxSvg == 0)
-                            {
-                                gpb.PV.TagID = item.TagID;
-                                gpb.PV.Value = item.Value;
-                            }
-                            if (idxSvg == 1)
-                            {
-                                gpb.SV.TagID = item.TagID;
-                                gpb.SV.Value = item.Value;
-                            }
-                            idxSvg++;
-                        }
-
-                        gpb.EnableTouchEvents = true;
-                        gpb.InputTransparent = false;
-
-                        if (Designing == true)
-                        {
-                            gpb = (ScadaButton)AttachDesignEvents(gpb, ScadaItem);
-                        }
-                        else
-                        {
-                            gpb.Touch += (sender, args) =>
-                            {
-                                switch (args.ActionType)
-                                {
-                                    case SKTouchAction.Released:
-
-                                        if (Designing == true)
-                                        {
-                                            gpb = (ScadaButton)AttachDesignEvents(gpb, ScadaItem);
-                                        }
-                                        else if (ScadaItem.Action == "TOGGLE")
-                                        {
-                                            float SV = 0;
-                                            if (gpb.PV.Value > 0.5)
-                                            {
-                                                SV = 0;
-                                            }
-                                            else
-                                            {
-                                                SV = 1;
-                                            }
-                                            
-                                            ScadaClasses.Telegram oTelegram = new ScadaClasses.Telegram()
-                                            {
-                                                MessageType = ScadaClasses.CmdupdateSV,
-                                                Page = ScadaClasses.Currentpage,
-                                                ItemType = ScadaItem.ItemType,
-                                                ItemID = ScadaItem.ItemID,
-                                                TagID = ScadaItem.TagID,
-                                                SV = SV.ToString(),
-                                                TagName = ScadaItem.TagName,
-                                                Action = ScadaItem.Action,
-                                            };
-                                            
-                                            MyDataAccessLayer.UpdateTagValue(gpb.SV.TagID, SV);
-                                            MyDataAccessLayer.StoreTagValue(gpb.SV.TagID, SV);
-                                            Update(this, null);
-                                        }
-                                        else if (ScadaItem.Action == "ON")
-                                        {
-                                            ScadaClasses.Telegram oTelegram = new ScadaClasses.Telegram()
-                                            {
-                                                MessageType = ScadaClasses.CmdupdateSV,
-                                                SV = "1",
-                                                ItemType = ScadaItem.ItemType,
-                                                ItemID = ScadaItem.ItemID,
-                                                TagID = ScadaItem.TagID,
-                                                Page = ScadaClasses.Currentpage,
-                                                Action = "SETPV"
-                                            };
-                                       
-                                        }
-                                        else if (ScadaItem.Action == "OFF")
-                                        {
-                                            ScadaClasses.Telegram oTelegram = new ScadaClasses.Telegram()
-                                            {
-                                                MessageType = ScadaClasses.CmdupdateSV,
-                                                SV = "0",
-                                                ItemType = ScadaItem.ItemType,
-                                                ItemID = ScadaItem.ItemID,
-                                                TagID = ScadaItem.TagID,
-                                                Page = ScadaClasses.Currentpage,
-                                                Action = "SETPV"
-                                            };
-                                        
-                                        }
-                                        else if (ScadaItem.Action == "COPYITEM")
-                                        {
-                                            ScadaClasses.Telegram oTelegram = new ScadaClasses.Telegram()
-                                            {
-                                                MessageType = 22,
-                                                Page = ScadaClasses.Currentpage,
-                                                ItemType = ScadaItem.ItemType,
-                                                ItemID = -1,
-                                                TagID = 1,
-                                                TagName = "Tag name",
-                                                Action = " ",
-                                            };
-                                            var NewItemID = MyDataAccessLayer.copyItem(oTelegram);
-                                            oTelegram.ItemID = NewItemID;
-                                            MyDataAccessLayer.AddItemDefaultTags(oTelegram);
-                                
-                                            Update(this, null);
-                                        }
-                                        else if (ScadaItem.Action == "DELETEITEM")
-                                        {
-                                            ScadaClasses.ScadaControlTelegram oTelegram = new ScadaClasses.ScadaControlTelegram()
-                                            {
-                                                MessageType = 23,
-                                                Page = ScadaClasses.Currentpage,
-                                                ItemType = 1,
-                                                ItemID = ScadaItem.ItemID,
-                                                TagID = 1,
-                                                TagName = " ",
-                                                Action = " ",
-                                            };
-                                            MyDataAccessLayer.deleteItem(ScadaItem.ItemID);
-                                            Update(this, null);
-                                      
-                                        }
-                                        else if (ScadaItem.Action == "POPUPLOGIN")
-                                        {
-                                            ScadaLogin(1);
-                                            foreach (SKCanvasView viewItem in SKCanvasPopupViews)
-                                            {
-                                                absoluteLayout.Add(viewItem);
-                                            }
-                                            Content = absoluteLayout;
-                                        }
-                                        else
-                                        {
-                                 
-
-                                            ScadaClasses.Currentpage = ScadaItem.Nextpage;
-                                            Update(this, null);
-
-                                    
-                                        }
-            
-                                        break;
-
-                                    case SKTouchAction.Pressed:
-
-                                        break;
-
-                                    case SKTouchAction.Moved:
-                                        gpb.GradientStartColor = uxTouchColor;
-                                        gpb.GradientEndColor = uxTouchColor;
-
-                                        break;
-
-                                    case SKTouchAction.Exited:
-                                        gpb.GradientStartColor = uxItemColor;
-                                        gpb.GradientEndColor = uxItemColor;
-
-                                        break;
-                                }
-                                args.Handled = true;
-                            };
-                        }
-                        AbsoluteLayout.SetLayoutBounds(gpb, new Rect(
-                                                                (Width / 100) * ScadaItem.Left,
-                                                                (Height / 100) * ScadaItem.Top,
-                                                                (Width / 100) * ScadaItem.Width,
-                                                                (Height / 100) * ScadaItem.Height));
-                        AbsoluteLayout.SetLayoutFlags(gpb, AbsoluteLayoutFlags.None);
-                        SKCanvasViews.Add(gpb);
-                        */
-                        break;
-
+                     break;
 
                     case ScadaClasses.uxHistoryChart:
                         var trh = new HistGraph();
                         trh.ItemID = ScadaItem.ItemID;
-                        trh.StyleId = ScadaItem.ItemID.ToString();
-                        //trh.Values = ScadaItem.Values;
+                        trh.StyleId = ScadaItem.ItemID.ToString();                    
                         trh.ListOfValues = ScadaItem.ListOfValues;
                         trh.AnchorX = 0;
                         trh.AnchorY = 0;
@@ -3115,7 +2798,7 @@ public partial class MainPage : ContentPage
                                     ScadaClasses.CurrentScadaPopup = ScadaClasses.uxTimeSpanMenu;
                                     ScadaClasses.Previouspage = -1;
                                     ScadaClasses.CurrentType = ScadaClasses.uxHistoryChart;
-                                    Update(this, null);
+                                    ScadaClasses.Refresh = true;
                                     break;
 
                                 case SKTouchAction.Moved:
@@ -3174,7 +2857,7 @@ public partial class MainPage : ContentPage
                             {
                                 case SKTouchAction.Pressed:
                                     ChartSetTimeScaleStep(ScadaItem.ItemID, 1);
-                                    Update(this, null);
+                                    ScadaClasses.Refresh = true;
                                     break;
 
                                 case SKTouchAction.Moved:
@@ -3231,7 +2914,7 @@ public partial class MainPage : ContentPage
                             {
                                 case SKTouchAction.Pressed:
                                     ChartSetTimeScaleStep(ScadaItem.ItemID, -1);
-                                    Update(this, null);
+                                    ScadaClasses.Refresh = true;
                                     break;
 
                                 case SKTouchAction.Moved:
@@ -3251,7 +2934,7 @@ public partial class MainPage : ContentPage
 
                         int btnRow = 1;
                         float btnY = 40F;
-                        //CurrentTag = 0;
+                      
                         var GraphItems = MyDataAccessLayer.GetItemTags(ScadaItem.ItemID);
                         foreach (var myGraph in GraphItems)
                         {
@@ -3300,7 +2983,7 @@ public partial class MainPage : ContentPage
                                         ScadaClasses.CurrentScadaPopup = ScadaClasses.uxTagsMenu;
                                         ScadaClasses.Previouspage = -1;
                                         ScadaClasses.CurrentType = ScadaClasses.uxHistoryChart;
-                                        Update(this, null);
+                                        ScadaClasses.Refresh = true;
 
                                         break;
 
@@ -3368,7 +3051,7 @@ public partial class MainPage : ContentPage
                                     ScadaClasses.CurrentScadaPopup = ScadaClasses.uxTagsMenu;
                                     ScadaClasses.Previouspage = -1;
                                     ScadaClasses.CurrentType = ScadaClasses.uxHistoryChart;
-                                    Update(this, null);
+                                    ScadaClasses.Refresh = true;
 
                                     break;
 
@@ -3389,95 +3072,75 @@ public partial class MainPage : ContentPage
                         break;
 
                     case ScadaClasses.uxToggle:
-                        var tg = new Toggle();
-                        tg.ItemID = ScadaItem.ItemID;
-                        tg.StyleId = ScadaItem.ItemID.ToString();
-                        tg.AnchorX = 0;
-                        tg.AnchorY = 0;
-                        tg.CornerRadius = 1;
-                        tg.BarBackgroundColor = uxItemColor;
-                        tg.BackgroundColor = uxItemColor.ToMauiColor();
-                        tg.GradientStartColor = uxItemColor;
-                        tg.GradientEndColor = uxItemColor;
-                        tg.WidthRequest = (Width / 100) * ScadaItem.Width;
-                        tg.HeightRequest = (Height / 100) * ScadaItem.Height;
+                        var SKToggle = new Toggle();
+                        SKToggle.ItemID = ScadaItem.ItemID;
+                        SKToggle.StyleId = ScadaItem.ItemID.ToString();
+                        SKToggle.AnchorX = 0;
+                        SKToggle.AnchorY = 0;
+                        SKToggle.CornerRadius = 1;
+                        SKToggle.BarBackgroundColor = uxItemColor;
+                        SKToggle.BackgroundColor = uxItemColor.ToMauiColor();
+                        SKToggle.GradientStartColor = uxItemColor;
+                        SKToggle.GradientEndColor = uxItemColor;
+                        SKToggle.WidthRequest = (Width / 100) * ScadaItem.Width;
+                        SKToggle.HeightRequest = (Height / 100) * ScadaItem.Height;
 
-                        tg.PV = new ItemValue();
-                        tg.SV = new ItemValue();
+                        SKToggle.PV = new ItemValue();
+                        SKToggle.SV = new ItemValue();
 
-                        var ItemValuesToggle = MyDataAccessLayer.ReadItemValues(tg.ItemID);
+                        var ItemValuesToggle = MyDataAccessLayer.ReadItemValues(SKToggle.ItemID);
                         int idxToggle = 0;
                         foreach (var item in ItemValuesToggle)
                         {
                             if (idxToggle == 0)
                             {
-                                tg.PV.TagID = item.TagID;
-                                tg.PV.Value = item.Value;
+                                SKToggle.PV.TagID = item.TagID;
+                                SKToggle.PV.Value = item.Value;
                             }
                             if (idxToggle == 1)
                             {
-                                tg.SV.TagID = item.TagID;
-                                tg.SV.Value = item.Value;
+                                SKToggle.SV.TagID = item.TagID;
+                                SKToggle.SV.Value = item.Value;
                             }
                             idxToggle++;
                         }
-                        tg.IsEnabled = true;
-                        tg.IsVisible = true;
-                        tg.EnableTouchEvents = true;
-                        tg.InputTransparent = false;
-                        tg.TextColor = uxTextColor;
-
-                        AbsoluteLayout.SetLayoutBounds(tg, new Rect(
-                            (Width / 100) * ScadaItem.Left,
-                            (Height / 100) *ScadaItem.Top,
-                            (Width / 100) * ScadaItem.Width,
-                            (Height / 100) * ScadaItem.Height));
-                        AbsoluteLayout.SetLayoutFlags(tg, AbsoluteLayoutFlags.None);
+                        SKToggle.IsEnabled = true;
+                        SKToggle.IsVisible = true;
+                        SKToggle.EnableTouchEvents = true;
+                        SKToggle.InputTransparent = false;
+                        SKToggle.TextColor = uxTextColor;
 
                         if (Designing == true)
                         {
-                            tg = (Toggle)AttachDesignEvents(tg, ScadaItem);
+                            SKToggle = (Toggle)AttachDesignEvents(SKToggle, ScadaItem);
                         }
                         else
                         {
-                            tg.Touch += (sender, args) =>
+                            SKToggle.Touch += (sender, args) =>
                             {
                                 switch (args.ActionType)
                                 {
                                     case SKTouchAction.Pressed:
                                         float SV = 0;
-                                        if (tg.SV.Value > 0.5)
+                                        if (SKToggle.SV.Value > 0.5)
                                         {
                                             SV = 0;
                                         }
                                         else
                                         {
                                             SV = 1;
-                                        }
-                                        /*
-                                        ScadaClasses.Telegram oTelegram = new ScadaClasses.Telegram()
-                                        {
-                                            MessageType = ScadaClasses.CmdupdateSV,
-                                            Page = ScadaClasses.Currentpage,
-                                            ItemType = ScadaItem.ItemType,
-                                            ItemID = ScadaItem.ItemID,
-                                            TagID = ScadaItem.TagID,
-                                            SV = SV.ToString(),
-                                            TagName = ScadaItem.TagName,
-                                            Action = ScadaItem.Action,
-                                        };
-                                        */
-                                        MyDataAccessLayer.UpdateTagValue(tg.SV.TagID, SV);
-                                        //MyDataAccessLayer.updateAdamSVTags();
-                                        MyDataAccessLayer.StoreTagValue(tg.SV.TagID, SV);
-
-                                        Update(this, null);
+                                        }                                 
+                                        MyDataAccessLayer.UpdateTagValue(SKToggle.SV.TagID, SV);                                  
+                                        MyDataAccessLayer.StoreTagValue(SKToggle.SV.TagID, SV);
+                                        ScadaClasses.Refresh = true;
                                         break;
                                 }
                                 args.Handled = true;
                             };
                         }
-                        SKCanvasViews.Add(tg);
+                        AbsoluteLayout.SetLayoutBounds(SKToggle, new Rect(wScale * ScadaItem.Left, hScale * ScadaItem.Top, wScale * ScadaItem.Width, hScale * ScadaItem.Height));
+                        AbsoluteLayout.SetLayoutFlags(SKToggle, AbsoluteLayoutFlags.None);
+                        SKCanvasViews.Add(SKToggle);
                         break;
 
 
@@ -3492,8 +3155,8 @@ public partial class MainPage : ContentPage
                         pr.BackgroundColor = uxItemColor.ToMauiColor();
                         pr.GradientStartColor = uxItemColor;
                         pr.GradientEndColor = uxItemColor;
-                        pr.WidthRequest = (Width / 100) * ScadaItem.Width;
-                        pr.HeightRequest = (Height / 100) * ScadaItem.Height;
+                        pr.WidthRequest = wScale * ScadaItem.Width;
+                        pr.HeightRequest = hScale * ScadaItem.Height;
                         pr.PV = new ItemValue();
                         pr.SV = new ItemValue();
                         var ItemValuesPr = MyDataAccessLayer.ReadItemValues(pr.ItemID);
@@ -3521,19 +3184,11 @@ public partial class MainPage : ContentPage
                         if (Designing == true)
                         {
                             pr = (ScadaProgress)AttachDesignEvents(pr, ScadaItem);
-                        }
-                        AbsoluteLayout.SetLayoutBounds(pr, new Rect(
-                            (Width / 100) * ScadaItem.Left,
-                            (Height / 100) * ScadaItem.Top,
-                            (Width / 100) * ScadaItem.Width,
-                            (Height / 100) * ScadaItem.Height));
+                        }               
+                        AbsoluteLayout.SetLayoutBounds(pr, new Rect(wScale * ScadaItem.Left, hScale * ScadaItem.Top, wScale * ScadaItem.Width, hScale * ScadaItem.Height));
                         AbsoluteLayout.SetLayoutFlags(pr, AbsoluteLayoutFlags.None);
                         SKCanvasViews.Add(pr);
                         break;
-
-
-
-
 
 
                     case ScadaClasses.uxSimulator:
@@ -3580,50 +3235,11 @@ public partial class MainPage : ContentPage
                         {
                             sim = (Simulator)AttachDesignEvents(sim, ScadaItem);
                         }
-                        AbsoluteLayout.SetLayoutBounds(sim, new Rect(
-                            (Width / 100) * ScadaItem.Left,
-                            (Height / 100) * ScadaItem.Top,
-                            (Width / 100) * ScadaItem.Width,
-                            (Height / 100) * ScadaItem.Height ));
+                        AbsoluteLayout.SetLayoutBounds(sim, new Rect(wScale * ScadaItem.Left, hScale * ScadaItem.Top, wScale * ScadaItem.Width, hScale * ScadaItem.Height));
                         AbsoluteLayout.SetLayoutFlags(sim, AbsoluteLayoutFlags.None);
                         SKCanvasViews.Add(sim);
-
                         break;
-                    /*
-                    case uxSvgOntop:
-                        var ss = new ScadaSvg();
-                        ss.ItemID = ScadaItem.ItemID;
-                        ss.StyleId = ScadaItem.ItemID.ToString();
-                        ss.AnchorX = 0;
-                        ss.AnchorY = 0;
-                        ss.CornerRadius = 1;
-                        ss.BarBackgroundColor = uxBackGroundColor;
-                        ss.BackgroundColor = uxBackGroundColor.ToMauiColor();
-                        ss.GradientStartColor = uxBackGroundColor;
-                        ss.GradientEndColor = uxBackGroundColor;
-                        ss.WidthRequest = (Width / 100) * double.Parse(ScadaItem.Width, CultureInfo.InvariantCulture);
-                        ss.HeightRequest = (Height / 100) * double.Parse(ScadaItem.Height, CultureInfo.InvariantCulture);
-
-                        ss.IsEnabled = true;
-                        ss.IsVisible = true;
-                        ss.EnableTouchEvents = false;
-                        ss.InputTransparent = true;
-                        foreach (ScadaClasses.LibItem Item in ScadaClasses.LibItems)
-                        {
-                            if (Item.sNameInLib == ScadaItem.Action)
-                            {
-                                ss.SvgBase64 = Item.sBase64;
-                            }
-                        }
-                        AbsoluteLayout.SetLayoutBounds(ss, new Rect(
-                            (Width / 100) * double.Parse(ScadaItem.Left, CultureInfo.InvariantCulture),
-                            (Height / 100) * double.Parse(ScadaItem.Top, CultureInfo.InvariantCulture),
-                            (Width / 100) * double.Parse(ScadaItem.Width, CultureInfo.InvariantCulture),
-                            (Height / 100) * double.Parse(ScadaItem.Height, CultureInfo.InvariantCulture)));
-                        AbsoluteLayout.SetLayoutFlags(ss, AbsoluteLayoutFlags.None);
-                        SKCanvasViews.Add(ss);
-                        break;
-                   */
+                   
                     case ScadaClasses.uxLoginMenu:
                         ScadaLogin(0);
                         break;
@@ -3633,7 +3249,6 @@ public partial class MainPage : ContentPage
                         break;
 
                     case ScadaClasses.uxSvgPopupMenu:
-
                         break;
 
                     case ScadaClasses.uxUploadMenu:
@@ -3652,7 +3267,6 @@ public partial class MainPage : ContentPage
                         FloatPanel.GradientStartColor = uxPopupColor;
                         FloatPanel.GradientEndColor = uxPopupColor;
                         FloatPanel.IndicatorColor = uxPopupColor; ;
-
                         FloatPanel.WidthRequest = (Width / 100) * ScadaItem.Width;
                         FloatPanel.HeightRequest = (Height / 100) * ScadaItem.Height;
                         FloatPanel.AlternativeTextColor = uxTextColor;
@@ -3697,22 +3311,11 @@ public partial class MainPage : ContentPage
                             var pt = args.Location;
                             switch (args.ActionType)
                             {
-                                case SKTouchAction.Pressed:
-                                   /* ScadaControlTelegram oTelegram = new ScadaControlTelegram()
-                                    {
-                                        MessageType = ScadaItem.MessageType,
-                                        Page = ScadaClasses.Currentpage,
-                                        ItemType = CurrentType,
-                                        ItemID = CurrentItem,
-                                        TagID = ScadaItem.TagID,
-                                        TagName = ScadaItem.TagName,
-                                        Action = ScadaItem.Action,
-                                    };
-                                    */
-                                    MyDataAccessLayer.deleteItem(ScadaItem.ItemID);
+                                case SKTouchAction.Pressed:                  
+                                    MyDataAccessLayer.deleteItem(ScadaClasses.CurrentItem);
                                     ScadaClasses.CurrentScadaPopup = -1;
                                     ScadaClasses.Previouspage = -1;
-                                    Update(this, null);
+                                    ScadaClasses.Refresh = true;
                                     break;
 
                                 case SKTouchAction.Moved:
@@ -3772,7 +3375,7 @@ public partial class MainPage : ContentPage
                                     MyDataAccessLayer.AddItemDefaultTags(oTelegram);
                                     ScadaClasses.CurrentScadaPopup = -1;
                                     ScadaClasses.Previouspage = -1;
-                                    Update(this, null);
+                                    ScadaClasses.Refresh = true;
                                     break;
 
                                 case SKTouchAction.Moved:
@@ -3815,22 +3418,10 @@ public partial class MainPage : ContentPage
                             var pt = args.Location;
                             switch (args.ActionType)
                             {
-                                case SKTouchAction.Pressed:
-                                    /*ScadaControlTelegram oTelegram = new ScadaControlTelegram()
-                                    {
-                                        MessageType = ScadaItem.MessageType,
-                                        Page = Currentpage,
-                                        ItemType = ScadaItem.ItemType,
-                                        ItemID = ScadaItem.ItemID,
-                                        TagID = ScadaItem.TagID,
-                                        TagName = ScadaItem.TagName,
-                                        Action = ScadaItem.Action,
-                                    };*/
+                                case SKTouchAction.Pressed:                          
                                     ScadaClasses.CurrentScadaPopup = ScadaClasses.uxItemTagsMenu;
                                     ScadaClasses.Previouspage = -1;
-                                    Update(this, null);
-                                    //string jsonData = JsonSerializer.Serialize(oTelegram);
-                                    //SendMessage(jsonData);
+                                    ScadaClasses.Refresh = true;                             
                                     break;
 
                                 case SKTouchAction.Moved:
@@ -3876,23 +3467,10 @@ public partial class MainPage : ContentPage
                             var pt = args.Location;
                             switch (args.ActionType)
                             {
-                                case SKTouchAction.Pressed:
-                                    /*
-                                    ScadaControlTelegram oTelegram = new ScadaControlTelegram()
-                                    {
-                                        MessageType = ScadaItem.MessageType,
-                                        Page = Currentpage,
-                                        ItemType = ScadaItem.ItemType,
-                                        ItemID = ScadaItem.ItemID,
-                                        TagID = ScadaItem.TagID,
-                                        TagName = ScadaItem.TagName,
-                                        Action = ScadaItem.Action,
-                                    };*/
+                                case SKTouchAction.Pressed:                              
                                     ScadaClasses.CurrentScadaPopup = ScadaClasses.uxItemTypeMenu;
                                     ScadaClasses.Previouspage = -1;
-                                    Update(this, null);
-                                    //string jsonData = JsonSerializer.Serialize(oTelegram);
-                                    //SendMessage(jsonData);
+                                    ScadaClasses.Refresh = true;                       
                                     break;
 
                                 case SKTouchAction.Moved:
@@ -3923,7 +3501,6 @@ public partial class MainPage : ContentPage
                             Background = uxBackGroundColor.ToMauiColor(),
                             BarBackgroundColor = uxBackGroundColor,
                             IndicatorType = 3,
-
                             GradientStartColor = uxPopupItemColor,
                             GradientEndColor = uxPopupItemColor,
                             CornerRadius = 0,
@@ -3939,22 +3516,10 @@ public partial class MainPage : ContentPage
                             var pt = args.Location;
                             switch (args.ActionType)
                             {
-                                case SKTouchAction.Pressed:/*
-                                    ScadaControlTelegram oTelegram = new ScadaControlTelegram()
-                                    {
-                                        MessageType = ScadaItem.MessageType,
-                                        Page = Currentpage,
-                                        ItemType = ScadaItem.ItemType,
-                                        ItemID = ScadaItem.ItemID,
-                                        TagID = ScadaItem.TagID,
-                                        TagName = ScadaItem.TagName,
-                                        Action = ScadaItem.Action,
-                                    };*/
+                                case SKTouchAction.Pressed:                                 
                                     ScadaClasses.CurrentScadaPopup = ScadaClasses.uxItemSizeMenu;
                                     ScadaClasses.Previouspage = -1;
-                                    Update(this, null);
-                                    //string jsonData = JsonSerializer.Serialize(oTelegram);
-                                    //SendMessage(jsonData);
+                                    ScadaClasses.Refresh = true;                        
                                     break;
 
                                 case SKTouchAction.Moved:
@@ -3969,7 +3534,6 @@ public partial class MainPage : ContentPage
                             }
                             args.Handled = true;
                         };
-
                         AbsoluteLayout.SetLayoutBounds(mySvgButton3, new Rect(x, y, WidthRequest, 20));
                         AbsoluteLayout.SetLayoutFlags(mySvgButton3, AbsoluteLayoutFlags.None);
                         if (y < ((Height / 100) *ScadaItem.Top) + ((Height / 100) * ScadaItem.Height) - 26)
@@ -3977,7 +3541,6 @@ public partial class MainPage : ContentPage
                             SKCanvasViews.Add(mySvgButton3);
                             y = y + 26;
                         }
-
 
                         var mySvgButton4 = new ScadaButton
                         {
@@ -4002,23 +3565,10 @@ public partial class MainPage : ContentPage
                             var pt = args.Location;
                             switch (args.ActionType)
                             {
-                                case SKTouchAction.Pressed:/*
-                                    ScadaControlTelegram oTelegram = new ScadaControlTelegram()
-                                    {
-                                        MessageType = ScadaItem.MessageType,
-                                        Page = ScadaClasses.Currentpage,
-                                        ItemType = ScadaItem.ItemType,
-                                        ItemID = ScadaItem.ItemID,
-                                        TagID = ScadaItem.TagID,
-                                        TagName = ScadaItem.TagName,
-                                        Action = "",
-                                    };*/
-                                    //CurrentItem = ScadaItem.ItemID;
+                                case SKTouchAction.Pressed:
                                     ScadaClasses.CurrentScadaPopup = ScadaClasses.uxPageChangeMenu;
                                     ScadaClasses.Previouspage = -1;
-                                    Update(this, null);
-                                    //string jsonData = JsonSerializer.Serialize(oTelegram);
-                                    //SendMessage(jsonData);
+                                    ScadaClasses.Refresh = true;                               
                                     break;
 
                                 case SKTouchAction.Moved:
@@ -4040,7 +3590,12 @@ public partial class MainPage : ContentPage
                         {
                             SKCanvasViews.Add(mySvgButton4);
                             y = y + 26;
-                        }                  
+                        }
+
+                        mySvgButton1.EnableFaceFade();
+                        mySvgButton2.EnableFaceFade();
+                        mySvgButton3.EnableFaceFade();
+                        mySvgButton4.EnableFaceFade();
                         break;
 
                     case ScadaClasses.uxItemTagsMenu:
@@ -4063,6 +3618,7 @@ public partial class MainPage : ContentPage
                         FloatPanel11.IsEnabled = true;
                         FloatPanel11.IsVisible = true;
                         FloatPanel11.IndicatorType = 10;
+                        FloatPanel11.EnableFaceFade();
                         AbsoluteLayout.SetLayoutBounds(FloatPanel11, new Rect(
                             (Width / 100) * ScadaItem.Left,
                             (Height / 100) * ScadaItem.Top,
@@ -4076,7 +3632,6 @@ public partial class MainPage : ContentPage
                         y = (Height / 100) * ScadaItem.Top;
                         w = (Width / 100) * ScadaItem.Width;
                         h = (Height / 100) * ScadaItem.Height;
-
 
                         CreateCloseButton(x, y, w, h);
 
@@ -4101,7 +3656,7 @@ public partial class MainPage : ContentPage
                                 FontSize = 16.5F,
                                 SvgBase64 = MyDataAccessLayer.LoadLibItem("InputSource", 1)
                             };
-
+                          
                             myItemTagsBtn.ButtonRow = row;
                             myItemTagsBtn.ButtonText = row.col1text;
                             myItemTagsBtn.EnableTouchEvents = true;
@@ -4125,8 +3680,7 @@ public partial class MainPage : ContentPage
                                         ScadaClasses.CurrentScadaPopup = ScadaClasses.uxTagsMenu;
                                         ScadaClasses.Previouspage = -1;
                                         ScadaClasses.CurrentRow = row.Id;
-                                        Update(this, null);
-                                        //SetItemTag(oTelegram);
+                                        ScadaClasses.Refresh = true;                                      
                                         break;
 
                                     case SKTouchAction.Moved:
@@ -4235,7 +3789,7 @@ public partial class MainPage : ContentPage
                                         ScadaClasses.Previouspage = -1;
                                         ScadaClasses.CurrentRow = row.Id;
                                         MyDataAccessLayer.SetItemSize(oTelegram);
-                                        Update(this, null);
+                                        ScadaClasses.Refresh = true;
                                         break;
 
                                     case SKTouchAction.Moved:
@@ -4320,22 +3874,11 @@ public partial class MainPage : ContentPage
                             var pt = args.Location;
                             switch (args.ActionType)
                             {
-                                case SKTouchAction.Pressed:/*
-                                    ScadaControlTelegram oTelegram = new ScadaControlTelegram()
-                                    {
-                                        MessageType = ScadaItem.MessageType,
-                                        Page = ScadaClasses.Currentpage,
-                                        ItemType = ScadaItem.ItemType,
-                                        ItemID = ScadaItem.ItemID,
-                                        TagID = ScadaItem.TagID,
-                                        TagName = ScadaItem.TagName,
-                                        Action = ScadaItem.Action,
-                                    };*/
+                                case SKTouchAction.Pressed:
                                     ScadaClasses.CurrentScadaPopup = ScadaClasses.uxItemTagsMenu;
                                     ScadaClasses.Previouspage = -1;
-                                    Update(this, null);
-                                    //string jsonData = JsonSerializer.Serialize(oTelegram);
-                                    //SendMessage(jsonData);
+                                    ScadaClasses.Refresh = true;
+                            
                                     break;
 
                                 case SKTouchAction.Moved:
@@ -4381,22 +3924,11 @@ public partial class MainPage : ContentPage
                             var pt = args.Location;
                             switch (args.ActionType)
                             {
-                                case SKTouchAction.Pressed:/*
-                                    ScadaControlTelegram oTelegram = new ScadaControlTelegram()
-                                    {
-                                        MessageType = ScadaItem.MessageType,
-                                        Page = ScadaClasses.Currentpage,
-                                        ItemType = ScadaItem.ItemType,
-                                        ItemID = ScadaItem.ItemID,
-                                        TagID = ScadaItem.TagID,
-                                        TagName = ScadaItem.TagName,
-                                        Action = ScadaItem.Action,
-                                    };*/
+                                case SKTouchAction.Pressed:
                                     ScadaClasses.CurrentScadaPopup = ScadaClasses.uxItemTypeMenu;
                                     ScadaClasses.Previouspage = -1;
-                                    Update(this, null);
-                                    //string jsonData = JsonSerializer.Serialize(oTelegram);
-                                    //SendMessage(jsonData);
+                                    ScadaClasses.Refresh = true;
+                             
                                     break;
 
                                 case SKTouchAction.Moved:
@@ -4443,22 +3975,10 @@ public partial class MainPage : ContentPage
                             var pt = args.Location;
                             switch (args.ActionType)
                             {
-                                case SKTouchAction.Pressed:/*
-                                    ScadaControlTelegram oTelegram = new ScadaControlTelegram()
-                                    {
-                                        MessageType = ScadaItem.MessageType,
-                                        Page = ScadaClasses.Currentpage,
-                                        ItemType = ScadaItem.ItemType,
-                                        ItemID = ScadaItem.ItemID,
-                                        TagID = ScadaItem.TagID,
-                                        TagName = ScadaItem.TagName,
-                                        Action = ScadaItem.Action,
-                                    };*/
+                                case SKTouchAction.Pressed:
                                     ScadaClasses.CurrentScadaPopup = ScadaClasses.uxPagesMenu;
                                     ScadaClasses.Previouspage = -1;
-                                    Update(this, null);
-                                    //string jsonData = JsonSerializer.Serialize(oTelegram);
-                                    //SendMessage(jsonData);
+                                    ScadaClasses.Refresh = true;                            
                                     break;
 
                                 case SKTouchAction.Moved:
@@ -4500,7 +4020,6 @@ public partial class MainPage : ContentPage
                         EditPanel.GradientStartColor = uxItemBackGroundColor;
                         EditPanel.GradientEndColor = uxItemBackGroundColor;
                         EditPanel.IndicatorColor = uxPanelColor;
-
                         EditPanel.WidthRequest = w;
                         EditPanel.HeightRequest = h;
                         EditPanel.AlternativeTextColor = uxTextColor;
@@ -4508,27 +4027,6 @@ public partial class MainPage : ContentPage
                         EditPanel.IsEnabled = true;
                         EditPanel.IsVisible = true;
                         EditPanel.IndicatorType = 0;
-
-                        /*
-                        var TagsPanel = new ScadaButton();
-                        TagsPanel.AnchorX = 0;
-                        TagsPanel.AnchorY = 0;
-                        TagsPanel.ItemID = ScadaItem.ItemID;
-                        TagsPanel.StyleId = ScadaItem.ItemID.ToString();
-                        TagsPanel.CornerRadius = 10;
-                        TagsPanel.BarBackgroundColor = uxPanelColor;
-                        TagsPanel.BackgroundColor = uxPanelColor.ToMauiColor();
-                        TagsPanel.GradientStartColor = uxItemBackGroundColor;
-                        TagsPanel.GradientEndColor = uxItemBackGroundColor;
-                        TagsPanel.IndicatorColor = uxPanelColor; ;
-                        TagsPanel.IndicatorType = 0;
-                        TagsPanel.WidthRequest = (Width / 100) * double.Parse(ScadaItem.Width, CultureInfo.InvariantCulture);
-                        TagsPanel.HeightRequest = (Height / 100) * double.Parse(ScadaItem.Height, CultureInfo.InvariantCulture);
-                        TagsPanel.AlternativeTextColor = uxTextColor;
-                        TagsPanel.TextColor = uxTextColor;
-                        TagsPanel.IsEnabled = true;
-                        TagsPanel.IsVisible = true;
-                        */
 
                         var btnApplyText = new ScadaButton();
                         btnApplyText.CornerRadius = 10;
@@ -4574,11 +4072,10 @@ public partial class MainPage : ContentPage
                                             MyDataAccessLayer.UpdateStoreInterval(ScadaClasses.CurrentTag, edtInputText.Text);
                                             break;
 
-
                                     }
                                     ScadaClasses.Previouspage = -1;
                                     ScadaClasses.CurrentScadaPopup = ScadaClasses.uxTagSettings;
-                                    Update(this, null);
+                                    ScadaClasses.Refresh = true;
                                     break;
 
                                 case SKTouchAction.Released:
@@ -4713,7 +4210,7 @@ public partial class MainPage : ContentPage
                                         ScadaClasses.CurrentTag = row.TagID;
                                         ScadaClasses.CurrentScadaPopup = -1;
                                         ScadaClasses.Previouspage = -1;
-                                        Update(this, null);
+                                        ScadaClasses.Refresh = true;
                                         break;
 
                                     case SKTouchAction.Moved:
@@ -4817,7 +4314,7 @@ public partial class MainPage : ContentPage
 
                                         ScadaClasses.CurrentScadaPopup = -1;
                                         ScadaClasses.Previouspage = -1;
-                                        Update(this, null);
+                                        ScadaClasses.Refresh = true;
                                         break;
 
                                     case SKTouchAction.Moved:
@@ -4938,7 +4435,7 @@ public partial class MainPage : ContentPage
                                         }
 
                                         ScadaClasses.Previouspage = -1;
-                                        Update(this, null);
+                                        ScadaClasses.Refresh = true;
                                         break;
 
                                     case SKTouchAction.Moved:
@@ -4977,19 +4474,14 @@ public partial class MainPage : ContentPage
                         FloatPanelPages.GradientStartColor = uxPopupColor;
                         FloatPanelPages.GradientEndColor = uxPopupColor;
                         FloatPanelPages.IndicatorColor = uxBackGroundColor;
-
-                        FloatPanelPages.WidthRequest = (Width / 100) * ScadaItem.Width;
-                        FloatPanelPages.HeightRequest = (Height / 100) * ScadaItem.Height;
+                        FloatPanelPages.WidthRequest = wScale * ScadaItem.Width;
+                        FloatPanelPages.HeightRequest = hScale * ScadaItem.Height;
                         FloatPanelPages.AlternativeTextColor = uxTextColor;
                         FloatPanelPages.TextColor = uxTextColor;
                         FloatPanelPages.IsEnabled = true;
                         FloatPanelPages.IsVisible = true;
                         FloatPanelPages.IndicatorType = 10;
-                        AbsoluteLayout.SetLayoutBounds(FloatPanelPages, new Rect(
-                            (Width / 100) * ScadaItem.Left,
-                            (Height / 100) * ScadaItem.Top,
-                            (Width / 100) * ScadaItem.Width,
-                            (Height / 100) * ScadaItem.Height));
+                        AbsoluteLayout.SetLayoutBounds(FloatPanelPages, new Rect(wScale * ScadaItem.Left, hScale * ScadaItem.Top, wScale * ScadaItem.Width, hScale * ScadaItem.Height));
                         AbsoluteLayout.SetLayoutFlags(FloatPanelPages, AbsoluteLayoutFlags.None);
                         SKCanvasViews.Add(FloatPanelPages);
 
@@ -5023,10 +4515,7 @@ public partial class MainPage : ContentPage
                             });
                             Page++;
                         }
-
                         ScadaItem.gridRows = gridRows;
-
-                        //Next and Previous buttons 
                         CreateCloseButton(x, y, w, h);
                         CreateFwdButton(x, y, w, h);
                         CreateRwdButton(x, y, w, h);
@@ -5070,7 +4559,7 @@ public partial class MainPage : ContentPage
                                     MyDataAccessLayer.addPage();
                                     ScadaClasses.CurrentScadaPopup = -1;
                                     ScadaClasses.Previouspage = -1;
-                                    Update(this, null);
+                                    ScadaClasses.Refresh = true;
                                     break;
 
                                 case SKTouchAction.Moved:
@@ -5133,7 +4622,7 @@ public partial class MainPage : ContentPage
                                         MyDataAccessLayer.SetNextPage(ScadaClasses.CurrentItem, ScadaClasses.Currentpage);
 
                                         ScadaClasses.CurrentScadaPopup = -1;
-                                        Update(this, null);
+                                        ScadaClasses.Refresh = true;
                                         break;
 
                                     case SKTouchAction.Moved:
@@ -5243,12 +4732,10 @@ public partial class MainPage : ContentPage
                                 FontSize = 16.5F,
                                 SvgBase64 = MyDataAccessLayer.LoadLibItem("Compass", 1),
                             };
-
                             myButton.ButtonRow = row;
                             myButton.ButtonText = row.col1text;
                             myButton.EnableTouchEvents = true;
                             myButton.InputTransparent = false;
-
                             myButton.Touch += (sender, args) =>
                             {
                                 var pt = args.Location;
@@ -5268,7 +4755,7 @@ public partial class MainPage : ContentPage
                                         ScadaClasses.Currentpage = row.TagID;
                                         MyDataAccessLayer.SetItemPage(ScadaClasses.CurrentItem, ScadaClasses.Currentpage);
                                         ScadaClasses.CurrentScadaPopup = -1;
-                                        Update(this, null);
+                                        ScadaClasses.Refresh = true;
                                         break;
 
                                     case SKTouchAction.Moved:
@@ -5296,35 +4783,28 @@ public partial class MainPage : ContentPage
                         break;
 
 
-
                     case ScadaClasses.uxLine:
-                        var Line = new ScadaLine();
-                        Line.ItemID = ScadaItem.ItemID;
-                        Line.StyleId = ScadaItem.ItemID.ToString();
-                        Line.AnchorX = 0;
-                        Line.AnchorY = 0;
-                        Line.CornerRadius = 10;
-                        Line.BarBackgroundColor = uxBackGroundColor;
-                        Line.BackgroundColor = uxBackGroundColor.ToMauiColor();
-                        Line.GradientStartColor = uxItemColor;
-                        Line.GradientEndColor = uxItemColor;
-                        Line.WidthRequest = (Width / 100) * ScadaItem.Width;
-                        Line.HeightRequest = (Height / 100) * ScadaItem.Height;
-                        Line.AlternativeTextColor = uxTextColor;
-                        Line.TextColor = uxTextColor;
-                        Line.FontSize = 10;
-                        Line.IsEnabled = true;
-                        Line.IsVisible = true;
-
-                        AbsoluteLayout.SetLayoutBounds(Line, new Rect(
-                            (Width / 100) * ScadaItem.Left,
-                            (Height / 100) * ScadaItem.Top,
-                            (Width / 100) * ScadaItem.Width,
-                            (Height / 100) * ScadaItem.Height));
-                        AbsoluteLayout.SetLayoutFlags(Line, AbsoluteLayoutFlags.None);
-                        SKCanvasViews.Add(Line);
-                        break;
-
+                        var SKLine = new ScadaLine();
+                        SKLine.ItemID = ScadaItem.ItemID;
+                        SKLine.StyleId = ScadaItem.ItemID.ToString();
+                        SKLine.AnchorX = 0;
+                        SKLine.AnchorY = 0;
+                        SKLine.CornerRadius = 10;
+                        SKLine.BarBackgroundColor = uxBackGroundColor;
+                        SKLine.BackgroundColor = uxBackGroundColor.ToMauiColor();
+                        SKLine.GradientStartColor = uxItemColor;
+                        SKLine.GradientEndColor = uxItemColor;
+                        SKLine.WidthRequest = wScale * ScadaItem.Width;
+                        SKLine.HeightRequest = hScale * ScadaItem.Height;
+                        SKLine.AlternativeTextColor = uxTextColor;
+                        SKLine.TextColor = uxTextColor;
+                        SKLine.FontSize = 10;
+                        SKLine.IsEnabled = true;
+                        SKLine.IsVisible = true;
+                        AbsoluteLayout.SetLayoutBounds(SKLine, new Rect(wScale * ScadaItem.Left, hScale * ScadaItem.Top, wScale * ScadaItem.Width, hScale * ScadaItem.Height));
+                        AbsoluteLayout.SetLayoutFlags(SKLine, AbsoluteLayoutFlags.None);
+                        SKCanvasViews.Add(SKLine);
+                    break;
              }
 
 
@@ -5357,7 +4837,7 @@ public partial class MainPage : ContentPage
 
                         ScadaClasses.Currentpage = 1;
                         ScadaClasses.CurrentScadaPopup = -1;
-                        Update(this, null);
+                        ScadaClasses.Refresh = true;
                         break;
 
                     case SKTouchAction.Moved:
@@ -5402,10 +4882,9 @@ public partial class MainPage : ContentPage
                 switch (args.ActionType)
                 {
                     case SKTouchAction.Pressed:
-
                         ScadaClasses.Previouspage = -1;
                         ScadaClasses.CurrentScadaPopup = ScadaClasses.uxLoginMenu;
-                        Update(this, null);
+                        ScadaClasses.Refresh = true;
                         break;
 
                     case SKTouchAction.Moved:
@@ -5453,7 +4932,7 @@ public partial class MainPage : ContentPage
                     case SKTouchAction.Pressed:
                         ScadaClasses.Previouspage = -1;
                         ScadaClasses.CurrentScadaPopup = ScadaClasses.uxDesignMenu;
-                        Update(this, null);
+                        ScadaClasses.Refresh = true;
                         break;
 
                     case SKTouchAction.Moved:
@@ -5500,7 +4979,7 @@ public partial class MainPage : ContentPage
                     case SKTouchAction.Pressed:
                         ScadaClasses.Previouspage = -1;
                         ScadaClasses.CurrentScadaPopup = ScadaClasses.uxSvgPopupMenu;
-                        Update(this, null);
+                        ScadaClasses.Refresh = true;
                         break;
 
                     case SKTouchAction.Moved:

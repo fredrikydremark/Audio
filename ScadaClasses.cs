@@ -26,22 +26,33 @@ namespace Scada
         public const int uxCompass = 12;
         public const int uxAltimeter = 13;
         public const int uxAirspeed = 14;
-        public const int uxMovingMap = 15;
+         
+        //Mapsui
+        public const int uxMovingMap = 15; 
+       
+        //Simulation,demo testing
         public const int uxController = 16;
         public const int uxSimulator = 17;
         public const int uxInterference = 18;
+        
+        //Automotive
         public const int uxAutomotivePower = 19;
         public const int uxAutomotiveSpeed = 20;
+        
         public const int uxProgressBar = 21;
         public const int uxLine = 23;
         public const int uxText = 24;
         public const int uxDonutChart = 25;
+        
+        //Grids
         public const int uxGridMessage = 26;
         public const int uxGridStringCmd = 27;
         public const int uxGridItemCmd = 28;
         public const int uxGridRowCmd = 29;
         public const int uxChatMessages = 30;
         public const int uxFloatingMenu = 34;
+
+        //Animation
         public const int uxAnimation = 36;
         public const int uxMovingItem = 37;
         public const int ux3D = 54;
@@ -79,14 +90,14 @@ namespace Scada
         public const int Cmdgriddata = 41;
         public const int Cmdendofpackets = 99;
 
-
         public static int Currentpage = 1;
-        public static int CurrentScadaPopup = ScadaClasses.uxTagsGrid;
+        public static int CurrentScadaPopup = -1;
         public static int CurrentItem = 0;
         public static int CurrentRow = 0;
         public static int CurrentType = 0;
         public static int CurrentTag = 0;
         public static int Previouspage = -1;
+        public static bool Refresh = false;
 
         /*
 
@@ -123,10 +134,10 @@ namespace Scada
             public double Value { get; set; }
             public double HL { get; set; }
             public double LL { get; set; }
-            public string Color { get; set; }
-            public string Name { get; set; }
-            public string Description { get; set; }
-            public string Unit { get; set; }
+            public string Color { get; set; } = "";
+            public string Name { get; set; } = "";
+            public string Description { get; set; } = "";
+            public string Unit { get; set; } = "";
             public int TypeOfTag { get; set; }
             public int AlarmEnable { get; set; }
             public int StoreIntervalSec { get; set; }
@@ -186,7 +197,6 @@ namespace Scada
             public SKColor uxItemColor = new SKColor();
             public SKColor uxGradientStartColor = new SKColor();
             public SKColor uxGradientEndColor = new SKColor();
-
             public SKColor uxTouchColor = new SKColor();
             public SKColor uxHoverColor = new SKColor();
             public SKColor uxTextColor = new SKColor();

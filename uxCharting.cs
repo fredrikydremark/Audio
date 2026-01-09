@@ -28,6 +28,12 @@ namespace Scada
         public float LastY;
         public float LL = -9999, HL = 9999;
 
+
+
+
+
+
+
         public static BindableProperty ItemIDProperty = BindableProperty.Create(nameof(ItemID), typeof(int),
         typeof(HistGraph), 0, BindingMode.OneWay,
             validateValue: (_, value) => value != null,

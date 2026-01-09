@@ -110,7 +110,6 @@ namespace Scada
         }
 
 
-
         protected override void OnPaintSurface(SKPaintSurfaceEventArgs e)
         {
             var info = e.Info;
@@ -123,8 +122,8 @@ namespace Scada
             var pathStroke = new SKPaint
             {
                 IsAntialias = true,
-                Style = SKPaintStyle.StrokeAndFill,
-                Color = new SKColor(3, 156, 35, 255),
+                Style = SKPaintStyle.Fill,
+                Color = new SKColor(148, 34, 204, 200),
                 StrokeWidth = 0
             };
 
@@ -132,11 +131,10 @@ namespace Scada
             path3.AddArc(new SKRect(d, d, r, r), -90, -180);
             path3.AddRect(new SKRect(d + r / 2, d, w - r / 2, r));
             path3.AddArc(new SKRect(w - r, d, w, r), -90, 180);
-
             path3.Close();
+
             canvas.Clear();
             canvas.DrawPath(path3, pathStroke);
-
         }
     }
 }

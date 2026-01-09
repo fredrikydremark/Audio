@@ -6,6 +6,30 @@ namespace Scada
 {
     public class ScadaText : SKCanvasView
     {
+        public ScadaText Init(double w, double h, ScadaText scb, ScadaClasses.Telegram Item, ScadaClasses.Colors Color)
+        {
+            scb.AnchorX = 0;
+            scb.AnchorY = 0;
+            scb.CornerRadius = 10;
+            scb.BarBackgroundColor = Color.uxBackGroundColor;
+            scb.BackgroundColor = Color.uxPanelColor.ToMauiColor();
+            scb.GradientStartColor = Color.uxGradientStartColor;
+            scb.GradientEndColor = Color.uxGradientEndColor;
+            scb.WidthRequest = w * Item.Width;
+            scb.HeightRequest = h * Item.Height;
+            scb.ItemID = Item.ItemID;
+            scb.StyleId = Item.ItemID.ToString();
+            scb.TheText = Item.Text;
+            scb.TextColor = Color.uxTextColor;
+            scb.FontSize = 18.5F;
+            scb.IsEnabled = true;
+            scb.IsVisible = true;
+            scb.EnableTouchEvents = true;
+            scb.InputTransparent = false;
+            return (scb);
+        }
+
+
         public static BindableProperty ItemIDProperty = BindableProperty.Create(nameof(ItemID), typeof(int),
         typeof(ScadaText), 0, BindingMode.OneWay,
             validateValue: (_, value) => value != null,
@@ -52,7 +76,7 @@ namespace Scada
         }
 
         public static BindableProperty FontSizeProperty = BindableProperty.Create(nameof(FontSize), typeof(float),
-            typeof(ScadaText), 12f, BindingMode.OneWay,
+            typeof(ScadaText), 18.5f, BindingMode.OneWay,
             validateValue: (_, value) => value != null && (float)value >= 0,
             propertyChanged: OnPropertyChangedInvalidate);
 

@@ -17,8 +17,8 @@ namespace Scada
             scb.BackgroundColor = Color.uxPanelColor.ToMauiColor();
             scb.GradientStartColor = Color.uxGradientStartColor;
             scb.GradientEndColor = Color.uxGradientEndColor;
-            scb.WidthRequest = (w / 100) * Item.Width;
-            scb.HeightRequest = (h / 100) * Item.Height;
+            scb.WidthRequest = w * Item.Width;
+            scb.HeightRequest = h * Item.Height;
             scb.AlternativeTextColor = Color.uxTextColor;
             scb.TextColor = Color.uxTextColor;
             scb.ItemID = Item.ItemID;
@@ -39,7 +39,9 @@ namespace Scada
                 }
                 i++;
             }
-            
+
+            //scb = (ScadaNumeric)AttachDesignEvents(scb, Item);
+
             scb.IsEnabled = true;
             scb.IsVisible = true;
             scb.EnableTouchEvents = true;

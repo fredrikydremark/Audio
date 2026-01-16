@@ -7,6 +7,8 @@ namespace Scada
 {
     public class Toggle : SKCanvasView
     {
+       
+
         public static BindableProperty ItemIDProperty = BindableProperty.Create(nameof(ItemID), typeof(int),
         typeof(Toggle), 0, BindingMode.OneWay,
             validateValue: (_, value) => value != null,
@@ -17,7 +19,6 @@ namespace Scada
             get => (int)GetValue(ItemIDProperty);
             set => SetValue(ItemIDProperty, value);
         }
-
 
         public static BindableProperty PVProperty = BindableProperty.Create(nameof(PV), typeof(ItemValue),
            typeof(Toggle), null, BindingMode.OneWay,
@@ -41,6 +42,7 @@ namespace Scada
             get => (ItemValue)GetValue(SVProperty);
             set => SetValue(SVProperty, value);
         }
+
 
         public static BindableProperty CornerRadiusProperty = BindableProperty.Create(nameof(CornerRadius), typeof(float),
         typeof(Toggle), 5f, BindingMode.OneWay,
@@ -118,17 +120,61 @@ namespace Scada
         private static void OnPropertyChangedInvalidate(BindableObject bindable, object oldvalue, object newvalue)
         {
             var control = (Toggle)bindable;
-
             if (oldvalue != newvalue)
-                control.InvalidateSurface();
+            {
+                if (control.IsLoaded == true)
+                {
+                    control.InvalidateSurface();
+                }
+            }
         }
 
+        public void Start()
+        {
+            RefreshTask();
+        }
+
+        public void RefreshValues()
+        {
+            DataAccessLayer MyDataAccessLayer = new DataAccessLayer();
+      
+            var ItemValues = MyDataAccessLayer.ReadItemValues(ItemID);
+            foreach (var item in ItemValues)
+            {       
+                 
+                        if (item.TagID == PV.TagID)
+                        {
+                            PV.Value = item.Value;
+                            PV.StatusQuality = item.StatusQuality;
+                        }
+
+                        if (item.TagID == SV.TagID)
+                        {
+                            SV.Value = item.Value;
+                            SV.StatusQuality = item.StatusQuality;
+                        }
+                                 
+            }
+            if (IsLoaded == true)
+            {
+                InvalidateSurface();
+            }
+        }
+
+        private async void RefreshTask()
+        {     
+            while (true)
+            {
+                await Task.Delay(5000);//UpdateInterval
+                RefreshValues();       
+            }
+        }
 
         protected override void OnPaintSurface(SKPaintSurfaceEventArgs e)
         {
             var info = e.Info;
             var canvas = e.Surface.Canvas;
-
+    
             var Backgroundpaint = new SKPaint
             {
                 IsAntialias = true,
@@ -172,19 +218,24 @@ namespace Scada
             path3.AddArc(new SKRect(w - r, d, w, r), -90, 180);
             path3.Close();
 
-
             canvas.Clear();
             canvas.DrawPath(path3, Backgroundpaint);
 
-            if (PV.Value > 0.5)
+            if (SV.Value > 0.5)
             {
-                canvas.DrawOval(r / 2, r / 2, r / 2, r / 2, ProgressPaint);
+                if (PV.Value > 0.5)
+                {
+                    canvas.DrawOval(r / 2, r / 2, r / 2, r / 2, ProgressPaint);
+                }
+                else
+                {
+                    canvas.DrawOval(r / 2, r / 2, r / 2, r / 2, OffPaint);
+                }
             }
             else
             {
                 canvas.DrawOval(w - r / 2, r / 2, r / 2, r / 2, OffPaint);
             }
-
         }
     }
 }

@@ -163,6 +163,7 @@ namespace Scada
 
         }
 
+        /*
         public List<ScadaClasses.LibItem> LibItems = new List<ScadaClasses.LibItem>();
 
         
@@ -177,7 +178,7 @@ namespace Scada
             public string Action { get; set; }
             public double SV { get; set; }
         }
-        
+        */
 
         public class Value
         {
@@ -234,7 +235,7 @@ namespace Scada
             public int Fade { get; set; }
             public double Radius { get; set; }       
             public int Nextpage { get; set; }
-            public string Action { get; set; }
+            public string Action { get; set; } = string.Empty;
             public int size { get; set; }        
             public List<List<Value>> ListOfValues = new List<List<Value>>() { };
             public List<gridRow> gridRows { get; set; }

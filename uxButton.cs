@@ -10,11 +10,10 @@ namespace Scada
 {
     public class ItemValue
     {
-        public int TagID { get; set; }
-        public float Value { get; set; }
-        public string? Unit { get; set; }
-        public int StatusQuality { get; set; }
-
+        public int TagID { get; set; } = -1;
+        public float Value { get; set; } = -1F;
+        public string Unit { get; set; } = "";
+        public int StatusQuality { get; set; } = -1;
     }
 
     public class gridRow
@@ -79,10 +78,15 @@ namespace Scada
             scb.ButtonText = Item.Text;
             scb.FontSize = 18.5F;
             scb.EnableFaceFade();
-            //scb.EnableIndicatorBlink();
+            scb.EnableIndicatorBlink();
             scb.PV = new ItemValue();
+            scb.PV.TagID = -1;
+            scb.PV.Value = -1;
+
             scb.SV = new ItemValue();
-     
+            scb.SV.TagID = -1;
+            scb.SV.Value = -1;
+
             DataAccessLayer MyDataAccessLayer = new DataAccessLayer();
             var ItemValuesBtn = MyDataAccessLayer.ReadItemValues(scb.ItemID);
             int idx = 0;
@@ -90,13 +94,13 @@ namespace Scada
             {
                 if (idx == 0)
                 {
-                    scb.PV.TagID = item.TagID;
-                    scb.PV.Value = item.Value;
+                    scb.SV.TagID = item.TagID;
+                    scb.SV.Value = item.Value;
                 }
                 if (idx == 1)
                 {
-                    scb.SV.TagID = item.TagID;
-                    scb.SV.Value = item.Value;
+                    scb.PV.TagID = item.TagID;
+                    scb.PV.Value = item.Value;
                 }
                 idx++;
             }
@@ -105,35 +109,38 @@ namespace Scada
             scb.IsVisible = true;
             scb.EnableTouchEvents = true;
             scb.InputTransparent = false;
-    
+            scb.Start();
+
                 scb.Touch += (sender, args) =>
                 {
                     switch (args.ActionType)
                     {
                         case SKTouchAction.Released:
                             if (Item.Action == "TOGGLE")
-                            {
-                                float SV = 0;
-                                if (scb.PV.Value > 0.5)
+                            {                          
+                                if (scb.SV.Value > 0.5)
                                 {
-                                    SV = 0;
+                                    scb.SV.Value = 0;
                                 }
                                 else
                                 {
-                                    SV = 1;
+                                    scb.SV.Value = 1;
                                 }                                                                                  
-                                MyDataAccessLayer.UpdateTagValue(scb.SV.TagID, SV);
-                                MyDataAccessLayer.StoreTagValue(scb.SV.TagID, SV);                        
+                                MyDataAccessLayer.UpdateTagValue(scb.SV.TagID, scb.SV.Value);
+                                MyDataAccessLayer.StoreTagValue(scb.SV.TagID, scb.SV.Value);
+                             
                             }
                             else if (Item.Action == "ON")
                             {
-                                MyDataAccessLayer.UpdateTagValue(scb.SV.TagID, 1);
-                                MyDataAccessLayer.StoreTagValue(scb.SV.TagID, 1);
+                                scb.SV.Value = 1;
+                                MyDataAccessLayer.UpdateTagValue(scb.SV.TagID, scb.SV.Value);
+                                MyDataAccessLayer.StoreTagValue(scb.SV.TagID, scb.SV.Value);
                             }
                             else if (Item.Action == "OFF")
                             {
-                                MyDataAccessLayer.UpdateTagValue(scb.SV.TagID, 0);
-                                MyDataAccessLayer.StoreTagValue(scb.SV.TagID, 0);
+                                scb.SV.Value = 0;
+                                MyDataAccessLayer.UpdateTagValue(scb.SV.TagID, scb.SV.Value);
+                                MyDataAccessLayer.StoreTagValue(scb.SV.TagID, scb.SV.Value);
                             }
                             else if (Item.Action == "POPUPALARM")
                             {
@@ -157,6 +164,7 @@ namespace Scada
                             scb.GradientStartColor = Color.uxItemColor;
                             scb.GradientEndColor = Color.uxItemColor;
                             ScadaClasses.Refresh = true;
+                       
                             break;
 
                         case SKTouchAction.Pressed:
@@ -391,10 +399,12 @@ namespace Scada
         {
             var control = (ScadaButton)bindable;
             if (oldvalue != newvalue)
+            {              
                 if (control.IsLoaded == true)
                 {
                     control.InvalidateSurface();
                 }
+            }
         }
 
         private SKCanvas DrawRoundRectWithArrow(SKCanvas c, SKPaint Paint, float x, float y, float w, float h, float radius)
@@ -472,6 +482,45 @@ namespace Scada
             localBtnIndicatorIntensity = 255;
         }
 
+        public void Start()
+        {
+            RefreshTask();
+        }
+
+        public void RefreshValues()
+        {
+            DataAccessLayer MyDataAccessLayer = new DataAccessLayer();
+
+            var ItemValues = MyDataAccessLayer.ReadItemValues(ItemID);
+            foreach (var item in ItemValues)
+            {
+             
+                    if (item.TagID == PV.TagID)
+                    {
+                        PV.Value = item.Value;
+                        PV.StatusQuality = item.StatusQuality;
+                    }
+                    if (item.TagID == SV.TagID)
+                    {
+                        SV.Value = item.Value;
+                        SV.StatusQuality = item.StatusQuality;
+                    }
+                
+            }
+            if (IsLoaded == true)
+            {
+                InvalidateSurface();
+            }
+        }
+
+        private async void RefreshTask()
+        {
+            while (true)
+            {
+                await Task.Delay(5000);
+                RefreshValues();       
+            }
+        }
 
         protected override void OnPaintSurface(SKPaintSurfaceEventArgs e)
         {
@@ -489,6 +538,7 @@ namespace Scada
             var canvas = e.Surface.Canvas;
             float w = info.Width;
             float h = info.Height;
+
             var progressBar = new SKRoundRect(new SKRect(0, 0, w, h), CornerRadius, CornerRadius);
 
             SKColor GrStart = GradientStartColor;
@@ -637,19 +687,16 @@ namespace Scada
                     catch
                     {
                     }
-
                 }
 
                 if (IndicatorType == 4)
                 {
-
                 }
 
                 if (IndicatorType == 5)
-                {
+                {   
                     var onPaint = new SKPaint { Color = new SKColor(100, 100, 100, 255), TextSize = FontSize, FilterQuality = SKFilterQuality.High, IsAntialias = true };
-
-                    if (PV.Value > 0.5)
+                    if (SV.Value > 0.5)
                     {
                         onPaint.Color = new SKColor(3, 156, 35, (byte)localBtnIndicatorIntensity);
                     }
@@ -676,13 +723,13 @@ namespace Scada
                     canvas.DrawCircle(center, radius, circlePaint);
 
                     if (SvgBase64 == "") return;
-                    var svg2 = new SKSvg();
+              
                     string sBase64Svg = SvgBase64;
                     byte[] data = Convert.FromBase64String(sBase64Svg);
                     string decodedString = Encoding.UTF8.GetString(data);
 
+                    var svg2 = new SKSvg();
                     var picture = svg2.FromSvg(decodedString);
-                    //var picture = svg2.FromSvg(decodedString);
                     var dimension = new SkiaSharp.SKSizeI
                     (
                          (int)Math.Ceiling(info.Height * 1.0),

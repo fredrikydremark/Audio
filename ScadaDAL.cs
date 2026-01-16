@@ -246,7 +246,7 @@ namespace Scada
                     ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
                 };
                 Connection.Open();
-                string sqlGetData = "select tagname,description,HL,LL,Color,StoreIntervalSec,alarmenable from tags where TagID =@TagID";
+                string sqlGetData = "select tagname,description,HL,LL,Color,Unit,StoreIntervalSec,alarmenable,TypeOfTag from tags where TagID =@TagID";
 
 
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
@@ -255,7 +255,7 @@ namespace Scada
                 SqlDataReader reader = cmdGetData.ExecuteReader();
 
                 var myTagParams = new List<gridRow>();
-                string tagname = "", description = "", HL = "", LL = "", Color = "";
+                string tagname = "", description = "", HL = "", LL = "", Color = "",Unit="",TypeOfTag="";
                 string AlarmEnable = "0", StoreIntervalSec = "0";
 
                 while (reader.Read())
@@ -265,8 +265,10 @@ namespace Scada
                     HL = reader.GetDouble(2).ToString();
                     LL = reader.GetDouble(3).ToString();
                     Color = reader.GetString(4);
-                    StoreIntervalSec = reader.GetInt32(5).ToString();
-                    AlarmEnable = reader.GetInt32(6).ToString();
+                    Unit = reader.GetString(5);
+                    StoreIntervalSec = reader.GetInt32(6).ToString();
+                    AlarmEnable = reader.GetInt32(7).ToString();
+                    TypeOfTag = reader.GetInt32(8).ToString();
                 }
 
                 myTagParams.Add(new gridRow
@@ -327,6 +329,32 @@ namespace Scada
 
                 myTagParams.Add(new gridRow
                 {
+                    col1text = "Color",
+                    col1width = 300,
+                    col2text = Color,
+                    col2width = 400,
+                    col3text = "",
+                    col4text = "",
+                    col5text = "",
+                    col6text = "",
+                    DataType = 0,
+                    Row = 4
+                });
+                myTagParams.Add(new gridRow
+                {
+                    col1text = "Unit",
+                    col1width = 300,
+                    col2text = Unit,
+                    col2width = 400,
+                    col3text = "",
+                    col4text = "",
+                    col5text = "",
+                    col6text = "",
+                    DataType = 0,
+                    Row = 5
+                });
+                myTagParams.Add(new gridRow
+                {
                     col1text = "StoreInterval Sec",
                     col1width = 300,
                     col2text = StoreIntervalSec.ToString(),
@@ -336,7 +364,7 @@ namespace Scada
                     col5text = "",
                     col6text = "",
                     DataType = 0,
-                    Row = 4
+                    Row = 6
                 });
 
                 myTagParams.Add(new gridRow
@@ -350,9 +378,21 @@ namespace Scada
                     col5text = "",
                     col6text = "",
                     DataType = 0,
-                    Row = 5
+                    Row = 7
                 });
-
+                myTagParams.Add(new gridRow
+                {
+                    col1text = "Type of tag",
+                    col1width = 300,
+                    col2text = TypeOfTag.ToString(),
+                    col2width = 400,
+                    col3text = "",
+                    col4text = "",
+                    col5text = "",
+                    col6text = "",
+                    DataType = 0,
+                    Row = 8
+                });
 
                 cmdGetData.Dispose();
                 cmdGetData = null;
@@ -985,6 +1025,69 @@ namespace Scada
             }
         }
 
+        public int UpdateTagColor(int TagID, string TagColor)
+        {
+            try
+            {
+                var Connection = new Microsoft.Data.SqlClient.SqlConnection
+                {
+                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                };
+
+                string sqlGetData = "UPDATE Tags SET Color = @TagColor  WHERE ( TagID = @TagID )";
+                Connection.Open();
+                SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
+                cmdGetData.Parameters.AddWithValue("@TagColor", TagColor);
+                cmdGetData.Parameters.AddWithValue("@TagID", TagID);
+                cmdGetData.ExecuteNonQuery();
+                cmdGetData.Dispose();
+                cmdGetData = null;
+                Connection.Close();
+                Connection = null;
+                return (0);
+            }
+            catch (Exception ex)
+            {
+                return (1);
+                throw new Exception(ex.ToString(), ex);
+            }
+            finally
+            {
+            }
+        }
+
+        public int UpdateTagUnit(int TagID, string TagUnit)
+        {
+            try
+            {
+                var Connection = new Microsoft.Data.SqlClient.SqlConnection
+                {
+                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                };
+
+                string sqlGetData = "UPDATE Tags SET Unit = @TagUnit  WHERE ( TagID = @TagID )";
+                Connection.Open();
+                SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
+                cmdGetData.Parameters.AddWithValue("@TagUnit", TagUnit);
+                cmdGetData.Parameters.AddWithValue("@TagID", TagID);
+                cmdGetData.ExecuteNonQuery();
+                cmdGetData.Dispose();
+                cmdGetData = null;
+                Connection.Close();
+                Connection = null;
+                return (0);
+            }
+            catch (Exception ex)
+            {
+                return (1);
+                throw new Exception(ex.ToString(), ex);
+            }
+            finally
+            {
+            }
+        }
+
+
         public int UpdateAlarmEnable(int TagID, string AlarmEnable)
         {
             try
@@ -1046,7 +1149,36 @@ namespace Scada
             {
             }
         }
+        public int UpdateTagType(int TagID, string TagType)
+        {
+            try
+            {
+                var Connection = new Microsoft.Data.SqlClient.SqlConnection
+                {
+                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                };
 
+                string sqlGetData = "UPDATE Tags SET TypeOfTag = @TagType  WHERE ( TagID = @TagID )";
+                Connection.Open();
+                SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
+                cmdGetData.Parameters.AddWithValue("@TagType", TagType);
+                cmdGetData.Parameters.AddWithValue("@TagID", TagID);
+                cmdGetData.ExecuteNonQuery();
+                cmdGetData.Dispose();
+                cmdGetData = null;
+                Connection.Close();
+                Connection = null;
+                return (0);
+            }
+            catch (Exception ex)
+            {
+                return (1);
+                throw new Exception(ex.ToString(), ex);
+            }
+            finally
+            {
+            }
+        }
 
         public int UpdateTagValue(int TagID, double dValue)
         {
@@ -2268,7 +2400,7 @@ namespace Scada
         }
 
 
-        public List<gridRow> ReadTags(string Filter, int Digital, int StartRow, int EndRow)
+        public List<gridRow> ReadTags(string Filter, int TypeOfTag, int StartRow, int EndRow)
         {
             try
             {
@@ -2279,10 +2411,10 @@ namespace Scada
                 };
                 Connection.Open();
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
-                //sqlGetData = "select top 10 tagID,Description from tags where Driver > 0 order by tagID";
-                sqlGetData = "select TagID,Description FROM( SELECT *, ROW_NUMBER() OVER (ORDER BY tagID) as row FROM tags WHERE ( Driver > 0 ) ) a WHERE ( Driver > 0 ) AND ( row > @StartRow and row <= @EndRow )";
+                sqlGetData = "select TagID,Description FROM( SELECT *, ROW_NUMBER() OVER (ORDER BY tagName) as row FROM tags WHERE ( Driver > 0 ) AND ( TypeOfTag = @TypeOfTag ) ) a WHERE ( Driver > 0 ) AND ( row > @StartRow and row <= @EndRow )";
                 cmdGetData.Parameters.AddWithValue("@StartRow", StartRow);
                 cmdGetData.Parameters.AddWithValue("@EndRow", EndRow);
+                cmdGetData.Parameters.AddWithValue("@TypeOfTag", TypeOfTag);
 
                 cmdGetData.CommandText = sqlGetData;
                 SqlDataReader reader = cmdGetData.ExecuteReader();
@@ -2358,6 +2490,7 @@ namespace Scada
                     oTempTele.Top = reader.GetDouble(3);
                     oTempTele.Width = reader.GetDouble(4);
                     oTempTele.Height = reader.GetDouble(5);
+
                     /*
                     int StatusQuality = 1;
                     if (reader.IsDBNull(18) == false)
@@ -2593,16 +2726,22 @@ namespace Scada
                 cmdGetData.CommandText = sqlGetData;
                 cmdGetData.ExecuteNonQuery();
 
-                //check PV within limits
-                sqlGetData = "INSERT INTO alarms SELECT tags.tagID,tags.Value,tags.HL,tags.LL,null,null,GETDATE(),tags.description FROM tags where (tags.AlarmEnable > 0) and ((tags.Value > tags.HL) or(tags.Value < tags.LL))and(not exists(select top 1 tagID from alarms where ( confirmed is not null ) and (tags.tagID = alarms.tagID)))";
+                //check PV within limits               
+                sqlGetData = "INSERT INTO alarms SELECT tags.tagID,tags.Value,tags.HL,tags.LL,null,null,GETDATE(),tags.description FROM tags where (tags.AlarmEnable > 0) and ((tags.Value > tags.HL) or(tags.Value < tags.LL))and(not exists(select top 1 tagID from alarms ))";
                 cmdGetData.CommandText = sqlGetData;
                 cmdGetData.ExecuteNonQuery();
 
-                //check PV within limits when deleted                            
+                //check PV within limits               
+                sqlGetData = "INSERT INTO alarms SELECT tags.tagID,tags.Value,tags.HL,tags.LL,null,null,GETDATE(),tags.description FROM tags where (tags.AlarmEnable > 0) and ((tags.Value > tags.HL) or(tags.Value < tags.LL))and(not exists(select top 1 tagID from alarms where ( deleted is null ) and (tags.tagID = alarms.tagID)))";
+                cmdGetData.CommandText = sqlGetData;
+                cmdGetData.ExecuteNonQuery();
+                
+                //check PV within limits when deleted                
+               /*
                 sqlGetData = "INSERT INTO alarms SELECT tags.tagID,tags.Value,tags.HL,tags.LL,null,null,GETDATE(),tags.description FROM tags where (tags.AlarmEnable > 0) and ((tags.Value > tags.HL) or(tags.Value < tags.LL)) and ((select top 1 deleted from alarms where (tags.tagID = alarms.tagID) order by alarmtime desc ) is not null )";
                 cmdGetData.CommandText = sqlGetData;
                 cmdGetData.ExecuteNonQuery();
-
+                */
                 //update PV in alarms on all non deleted alarms //,alarmtime = GetDate()
                 sqlGetData = "update alarms set PV = tags.Value,HL = tags.HL, LL = tags.LL  from alarms JOIN tags on tags.tagID = alarms.tagID where tags.tagID = alarms.tagID and ((tags.Value < tags.HL) or (tags.Value > tags.LL)) and alarms.deleted is null";
                 cmdGetData.CommandText = sqlGetData;
@@ -2819,11 +2958,20 @@ namespace Scada
                 cmdGetData.Parameters.AddWithValue("@ItemID", ItemID);
                 cmdGetData.CommandText = sqlGetData;
                 SqlDataReader reader = cmdGetData.ExecuteReader();
+                int theID = -1;
                 float theValue = 0F;
                 string sUnit = "";
                 var ItemValues = new List<ItemValue>();
                 while (reader.Read())
                 {
+                    if (reader.IsDBNull(0) == false)
+                    {
+                        theID = reader.GetInt32(0);
+                    }
+                    else
+                    {
+                        theID = -1 ;
+                    }
                     if (reader.IsDBNull(1) == false)
                     {
                         theValue = (float)reader.GetDouble(1);
@@ -2849,7 +2997,7 @@ namespace Scada
 
                     ItemValues.Add(new ItemValue
                     {
-                        TagID = reader.GetInt32(0),
+                        TagID = theID,
                         Value = theValue,
                         Unit = sUnit,
                         StatusQuality = StatusQuality
@@ -3595,6 +3743,8 @@ namespace Scada
         }
 
 
+        /*
+
         public int GetItemIsDigital(int ItemID)
         {
             int ItemType = 0;
@@ -3664,6 +3814,7 @@ namespace Scada
             {
             }
         }
+        */
 
         public int GetTagType(int TagID)
         {

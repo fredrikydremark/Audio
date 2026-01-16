@@ -41,7 +41,6 @@ namespace Scada
             set => SetValue(ItemIDProperty, value);
         }
 
-
         public static BindableProperty TheTextProperty = BindableProperty.Create(nameof(TheText), typeof(string),
         typeof(ScadaText), "", BindingMode.OneWay,
         validateValue: (_, value) => value != null,
@@ -52,7 +51,6 @@ namespace Scada
             get => (string)GetValue(TheTextProperty);
             set => SetValue(TheTextProperty, value);
         }
-
 
         public static BindableProperty CornerRadiusProperty = BindableProperty.Create(nameof(CornerRadius), typeof(float),
             typeof(ScadaText), 5f, BindingMode.OneWay,

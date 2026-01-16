@@ -8,10 +8,138 @@ using SkiaSharp.Views.Maui.Controls;
 
 namespace Scada
 {
-    public class ScadaCircularProgress : SKCanvasView
+    public class CircularProgress : SKCanvasView
     {
+        bool bFaceFade = true;
+        bool bIndicatorFade = true;
+        float localBtnIndicatorIntensity = 255f;
+        float localBtnFaceIntensity = 255f;
+
+      
+        public CircularProgress Init(double w, double h, CircularProgress scb, ScadaClasses.Telegram Item, ScadaClasses.Colors Color)
+        {
+            scb.AnchorX = 0;
+            scb.AnchorY = 0;
+            scb.CornerRadius = 10;
+            scb.BarBackgroundColor = Color.uxBackGroundColor;
+            scb.BackgroundColor = Color.uxPanelColor.ToMauiColor();
+            scb.GradientStartColor = Color.uxGradientStartColor;
+            scb.GradientEndColor = Color.uxGradientEndColor;
+            scb.WidthRequest = w * Item.Width;
+            scb.HeightRequest = h * Item.Height;
+            scb.AlternativeTextColor = Color.uxTextColor;
+            scb.TextColor = Color.uxTextColor;
+            scb.ItemID = Item.ItemID;
+            scb.StyleId = Item.ItemID.ToString();
+            scb.FontSize = 18.5F;
+            scb.EnableFaceFade();
+            scb.EnableIndicatorBlink();
+            scb.PV = new ItemValue();
+            scb.SV = new ItemValue();
+            DataAccessLayer MyDataAccessLayer = new DataAccessLayer();
+
+            var ItemValuesBtn = MyDataAccessLayer.ReadItemValues(scb.ItemID);
+            int i = 0;
+            foreach (var item in ItemValuesBtn)
+            {
+                if (i == 0)
+                {
+                    scb.PV.TagID = item.TagID;
+                    scb.PV.Value = item.Value;
+                }
+                if (i == 1)
+                {
+                    scb.SV.TagID = item.TagID;
+                    scb.SV.Value = item.Value;
+                }
+                i++;
+            }
+            scb.Touch += (sender, args) =>
+            {
+                switch (args.ActionType)
+                {
+                    case SKTouchAction.Released:
+                        if (Item.Action == "TOGGLE")
+                        {
+                            if (scb.SV.Value > 0.5)
+                            {
+                                scb.SV.Value = 0;
+                            }
+                            else
+                            {
+                                scb.SV.Value = 1;
+                            }
+                            MyDataAccessLayer.UpdateTagValue(scb.SV.TagID, scb.SV.Value);
+                            MyDataAccessLayer.StoreTagValue(scb.SV.TagID, scb.SV.Value);
+
+                        }
+                        else if (Item.Action == "ON")
+                        {
+                            scb.SV.Value = 1;
+                            MyDataAccessLayer.UpdateTagValue(scb.SV.TagID, scb.SV.Value);
+                            MyDataAccessLayer.StoreTagValue(scb.SV.TagID, scb.SV.Value);
+                        }
+                        else if (Item.Action == "OFF")
+                        {
+                            scb.SV.Value = 0;
+                            MyDataAccessLayer.UpdateTagValue(scb.SV.TagID, scb.SV.Value);
+                            MyDataAccessLayer.StoreTagValue(scb.SV.TagID, scb.SV.Value);
+                        }
+                        else if (Item.Action == "POPUPALARM")
+                        {
+                            ScadaClasses.Previouspage = -1;
+                            ScadaClasses.CurrentScadaPopup = ScadaClasses.uxAlarmGrid;
+                        }
+                        else if (Item.Action == "POPUPLOGIN")
+                        {
+                            ScadaClasses.Previouspage = -1;
+                            ScadaClasses.CurrentScadaPopup = ScadaClasses.uxLoginMenu;
+                        }
+                        else if (Item.Action == "POPUPDESIGN")
+                        {
+                            ScadaClasses.Previouspage = -1;
+                            ScadaClasses.CurrentScadaPopup = ScadaClasses.uxDesignMenu;
+                        }
+                        else
+                        {
+                            ScadaClasses.Currentpage = Item.Nextpage;
+                        }
+                        scb.GradientStartColor = Color.uxItemColor;
+                        scb.GradientEndColor = Color.uxItemColor;
+                        ScadaClasses.Refresh = true;
+
+                        break;
+
+                    case SKTouchAction.Pressed:
+                        scb.GradientStartColor = Color.uxTouchColor;
+                        scb.GradientEndColor = Color.uxTouchColor;
+                        break;
+
+                    case SKTouchAction.Moved:
+                        break;
+
+                    case SKTouchAction.Entered:
+                        bFaceFade = false;
+                        break;
+
+                    case SKTouchAction.Exited:
+                        bFaceFade = true;
+                        break;
+                }
+            };
+    
+            scb.IsEnabled = true;
+            scb.IsVisible = true;
+            scb.EnableTouchEvents = true;
+            scb.InputTransparent = false;
+            return (scb);
+        }
+
+
+
+
         public static BindableProperty ItemIDProperty = BindableProperty.Create(nameof(ItemID), typeof(int),
-        typeof(ScadaCircularProgress), 0, BindingMode.OneWay,
+        typeof(CircularProgress), 0, BindingMode.OneWay,
             validateValue: (_, value) => value != null,
         propertyChanged: OnPropertyChangedInvalidate);
 
@@ -23,7 +151,7 @@ namespace Scada
 
        
         public static BindableProperty PVProperty = BindableProperty.Create(nameof(PV), typeof(ItemValue),
-           typeof(ScadaCircularProgress), null, BindingMode.OneWay,
+           typeof(CircularProgress), null, BindingMode.OneWay,
            validateValue: (_, value) => value != null,
            propertyChanged: OnPropertyChangedInvalidate);
 
@@ -35,7 +163,7 @@ namespace Scada
 
 
         public static BindableProperty SVProperty = BindableProperty.Create(nameof(SV), typeof(ItemValue),
-           typeof(ScadaCircularProgress), null, BindingMode.OneWay,
+           typeof(CircularProgress), null, BindingMode.OneWay,
            validateValue: (_, value) => value != null,
            propertyChanged: OnPropertyChangedInvalidate);
 
@@ -47,7 +175,7 @@ namespace Scada
 
 
         public static BindableProperty CornerRadiusProperty = BindableProperty.Create(nameof(CornerRadius), typeof(float),
-            typeof(ScadaCircularProgress), 0f, BindingMode.OneWay,
+            typeof(CircularProgress), 0f, BindingMode.OneWay,
             validateValue: (_, value) => value != null && (float)value >= 0,
             propertyChanged: OnPropertyChangedInvalidate);
 
@@ -59,7 +187,7 @@ namespace Scada
         }
 
         public static BindableProperty BarBackgroundColorProperty = BindableProperty.Create(nameof(BarBackgroundColor), typeof(SKColor),
-            typeof(ScadaCircularProgress), SKColors.White, BindingMode.OneWay,
+            typeof(CircularProgress), SKColors.White, BindingMode.OneWay,
             validateValue: (_, value) => value != null, propertyChanged: OnPropertyChangedInvalidate);
 
         public SKColor BarBackgroundColor
@@ -69,7 +197,7 @@ namespace Scada
         }
 
         public static BindableProperty FontSizeProperty = BindableProperty.Create(nameof(FontSize), typeof(float),
-            typeof(ScadaCircularProgress), 0f, BindingMode.OneWay,
+            typeof(CircularProgress), 0f, BindingMode.OneWay,
             validateValue: (_, value) => value != null && (float)value >= 0,
             propertyChanged: OnPropertyChangedInvalidate);
 
@@ -80,7 +208,7 @@ namespace Scada
         }
 
         public static BindableProperty GradientStartColorProperty = BindableProperty.Create(nameof(GradientStartColor), typeof(SKColor),
-            typeof(ScadaCircularProgress), SKColors.Purple, BindingMode.OneWay,
+            typeof(CircularProgress), SKColors.Purple, BindingMode.OneWay,
             validateValue: (_, value) => value != null, propertyChanged: OnPropertyChangedInvalidate);
 
         public SKColor GradientStartColor
@@ -90,7 +218,7 @@ namespace Scada
         }
 
         public static BindableProperty GradientEndColorProperty = BindableProperty.Create(nameof(GradientEndColor), typeof(SKColor),
-            typeof(ScadaCircularProgress), SKColors.Blue, BindingMode.OneWay,
+            typeof(CircularProgress), SKColors.Blue, BindingMode.OneWay,
             validateValue: (_, value) => value != null, propertyChanged: OnPropertyChangedInvalidate);
 
         public SKColor GradientEndColor
@@ -100,7 +228,7 @@ namespace Scada
         }
 
         public static BindableProperty TextColorProperty = BindableProperty.Create(nameof(TextColor), typeof(SKColor),
-            typeof(ScadaCircularProgress), SKColors.Blue, BindingMode.OneWay,
+            typeof(CircularProgress), SKColors.Blue, BindingMode.OneWay,
             validateValue: (_, value) => value != null, propertyChanged: OnPropertyChangedInvalidate);
 
         public SKColor TextColor
@@ -110,7 +238,7 @@ namespace Scada
         }
 
         public static BindableProperty AlternativeTextColorProperty = BindableProperty.Create(nameof(AlternativeTextColor), typeof(SKColor),
-            typeof(ScadaCircularProgress), SKColors.Blue, BindingMode.OneWay,
+            typeof(CircularProgress), SKColors.Blue, BindingMode.OneWay,
             validateValue: (_, value) => value != null, propertyChanged: OnPropertyChangedInvalidate);
 
         public SKColor AlternativeTextColor
@@ -121,10 +249,123 @@ namespace Scada
 
         private static void OnPropertyChangedInvalidate(BindableObject bindable, object oldvalue, object newvalue)
         {
-            var control = (ScadaCircularProgress)bindable;
+            var control = (CircularProgress)bindable;
             if (oldvalue != newvalue)
                 control.InvalidateSurface();
         }
+
+
+        public void FadeDown()
+        {
+            bFaceFade = false;
+        }
+
+        public void FadeUp()
+        {
+            bFaceFade = true;
+        }
+
+        public async void EnableFaceFade()
+        {
+            float Step = 5.0F;
+            while (true)
+            {
+                if (bFaceFade == true)
+                {
+                    if (localBtnFaceIntensity > 200)
+                    {
+                        localBtnFaceIntensity = localBtnFaceIntensity - Step;
+                        if (IsLoaded == true)
+                        {
+                            InvalidateSurface();
+                        }
+                    }
+                }
+                if (bFaceFade == false)
+                {
+                    if (localBtnFaceIntensity < 250)
+                    {
+                        localBtnFaceIntensity = localBtnFaceIntensity + Step;
+                        if (IsLoaded == true)
+                        {
+                            InvalidateSurface();
+                        }
+                    }
+                }
+                await Task.Delay(10);
+            }
+        }
+
+
+
+        public async void EnableIndicatorBlink()
+        {
+            const int cStep = 2;
+            int iStep = cStep;
+            while (bIndicatorFade)
+            {
+                if ((localBtnIndicatorIntensity + iStep) > 255)
+                {
+                    iStep = -cStep;
+                }
+                if (localBtnIndicatorIntensity < 100)
+                {
+                    iStep = cStep;
+                }
+                if (IsLoaded == true)
+                {
+                    InvalidateSurface();
+                }
+                localBtnIndicatorIntensity = localBtnIndicatorIntensity + iStep;
+                await Task.Delay(10);
+            }
+            localBtnIndicatorIntensity = 255;
+        }
+
+        public void Start()
+        {
+            RefreshTask();
+        }
+
+        public void RefreshValues()
+        {
+            DataAccessLayer MyDataAccessLayer = new DataAccessLayer();
+
+            var ItemValues = MyDataAccessLayer.ReadItemValues(ItemID);
+            foreach (var item in ItemValues)
+            {
+
+                if (item.TagID == PV.TagID)
+                {
+                    PV.Value = item.Value;
+                    PV.StatusQuality = item.StatusQuality;
+                }
+                if (item.TagID == SV.TagID)
+                {
+                    SV.Value = item.Value;
+                    SV.StatusQuality = item.StatusQuality;
+                }
+
+            }
+            if (IsLoaded == true)
+            {
+                InvalidateSurface();
+            }
+        }
+
+        private async void RefreshTask()
+        {
+            while (true)
+            {
+                await Task.Delay(5000);
+                RefreshValues();
+            }
+        }
+
+
+
+
+
 
         private SKPoint PointFromDegrees(float degrees, int radius, SKRect rect, int padding = 0)
         {
@@ -134,80 +375,81 @@ namespace Scada
             return new SKPoint(x, y);
         }
 
-        
+        SKPaint Backgroundpaint = new SKPaint
+        {
+            IsAntialias = true,
+            Style = SKPaintStyle.StrokeAndFill,
+            Color = new SKColor(60, 60, 60, 220),
+            StrokeWidth = 0
+        };
+
+        SKPaint OnPaint = new SKPaint
+        {
+            IsAntialias = true,
+            Color = new SKColor(100, 100, 100, 255),
+            TextSize = 16.5F,
+            Style = SKPaintStyle.Stroke,
+            StrokeWidth = 7.5F,
+            FilterQuality = SKFilterQuality.High
+        };
+
+        SKPaint OffPaint = new SKPaint
+        {
+            IsAntialias = true,
+            Style = SKPaintStyle.Stroke,
+            Color = new SKColor(100, 100, 100, 220),
+            StrokeWidth = 7.5F
+        };
+
+
         protected override void OnPaintSurface(SKPaintSurfaceEventArgs e)
         {
             var info = e.Info;
-            var canvas = e.Surface.Canvas;
-            
+            var canvas = e.Surface.Canvas;          
             float MaxValue = 100;         
-     
-            var Backgroundpaint = new SKPaint
+    
+            if (PV.Value > MaxValue ) 
             {
-                IsAntialias = true,
-                Style = SKPaintStyle.StrokeAndFill,
-                Color = GradientStartColor,
-                StrokeWidth = 0
-            };
-
-            var ProgressPaint = new SKPaint
-            {
-                IsAntialias = true,
-                Style = SKPaintStyle.Stroke,
-                Color = new SKColor(3, 156, 35, 240),
-                StrokeWidth = 7.5F
-            };
-
-            var OffPaint = new SKPaint
-            {
-                IsAntialias = true,
-                Style = SKPaintStyle.Stroke,
-                Color = new SKColor(100, 100, 100, 200),
-                StrokeWidth = 7.5F
-            };
-
-            if (PV.Value > MaxValue ) {
                PV.Value = (float)(MaxValue);
             }
-            if (PV.Value > 0.5) //FY Temporary fix for digital
+            if (PV.Value > 0.5) 
             {
-                PV.Value = (float)(MaxValue);
+               PV.Value = (float)(MaxValue);
             }
 
-            var radius = (info.Height / 2);
+            float radius = (info.Height / 2);
+            float frame = radius / 4;
+            float diam = radius * 2.0F;
             var center = new SKPoint(info.Rect.MidX, info.Rect.MidY);
             var degrees = ( PV.Value / 100 ) * 360;
 
             //Draw Circle        
             canvas.Clear();
             canvas.DrawArc(new SKRect(0, 0, info.Height, info.Height), -90, 360, false, Backgroundpaint);
-
          
-            float frame = radius / 4;
-            float diam = radius * 2.0F;       
-            
             if (PV.Value > 0.5)
             {
-                canvas.DrawArc(new SKRect(frame, frame, diam - frame, diam - frame), -90, degrees, false, ProgressPaint);               
+                OnPaint.Color = new SKColor(3, 156, 35, (byte)localBtnIndicatorIntensity);
+                canvas.DrawArc(new SKRect(frame, frame, diam - frame, diam - frame), -90, degrees, false, OnPaint);               
             }
             else
             {
                 canvas.DrawArc(new SKRect(frame, frame, diam - frame, diam - frame), -90, 360, false, OffPaint);
-            }
-            
-            /* 
-            Dotted experiment
-            if (Percentage > 0.5)
-            {
-                float Angle = -90;
-                while (Angle < degrees)
-                {
-                    canvas.DrawArc(new SKRect(9, 10, info.Height - 10, info.Height - 10), Angle, 10, false, ProgressPaint);
-                    Angle = Angle + 20;
-                }
-            }
-            */
+            }                
         }
-
     }
 }
+
+
+/* 
+        Dotted experiment
+        if (Percentage > 0.5)
+        {
+            float Angle = -90;
+            while (Angle < degrees)
+            {
+                canvas.DrawArc(new SKRect(9, 10, info.Height - 10, info.Height - 10), Angle, 10, false, ProgressPaint);
+                Angle = Angle + 20;
+            }
+        }
+        */

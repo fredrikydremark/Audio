@@ -197,36 +197,31 @@ namespace Scada
 
         public void Start()
         {
-            UpdateArc();
+            UpdateValue();
         }
-
-        public void Stop()
+        private async void UpdateValue()
         {
-
-        }
-
-        private async void UpdateArc()
-        {
-            var Step = 3;
+            DataAccessLayer MyDataAccessLayer = new DataAccessLayer();
             while (true)
             {
-                await Task.Delay(50);
-                if (intensity > 200)
+                await Task.Delay(5000);             
+                var ItemValues = MyDataAccessLayer.ReadItemValues(ItemID);           
+                foreach (var item in ItemValues)
                 {
-                    for (int i = 0; i < 30; i++)
+                    if (item.TagID == PV.TagID)
                     {
-                        if (IsLoaded == true)
-                        {
-                            InvalidateSurface();
-                        }
-                        intensity = intensity - Step;
-                        await Task.Delay(50);
+                        PV.Value = item.Value;
+                        PV.StatusQuality = item.StatusQuality;
                     }
+                }
+                if (IsLoaded == true)
+                {
+                    InvalidateSurface();
                 }
             }
         }
 
-
+      
         protected override void OnPaintSurface(SKPaintSurfaceEventArgs e)
         {
             var info = e.Info;

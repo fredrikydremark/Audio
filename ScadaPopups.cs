@@ -137,8 +137,7 @@ namespace Scada
 
 
             if (CurrentScadaPopup == ScadaClasses.uxTagsGrid)
-            {
-            
+            {            
                 ScadaClasses.Telegram oMenuTelegram = new ScadaClasses.Telegram()
                 {
                     MessageType = 0,
@@ -205,11 +204,9 @@ namespace Scada
                     SV = "0.0",
                     Text = " ",
                     Radius = 10
-                    //gridRows = MyDataAccessLayer.GetTagParams(CurrentTag)
                 };
                 ScadaItems.Add(oMenuTelegram);
             }
-
 
 
             if (CurrentScadaPopup == ScadaClasses.uxItemSizeMenu)
@@ -234,8 +231,6 @@ namespace Scada
                 };
                 ScadaItems.Add(oMenuTelegram);
             }
-
-
 
             if (CurrentScadaPopup == ScadaClasses.uxTimeSpanMenu)
             {
@@ -307,7 +302,6 @@ namespace Scada
                 ScadaItems.Add(oMenuTelegram);
             }
 
-
             if (CurrentScadaPopup == ScadaClasses.uxLoginMenu)
             {
                 ScadaClasses.Telegram oMenuTelegram = new ScadaClasses.Telegram()
@@ -326,6 +320,30 @@ namespace Scada
                     PV = "0.0",
                     SV = "0.0",
                     Text = " ",
+                    Radius = 10
+                };
+                ScadaItems.Add(oMenuTelegram);
+            }
+
+            if (CurrentScadaPopup == ScadaClasses.uxAlarmGrid)
+            {
+                ScadaClasses.Telegram oMenuTelegram = new ScadaClasses.Telegram()
+                {
+                    MessageType = 0,
+                    Top = (((Ypos / Height) * 100) + 1.7 + (Yheight / Width) * 100),
+                    Left = (((Xpos / Width) * 100) + ((Xwidth / Width) * 100) / 5),
+                    Width = 80,
+                    Height = 50,
+                    Page = Currentpage,
+                    ItemType = ScadaClasses.uxAlarmGrid,
+                    ItemID = -1,
+                    TagID = 1,
+                    TagName = " ",
+                    Action = " ",
+                    PV = "0.0",
+                    SV = "0.0",
+                    Text = " ",                    
+                    gridRows = MyDataAccessLayer.ReadAlarmMessages(""),
                     Radius = 10
                 };
                 ScadaItems.Add(oMenuTelegram);
@@ -402,19 +420,11 @@ namespace Scada
             return ScadaItems;
         }
 
-
-
-
-
-
-
         public class A
         {
             public string X { get; set; }
             public string Y { get; set; }
            
-        }
-
-          
+        }          
     }
 }

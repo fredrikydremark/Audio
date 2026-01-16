@@ -8,6 +8,10 @@ namespace Scada
 {
     public class ScadaNumeric : SKCanvasView
     {
+        bool AnimationRunning = false;
+        float DV = 0;
+        float OV = 0;
+
         public ScadaNumeric Init(double w, double h, ScadaNumeric scb, ScadaClasses.Telegram Item, ScadaClasses.Colors Color)
         {
             scb.AnchorX = 0;
@@ -25,9 +29,10 @@ namespace Scada
             scb.StyleId = Item.ItemID.ToString();
             scb.FontSize = 18.5F;
             scb.PV = new ItemValue();
+            scb.PV.TagID = -1;
+            scb.PV.Value = -1;
 
-            DataAccessLayer MyDataAccessLayer = new DataAccessLayer();
-            
+            DataAccessLayer MyDataAccessLayer = new DataAccessLayer();           
             var ItemValuesBtn = MyDataAccessLayer.ReadItemValues(scb.ItemID);
             int i = 0;
             foreach (var item in ItemValuesBtn)
@@ -36,6 +41,8 @@ namespace Scada
                 {
                     scb.PV.TagID = item.TagID;
                     scb.PV.Value = item.Value;
+                    scb.PV.Unit = item.Unit;
+                    scb.PV.StatusQuality = item.StatusQuality;
                 }
                 i++;
             }
@@ -184,13 +191,13 @@ namespace Scada
             }
         }
 
-        bool AnimationRunning = false;
-        float DV = 0;
-        float OV = 0;
+ 
         public void Start()
         {
             if (AnimationRunning == false)
                 UpdateAnimation();
+
+            UpdateValue();
         }
 
         private async void UpdateAnimation()
@@ -213,6 +220,30 @@ namespace Scada
                 }
             }
         }
+
+        private async void UpdateValue()
+        {
+            while (true)
+            {
+                await Task.Delay(5000);
+                DataAccessLayer MyDataAccessLayer = new DataAccessLayer();
+                var ItemValues = MyDataAccessLayer.ReadItemValues(ItemID);
+                foreach (var item in ItemValues)
+                {
+                    if (item.TagID == PV.TagID)
+                    {
+                        PV.Value = item.Value;
+                        PV.StatusQuality = item.StatusQuality;
+                        PV.Unit = item.Unit;
+                    }
+                }
+                if (IsLoaded == true)
+                {
+                    InvalidateSurface();
+                }               
+            }
+        }
+
 
         protected override void OnPaintSurface(SKPaintSurfaceEventArgs e)
         {
@@ -249,15 +280,15 @@ namespace Scada
             path3.AddArc(new SKRect(w - r, d, w, r), -90, 180);
             path3.Close();
 
-            string DegreeC = "\u00B0C";
-            string Unit = DegreeC;
+            string sDegreeC = "\u00B0C";
+            string sUnit = sDegreeC;
             if (PV.Unit == "C")
             {
-                Unit = DegreeC;
+                sUnit = sDegreeC;
             }
             else
             {
-                Unit = PV.Unit;
+                sUnit = PV.Unit;
             }
 
             string Format = "0.0";
@@ -271,11 +302,11 @@ namespace Scada
             string s = "";
             if (PV.StatusQuality == 0)
             {
-                s = DV.ToString(Format) + Unit;
+                s = DV.ToString(Format) + sUnit;
             }
             else
             {
-                s = "--.-" + Unit;
+                s = "--.-" + sUnit;
             }
 
 

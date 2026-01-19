@@ -155,11 +155,34 @@ namespace Scada
                     SV = "0.0",
                     Text = " ",
                     Radius = 10,
-                    gridRows = MyDataAccessLayer.LoadTags2()
+                    gridRows = MyDataAccessLayer.LoadTags()
                 };
                 ScadaItems.Add(oMenuTelegram);
             }
 
+            if (CurrentScadaPopup == ScadaClasses.uxParameters)
+            {
+                ScadaClasses.Telegram oMenuTelegram = new ScadaClasses.Telegram()
+                {
+                    MessageType = 0,
+                    Top = 20,
+                    Left = 30,
+                    Width = 40,
+                    Height = 55,
+                    Page = Currentpage,
+                    ItemType = ScadaClasses.uxParameters,
+                    ItemID = 777,
+                    TagID = 4,
+                    TagName = " ",
+                    Action = " ",
+                    PV = "0.0",
+                    SV = "0.0",
+                    Text = " ",
+                    Radius = 10,
+                    gridRows = MyDataAccessLayer.LoadParameters()
+                };
+                ScadaItems.Add(oMenuTelegram);
+            }
 
             if (CurrentScadaPopup == ScadaClasses.uxTagSettings)
             {

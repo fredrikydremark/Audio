@@ -55,7 +55,7 @@ namespace Scada
         //Animation
         public const int uxAnimation = 36;
         public const int uxMovingItem = 37;
-        public const int ux3D = 54;
+        public const int ux3D = 90;
 
         //Menus
         public const int uxLoginMenu = 38;
@@ -75,6 +75,7 @@ namespace Scada
         public const int uxTagSettings = 51;
         public const int uxItemSizeMenu = 52;
         public const int uxEditText = 53;
+        public const int uxParameters = 54;
 
         public const int CmdInvalid = -1;
         public const int Cmdgetpictures = 1;

@@ -412,7 +412,7 @@ namespace Scada
 
 
 
-        public List<gridRow> LoadTags2()
+        public List<gridRow> LoadTags()
         {
             try
             {
@@ -495,6 +495,74 @@ namespace Scada
             {
             }
         }
+
+        public List<gridRow> LoadParameters()
+        {
+            try
+            {
+                var Connection = new Microsoft.Data.SqlClient.SqlConnection
+                {
+                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                };
+                Connection.Open();
+                string sqlGetData = "select tags.tagID,tags.driver,tags.tagname,tags.Description from tags " +                 
+                                     "WHERE Driver = 0 ";
+
+                SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
+
+
+                cmdGetData.CommandText = sqlGetData;
+                SqlDataReader reader = cmdGetData.ExecuteReader();
+
+                var gridRows = new List<gridRow>();
+                int r = 0;
+                while (reader.Read())
+                {
+                    int TagID = reader.GetInt32(0);
+                    int Driver = reader.GetInt32(1);
+                    string TagName = reader.GetString(2);
+                    string TagDesc = reader.GetString(3);
+
+              
+                   
+                    gridRows.Add(new gridRow
+                    {
+                        Status = 0,
+                        col1text = TagName,
+                        col1width = 250F,
+                        col2text = TagDesc,
+                        col2width = 250F,
+                        col3text = "",
+                        col3width = 50F,
+                        col4text = "",
+                        col4width = 50F,
+                        col5text = "",
+                        col5width = 50F,
+                        col6text = "",
+                        col6width = 50F,
+                        TagID = TagID,
+                        Row = r,
+                        Id = 0
+                    });
+                    r++;
+
+                }
+                cmdGetData.Dispose();
+                cmdGetData = null;
+                Connection.Close();
+                Connection = null;
+                return (gridRows);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString(), ex);
+            }
+            finally
+            {
+            }
+        }
+
+
 
 
         public int EnableAlarmOnTag(int TagID, bool Enable)
@@ -2575,17 +2643,20 @@ namespace Scada
                     {
                         oTempTele.Radius = reader.GetDouble(17);
                     }
-
                     if (oTempTele.ItemType == ScadaClasses.uxAlarmGrid)
                     {
                         oTempTele.gridRows = ReadAlarmMessages("All");
                     }
                     if (oTempTele.ItemType == ScadaClasses.uxTagsGrid)
                     {
-                        oTempTele.gridRows = LoadTags2();
+                        oTempTele.gridRows = LoadTags();
+                    }
+                    if (oTempTele.ItemType == ScadaClasses.uxParameters)
+                    {
+                        oTempTele.gridRows = LoadParameters();
                     }
 
-                    if (oTempTele.ItemType == ScadaClasses.uxHistoryChart) // HistoryChart 
+                    if (oTempTele.ItemType == ScadaClasses.uxHistoryChart) 
                     {
                         oTempTele.Min = "0";
                         oTempTele.Max = "30";

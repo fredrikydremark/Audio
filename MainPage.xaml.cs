@@ -991,7 +991,142 @@ public partial class MainPage : ContentPage
         }
     }
 
+    private void ScadaParameters()
+    {
+        double panelWith = 0.7;
+        double panelHeight = 0.7;
 
+        double x = (Width / 2) - panelWith * Width / 2;
+        double y = (Height / 2) - panelHeight * Height / 2;
+        double w = (panelWith * Width);
+        double h = (panelHeight * Height);
+        var popupAlarm = new ScadaButton();
+        popupAlarm.AnchorX = 0;
+        popupAlarm.AnchorY = 0;
+        popupAlarm.CornerRadius = 10;
+        popupAlarm.BarBackgroundColor = uxPanelColor;
+        popupAlarm.BackgroundColor = uxPanelColor.ToMauiColor();
+        popupAlarm.GradientStartColor = uxPopupColor;//uxItemBackGroundColor
+        popupAlarm.GradientEndColor = uxPopupColor; //uxItemBackGroundColor
+        popupAlarm.IndicatorColor = uxPanelColor;
+        popupAlarm.IndicatorType = 0;
+        popupAlarm.WidthRequest = w;
+        popupAlarm.HeightRequest = h;
+        popupAlarm.AlternativeTextColor = uxTextColor;
+        popupAlarm.TextColor = uxTextColor;
+        popupAlarm.IsEnabled = true;
+        popupAlarm.IsVisible = true;
+        AbsoluteLayout.SetLayoutBounds(popupAlarm, new Rect(x, y, w, h));
+        AbsoluteLayout.SetLayoutFlags(popupAlarm, AbsoluteLayoutFlags.None);
+        SKCanvasViews.Add(popupAlarm);
+        CreateCloseButton(x, y, w, h);
+
+        y = y + popupAlarm.CornerRadius;
+        var TheColor = uxItemColor;
+        y = y + 20;
+        for (int r = 0; r < 17; r++)
+        {
+            if ((r % 2) == 0)
+            {
+                TheColor = uxLightColor;
+            }
+            else
+            {
+                TheColor = uxItemColor;
+            }
+
+            var myRowButton = new ScadaButton
+            {
+                ItemID = 1,
+                StyleId = r.ToString(),
+                WidthRequest = w,
+                HeightRequest = 26,
+                Background = uxItemColor.ToMauiColor(),
+                BarBackgroundColor = uxItemColor,
+                IndicatorType = 2,
+
+                IndicatorColor = TheColor,
+                GradientStartColor = TheColor,
+                GradientEndColor = TheColor,
+
+                CornerRadius = 0,
+                TextColor = uxTextColor,
+                FontSize = 18.5F,
+                SvgBase64 = "",
+            };
+
+            var gridRow = new gridRow
+            {
+                Status = 0,
+                col1text = "",
+                col1width = 0F,
+                col2text = "",
+                col2width = 0F,
+                col3text = "",
+                col3width = 0F,
+                col4text = "",
+                col4width = 0F,
+                col5text = "",
+                col5width = 0F,
+                col6text = "",
+                col6width = 0F,
+                Row = r,
+                Id = -1
+            };
+            myRowButton.ButtonRow = gridRow;
+            myRowButton.ButtonText = "";
+
+            myRowButton.Touch += (sender, args) =>
+            {
+                var pt = args.Location;
+                switch (args.ActionType)
+                {
+                    case SKTouchAction.Released:
+                        ScadaClasses.Previouspage = -1;
+                        ScadaClasses.CurrentScadaPopup = ScadaClasses.uxTagSettings;
+                        ScadaClasses.CurrentTag = myRowButton.ButtonRow.TagID;
+                        ScadaClasses.Refresh = true;
+                        /*ScadaAlarmPopup(myRowButton.ButtonRow.Id, myRowButton.ButtonRow.TagID, myRowButton.ButtonRow.col2text);
+                        foreach (SKCanvasView viewItem in SKCanvasPopupViews)
+                        {
+                            absoluteLayout.Add(viewItem);
+                        }
+                        Content = absoluteLayout;
+                        */
+                        break;
+
+                    case SKTouchAction.Entered:
+                        myRowButton.GradientStartColor = uxTouchColor;
+                        myRowButton.GradientEndColor = uxTouchColor;
+                        myRowButton.IndicatorColor = uxTouchColor;
+                        break;
+
+                    case SKTouchAction.Exited:
+                        if ((myRowButton.ButtonRow.Row % 2) == 0)
+                        {
+                            TheColor = uxLightColor;
+                        }
+                        else
+                        {
+                            TheColor = uxItemColor;
+                        }
+                        myRowButton.GradientStartColor = TheColor;
+                        myRowButton.GradientEndColor = TheColor;
+                        myRowButton.IndicatorColor = TheColor;
+                        break;
+                }
+                args.Handled = true;
+            };
+            myRowButton.EnableIndicatorBlink();
+            myRowButton.InputTransparent = false;
+            myRowButton.EnableTouchEvents = true;
+
+            AbsoluteLayout.SetLayoutBounds(myRowButton, new Rect(x, y, myRowButton.WidthRequest, 26));
+            AbsoluteLayout.SetLayoutFlags(myRowButton, AbsoluteLayoutFlags.None);
+            SKCanvasViews.Add(myRowButton);
+            y = y + 26;
+        }
+    }
 
     private void ScadaDesign(int InfoType)
     {
@@ -1204,16 +1339,7 @@ public partial class MainPage : ContentPage
             switch (args.ActionType)
             {
                 case SKTouchAction.Released:
-                    /*ScadaControlTelegram oTelegram = new ScadaControlTelegram()
-                    {
-                        MessageType = 22,
-                        Page = ScadaClasses.Currentpage,
-                        ItemType = 3,
-                        ItemID = 1,
-                        TagID = 1,
-                        TagName = "",
-                        Action = " ",
-                    };*/
+                   
                     ScadaClasses.Previouspage = -1;
                     ScadaClasses.CurrentScadaPopup = -1;
                     ScadaClasses.Refresh = true;
@@ -1444,7 +1570,7 @@ public partial class MainPage : ContentPage
                         Action = " ",
                     };*/
                     ScadaClasses.Previouspage = -1;
-                    ScadaClasses.CurrentScadaPopup = ScadaClasses.uxTagsGrid;
+                    ScadaClasses.CurrentScadaPopup = ScadaClasses.uxParameters;
                     ScadaClasses.Refresh = true;
                     break;
 
@@ -2445,167 +2571,12 @@ public partial class MainPage : ContentPage
                         ScadaAlarmGrid();
                         break;
 
+                    case ScadaClasses.uxParameters:
+                        ScadaParameters();
+                        break;
+
                     case ScadaClasses.uxTagsGrid:
-                        ScadaTagsGrid();
-                       
-                        /*
-                        var TagsPanel = new ScadaButton();
-                        TagsPanel.AnchorX = 0;
-                        TagsPanel.AnchorY = 0;
-                        TagsPanel.ItemID = ScadaItem.ItemID;
-                        TagsPanel.StyleId = ScadaItem.ItemID.ToString();
-                        TagsPanel.CornerRadius = 10;
-                        TagsPanel.BarBackgroundColor = uxPanelColor;
-                        TagsPanel.BackgroundColor = uxPanelColor.ToMauiColor();
-                        TagsPanel.GradientStartColor = uxItemBackGroundColor;
-                        TagsPanel.GradientEndColor = uxItemBackGroundColor;
-                        TagsPanel.IndicatorColor = uxPanelColor; 
-                        TagsPanel.IndicatorType = 0;
-                        TagsPanel.WidthRequest = (Width / 100) * ScadaItem.Width;
-                        TagsPanel.HeightRequest = (Height / 100) * ScadaItem.Height;
-                        TagsPanel.AlternativeTextColor = uxTextColor;
-                        TagsPanel.TextColor = uxTextColor;
-                        TagsPanel.IsEnabled = true;
-                        TagsPanel.IsVisible = true;
-
-                        if (Designing == true)
-                        {
-                            TagsPanel.EnableTouchEvents = true;
-                            TagsPanel.InputTransparent = false;
-                            TagsPanel = (ScadaButton)AttachDesignEvents(TagsPanel, ScadaItem);
-                        }
-
-                        AbsoluteLayout.SetLayoutBounds(TagsPanel, new Rect(
-                                (Width / 100) * ScadaItem.Left,
-                                (Height / 100) * ScadaItem.Top,
-                                (Width / 100) * ScadaItem.Width,
-                                (Height / 100) * ScadaItem.Height));
-                        AbsoluteLayout.SetLayoutFlags(TagsPanel, AbsoluteLayoutFlags.None);
-                        SKCanvasViews.Add(TagsPanel);
-
-                        x = (Width / 100) * ScadaItem.Left;
-                        y = (Height / 100) * ScadaItem.Top;
-                        w = (Width / 100) * ScadaItem.Width;
-                        h = (Height / 100) * ScadaItem.Height;
-
-                        CreateCloseButton(x, y, w, h);
-                        CreateFwdButton(x, y, w, h);
-                        CreateRwdButton(x, y, w, h);
-                        CreateAddTagButton(x, y, w, h);
-
-                        y = y + TagsPanel.CornerRadius;
-
-                        var TagRowColor = uxItemColor;
-                        y = y + 40;
-                        for (int r = 0; r < 10; r++)
-                        {
-                            if ((r % 2) == 0)
-                            {
-                                TagRowColor = uxLightColor;
-                            }
-                            else
-                            {
-                                TagRowColor = uxItemColor;
-                            }
-
-                            var myRowButton = new ScadaButton
-                            {
-                                ItemID = ScadaItem.ItemID,
-                                StyleId = r.ToString(),
-                                WidthRequest = (Width / 100) * ScadaItem.Width,
-                                HeightRequest = 26,
-                                Background = uxItemColor.ToMauiColor(),
-                                BarBackgroundColor = uxItemColor,
-                                IndicatorType = 2,
-
-                                IndicatorColor = TagRowColor,
-                                GradientStartColor = TagRowColor,
-                                GradientEndColor = TagRowColor,
-
-                                CornerRadius = 0,
-                                TextColor = uxTextColor,
-                                FontSize = 18.5F,
-                                SvgBase64 = "",
-                            };
-
-                            var gridRow = new gridRow
-                            {
-                                Status = 0,
-                                col1text = "",
-                                col1width = 0F,
-                                col2text = "",
-                                col2width = 0F,
-                                col3text = "",
-                                col3width = 0F,
-                                col4text = "",
-                                col4width = 0F,
-                                col5text = "",
-                                col5width = 0F,
-                                col6text = "",
-                                col6width = 0F,
-                                Row = r,
-                                Id = -1
-                            };
-                            myRowButton.ButtonRow = gridRow;
-                            myRowButton.ButtonText = "";
-
-                            if (Designing == true)
-                            {
-                                myRowButton.EnableTouchEvents = false;
-                            }
-                            else
-                            {
-                                myRowButton.EnableTouchEvents = true;
-                            }
-
-                            myRowButton.Touch += (sender, args) =>
-                            {
-                                var pt = args.Location;
-                                switch (args.ActionType)
-                                {
-                                    case SKTouchAction.Released:
-                                        ScadaClasses.Previouspage = -1;
-                                        ScadaClasses.CurrentScadaPopup = ScadaClasses.uxTagSettings;
-                                        ScadaClasses.CurrentTag = myRowButton.ButtonRow.TagID;
-                                        ScadaClasses.Refresh = true;
-                                        break;
-
-                                    case SKTouchAction.Entered:
-                                        myRowButton.GradientStartColor = uxTouchColor;
-                                        myRowButton.GradientEndColor = uxTouchColor;
-                                        myRowButton.IndicatorColor = uxTouchColor;
-                                        break;
-
-                                    case SKTouchAction.Exited:
-
-                                        if ((myRowButton.ButtonRow.Row % 2) == 0)
-                                        {                                    
-                                            myRowButton.GradientStartColor = uxLightColor;
-                                            myRowButton.GradientEndColor = uxLightColor;
-                                            myRowButton.IndicatorColor = uxLightColor;
-                                        }
-                                        else
-                                        {                        
-                                            myRowButton.GradientStartColor = uxItemColor;
-                                            myRowButton.GradientEndColor = uxItemColor;
-                                            myRowButton.IndicatorColor = uxItemColor;
-                                        }                        
-                                        break;
-                                }
-                                args.Handled = true;
-                            };
-                            myRowButton.EnableIndicatorBlink();
-                            myRowButton.InputTransparent = false;
-                            AbsoluteLayout.SetLayoutBounds(myRowButton, new Rect(x, y, myRowButton.WidthRequest, 26));
-                            AbsoluteLayout.SetLayoutFlags(myRowButton, AbsoluteLayoutFlags.None);
-
-                            if (y < (Height / 100 * ScadaItem.Top) + (Height / 100 * ScadaItem.Height) - 26)
-                            {
-                                SKCanvasViews.Add(myRowButton);
-                                y = y + 26;
-                            }
-                        }
-                        */
+                        ScadaTagsGrid();                  
                         break;
 
                     case ScadaClasses.uxTagSettings:
@@ -5317,6 +5288,7 @@ public partial class MainPage : ContentPage
                     {
                         if ((ScadaItem.ItemType == ScadaClasses.uxAlarmGrid) ||
                             (ScadaItem.ItemType == ScadaClasses.uxTagsGrid) ||
+                            (ScadaItem.ItemType == ScadaClasses.uxParameters) ||
                             (ScadaItem.ItemType == ScadaClasses.uxTagSettings))                          
                         {
                                 int iRow = Convert.ToInt32(dItem.StyleId);                            

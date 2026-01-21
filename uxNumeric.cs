@@ -197,7 +197,7 @@ namespace Scada
             if (AnimationRunning == false)
                 UpdateAnimation();
 
-            UpdateValue();
+            //RefreshTask();
         }
 
         private async void UpdateAnimation()
@@ -221,29 +221,35 @@ namespace Scada
             }
         }
 
-        private async void UpdateValue()
+        public void RefreshValues(List<ItemValue> ItemValues)
         {
-            while (true)
+            if (ItemValues != null)
             {
-                await Task.Delay(5000);
-                DataAccessLayer MyDataAccessLayer = new DataAccessLayer();
-                var ItemValues = MyDataAccessLayer.ReadItemValues(ItemID);
                 foreach (var item in ItemValues)
                 {
                     if (item.TagID == PV.TagID)
                     {
                         PV.Value = item.Value;
                         PV.StatusQuality = item.StatusQuality;
-                        PV.Unit = item.Unit;
                     }
                 }
                 if (IsLoaded == true)
                 {
                     InvalidateSurface();
-                }               
+                }
             }
         }
 
+        private async void RefreshTask()
+        {
+            DataAccessLayer MyDataAccessLayer = new DataAccessLayer();
+            while (true)
+            {
+                await Task.Delay(5000);
+                var ItemValues = MyDataAccessLayer.ReadItemValues(ItemID);
+                RefreshValues(ItemValues);
+            }
+        }
 
         protected override void OnPaintSurface(SKPaintSurfaceEventArgs e)
         {

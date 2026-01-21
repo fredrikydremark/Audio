@@ -732,6 +732,7 @@ public partial class MainPage : ContentPage
         double w = (panelWith * Width);
         double h = (panelHeight * Height);
         var popupAlarm = new ScadaButton();
+        popupAlarm.StyleId = "-1";
         popupAlarm.AnchorX = 0;
         popupAlarm.AnchorY = 0;
         popupAlarm.CornerRadius = 10;
@@ -5226,7 +5227,19 @@ public partial class MainPage : ContentPage
                     dItem.InvalidateSurface();
                 }
             }
-
+           
+            
+            if (uxItem is ScadaNumeric)
+            {
+                var dItem = uxItem as ScadaNumeric;
+                foreach (var Item in ScadaItems)
+                {
+                    if (dItem.ItemID == Item.ItemID)
+                    {
+                       dItem.RefreshValues(Item.ItemValues);
+                    }
+                }
+            }
 
             if (uxItem is Toggle)
             {
@@ -5242,7 +5255,16 @@ public partial class MainPage : ContentPage
             if (uxItem is ScadaButton)
             {
                 var dItem = uxItem as ScadaButton;
-                //Sets Time span Button text
+               
+                foreach (var Item in ScadaItems)
+                {
+                    if (dItem.ItemID == Item.ItemID)
+                    {
+                        dItem.RefreshValues(Item.ItemValues);
+                    }
+                }
+
+                //Sets Time span Button text                
                 if (dItem.StyleId == "myTimeScaleButton")
                 {
                     var ChartSetting = MyDataAccessLayer.GetChartSettings(dItem.ItemID);
@@ -5276,22 +5298,23 @@ public partial class MainPage : ContentPage
                             break;
                     }
                 }
-                if (dItem.PV != null)
-                {
-                    dItem.RefreshValues();
-                }
+                
+                
+                     
 
-
-                foreach (var ScadaItem in ScadaItems)
-                {                
-                    if (dItem != null)
+                    foreach (var ScadaItem in ScadaItems)
                     {
-                        if ((ScadaItem.ItemType == ScadaClasses.uxAlarmGrid) ||
-                            (ScadaItem.ItemType == ScadaClasses.uxTagsGrid) ||
-                            (ScadaItem.ItemType == ScadaClasses.uxParameters) ||
-                            (ScadaItem.ItemType == ScadaClasses.uxTagSettings))                          
+                        if (dItem != null)
                         {
-                                int iRow = Convert.ToInt32(dItem.StyleId);                            
+                            if ((ScadaItem.ItemType == ScadaClasses.uxAlarmGrid) ||
+                                (ScadaItem.ItemType == ScadaClasses.uxTagsGrid) ||
+                                (ScadaItem.ItemType == ScadaClasses.uxParameters) ||
+                                (ScadaItem.ItemType == ScadaClasses.uxTagSettings))
+                            {
+                                          
+                            bool isNumeric = int.TryParse(dItem.StyleId, out int iRow);                    
+                            if (isNumeric)
+                            {
                                 var emptyrow = new gridRow
                                 {
                                     Status = 5,
@@ -5323,8 +5346,10 @@ public partial class MainPage : ContentPage
                                             dItem.InvalidateSurface();
                                         }
                                     }
-                                }                     
-                        }            
+                                }
+                            }
+                            
+                        }         
                     }              
                 }
             }

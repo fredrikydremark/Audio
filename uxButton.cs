@@ -484,17 +484,15 @@ namespace Scada
 
         public void Start()
         {
-            RefreshTask();
+            //RefreshTask();
         }
 
-        public void RefreshValues()
+        public void RefreshValues(List<ItemValue> ItemValues)
         {
-            DataAccessLayer MyDataAccessLayer = new DataAccessLayer();
-
-            var ItemValues = MyDataAccessLayer.ReadItemValues(ItemID);
-            foreach (var item in ItemValues)
+            if ((ItemValues != null) && (PV != null))
             {
-             
+                foreach (var item in ItemValues)
+                {
                     if (item.TagID == PV.TagID)
                     {
                         PV.Value = item.Value;
@@ -505,20 +503,22 @@ namespace Scada
                         SV.Value = item.Value;
                         SV.StatusQuality = item.StatusQuality;
                     }
-                
-            }
-            if (IsLoaded == true)
-            {
-                InvalidateSurface();
+                }
+                if (IsLoaded == true)
+                {
+                    InvalidateSurface();
+                }
             }
         }
 
         private async void RefreshTask()
         {
+            DataAccessLayer MyDataAccessLayer = new DataAccessLayer();
             while (true)
             {
                 await Task.Delay(5000);
-                RefreshValues();       
+                var ItemValues = MyDataAccessLayer.ReadItemValues(ItemID);
+                RefreshValues(ItemValues);       
             }
         }
 

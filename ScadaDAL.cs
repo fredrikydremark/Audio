@@ -2581,6 +2581,7 @@ namespace Scada
                         oTempTele.PV = "--.-";
                     }
                     */
+                    oTempTele.ItemValues = ReadItemValues(oTempTele.ItemID);
 
                     if (reader.IsDBNull(7) == false)
                     {

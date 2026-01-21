@@ -166,9 +166,6 @@ namespace Scada
             }
         }
 
-        int State = 0;
-        int OldState = 0;
-        float Increase = 0.5F;
 
         protected override void OnPaintSurface(SKPaintSurfaceEventArgs e)
         {
@@ -188,7 +185,33 @@ namespace Scada
             };
 
 
-            //Limiter
+            /*
+           
+            if ( PV.Value > 1) 
+               temperature++
+            else
+               temperature--
+
+            if temperature < min_temperature
+               temperature = min_temperature
+
+            if temperature > max_temperature
+               temperature = max_temperature
+
+            Output.Value = temperature;
+            */
+
+
+            if (Output.Value > 0.5F)
+            {
+                PV.Value = PV.Value + 2F;           
+            }
+            else
+            {
+                PV.Value = PV.Value - 2F;          
+            }
+
+
             if (PV.Value > MaxValue)
             {
                 PV.Value = (float)(MaxValue);
@@ -196,38 +219,12 @@ namespace Scada
 
             if (PV.Value < MinValue)
             {
-                PV.Value = (float)(MaxValue);
+                PV.Value = (float)(MinValue);
             }
 
-            if (Output.Value > 50)
-            {
-                PV.Value = PV.Value + Increase;
-                State = 1;
-            }
-            else
-            {
-                PV.Value = PV.Value + Increase;
-                State = 0;
-            }
-
-            if ((State == OldState) && (State == 1))
-            {
-                if (Increase < 0.5F)
-                {
-                    Increase = Increase + 0.1F;
-                }
-            }
-
-            if ((State == OldState) && (State == 0))
-            {
-                if (Increase > -0.5F)
-                {
-                    Increase = Increase - 0.1F;
-                }
-            }
-
-            OldState = State;
-            MyDataAccessLayer.UpdateTagValue(PV.TagID, PV.Value);
+         
+          
+            //MyDataAccessLayer.UpdateTagValue(PV.TagID, PV.Value);
             //MyDataAccessLayer.StoreTagValue(PV.TagID, PV.Value);
             canvas.Clear();
             canvas.DrawRoundRect(backgroundBar, Background);

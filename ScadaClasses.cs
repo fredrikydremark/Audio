@@ -240,6 +240,8 @@ namespace Scada
             public int size { get; set; }        
             public List<List<Value>> ListOfValues = new List<List<Value>>() { };
             public List<gridRow> gridRows { get; set; }
+            public List<ItemValue> ItemValues { get; set; }
+  
         }
     }
 }

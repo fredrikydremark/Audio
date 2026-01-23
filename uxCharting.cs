@@ -11,7 +11,6 @@ namespace Scada
         public DateTime t { get; set; }
     }
 
-
     public class MyValue
     {
         public int Hour { get; set; }
@@ -27,12 +26,6 @@ namespace Scada
 
         public float LastY;
         public float LL = -9999, HL = 9999;
-
-
-
-
-
-
 
         public static BindableProperty ItemIDProperty = BindableProperty.Create(nameof(ItemID), typeof(int),
         typeof(HistGraph), 0, BindingMode.OneWay,
@@ -364,7 +357,7 @@ end;
                 if (LocalValues.Count > 2)
                 {
                     SKColor theColor = RGBStringToColor(LocalValues[1].Color);
-                    SKPaint LinePaint = new SKPaint
+                    SKPaint myPaint = new SKPaint
                     {
                         IsAntialias = true,
                         Style = SKPaintStyle.StrokeAndFill,
@@ -382,7 +375,7 @@ end;
                         {
                             if (Convert.ToDouble(LocalValues[m].Y) > 0.5F)
                             {
-                                if (LocalValues[m].TypeOfTag == 0)
+                                if (LocalValues[m].TypeOfTag == 1)
                                 {
                                     sv = "1,0";
                                 }
@@ -411,6 +404,7 @@ end;
                         x = x - (w / Count);
                         if (j > 0)
                         {
+                            //LocalValues[0].TypeOfTag = 0;
                             if (LocalValues[j].Y != "0")
                             {
                                 thePoint = new SKPoint(x, h - (float)(Convert.ToDouble(LocalValues[j].Y) / 100.0F) * h);
@@ -418,25 +412,37 @@ end;
                                 {
                                     if (LocalValues[0].TypeOfTag == 0)
                                     {
-                                        canvas.DrawRect(x - (w / Count) / 2, h - h / 6, (w / Count) * 4F, 5 * -(float)(Convert.ToDouble(LocalValues[j].Y) / 100.0F) * h, Line3Paint);
+                                        //canvas.DrawRect(x - (w / Count) / 2, h - h / 6, (w / Count) * 4F, 5 * -(float)(Convert.ToDouble(LocalValues[j].Y) / 100.0F) * h, Line3Paint);
                                     }
                                     if (LocalValues[0].TypeOfTag == 1)
                                     {
+                                        canvas.DrawRect(x - (w / Count) / 2, h - h / 6, (w / Count) * 4F, 5 * -(float)(Convert.ToDouble(LocalValues[j].Y) / 100.0F) * h, Line3Paint);
                                         //canvas.DrawLine(oldPoint, thePoint, LinePaint);                                         
+                                        /*
+                                        if (Math.Abs(thePoint.Y - oldPoint.Y) > 0.05F)
+                                        {
+                                            pts.Add(new SKPoint(thePoint.X, thePoint.Y));
+                                        }*/
+                                    }
+                                    if (LocalValues[0].TypeOfTag == 2)
+                                    {
+                                        canvas.DrawRect(thePoint.X, thePoint.Y, (w / Count) / 1.5F, thePoint.Y + h, myPaint);
+                                    }
+                                    if (LocalValues[0].TypeOfTag == 3)
+                                    {
+                                        //canvas.DrawLine(oldPoint, thePoint, Line1Paint);
+                                        
                                         if (Math.Abs(thePoint.Y - oldPoint.Y) > 0.05F)
                                         {
                                             pts.Add(new SKPoint(thePoint.X, thePoint.Y));
                                         }
-                                    }
-                                    if (LocalValues[0].TypeOfTag == 2)
-                                    {
-                                        canvas.DrawRect(thePoint.X, thePoint.Y, (w / Count) / 1.5F, thePoint.Y + h, LinePaint);
-                                    }
-                                    if (LocalValues[0].TypeOfTag == 3)
-                                    {
+                                        
+
+                                        /*
                                         var R = new SKRect(thePoint.X, thePoint.Y, thePoint.X + ((w / Count) / 1.5F), thePoint.Y + h);
                                         var RR = new SKRoundRect(R, 2F, 2F);
                                         canvas.DrawRoundRect(RR, LinePaint);
+                                        */
                                     }
                                 }
                                 oldPoint = thePoint;
@@ -467,9 +473,9 @@ end;
                         j--;
                     }
 
-                    if (LocalValues[0].TypeOfTag == 1)
+                    if (LocalValues[0].TypeOfTag == 3)
                     {
-                        canvas.DrawPoints(SKPointMode.Polygon, pts.ToArray(), LinePaint);
+                        canvas.DrawPoints(SKPointMode.Polygon, pts.ToArray(), myPaint);
                     }
                     incColor++;
                 }

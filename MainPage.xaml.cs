@@ -25,6 +25,7 @@ public partial class MainPage : ContentPage
     SKColor uxLightColor = new SKColor();
     SKColor uxGridThinColor = new SKColor();
     SKColor uxGridFatColor = new SKColor();
+    SKColor uxTransparentButtonColor = new SKColor();
 
     ScadaClasses.Colors ScadaColor = new ScadaClasses.Colors();
 
@@ -2448,8 +2449,8 @@ public partial class MainPage : ContentPage
             uxTextColor = RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_TextColor"));
             uxGridThinColor = RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_GridThinColor"));
             uxGridFatColor = RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_GridFatColor"));
-
-
+            uxTransparentButtonColor = RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_TransparentButtonColor"));
+            /*
             ScadaColor.uxItemBackGroundColor = RGBStringToColor("rgba(50,50,50,200)");
             ScadaColor.uxPanelColor = RGBStringToColor("rgba(30,30,30,200)");
             ScadaColor.uxItemColor = RGBStringToColor("rgba(60,60,60,250)");
@@ -2462,7 +2463,9 @@ public partial class MainPage : ContentPage
             ScadaColor.uxTouchColor = RGBStringToColor("rgba(175,175,175,100)");
             ScadaColor.uxOffColor = RGBStringToColor("rgba(175,175,175,175)");
             ScadaColor.uxLightColor = RGBStringToColor("rgba(200,200,200,100)");
-
+            ScadaColor.uxTransparentButtonColor = RGBStringToColor("rgba(200,200,200,100)");
+            */
+      
 
             SKCanvasPopupViews.Clear();
             SKCanvasViews.Clear();
@@ -2835,8 +2838,8 @@ public partial class MainPage : ContentPage
                             IndicatorType = 1,
 
                             IndicatorColor = uxPopupItemColor,
-                            GradientStartColor = uxPopupItemColor,
-                            GradientEndColor = uxPopupItemColor,
+                            GradientStartColor = uxTransparentButtonColor,
+                            GradientEndColor = uxTransparentButtonColor,
                             ButtonText = "Today last 15 minutes",
                             CornerRadius = 13,
                             TextColor = uxTextColor,
@@ -2873,8 +2876,8 @@ public partial class MainPage : ContentPage
                                     break;
 
                                 case SKTouchAction.Exited:
-                                    myTimeScaleButton.GradientStartColor = uxPopupItemColor;
-                                    myTimeScaleButton.GradientEndColor = uxPopupItemColor;
+                                    myTimeScaleButton.GradientStartColor = uxTransparentButtonColor;
+                                    myTimeScaleButton.GradientEndColor = uxTransparentButtonColor;
                                     break;
 
                             }
@@ -4229,15 +4232,22 @@ public partial class MainPage : ContentPage
 
                         //int Dig = MyDataAccessLayer.GetItemIsDigital(ScadaClasses.CurrentItem);
                         
-                        int TypeOfTag = 0;
+                        int TypeOfTag = 1;
                         if ((ScadaClasses.CurrentType == ScadaClasses.uxToggle) ||
                             (ScadaClasses.CurrentType == ScadaClasses.uxButton) || 
                             (ScadaClasses.CurrentType == ScadaClasses.uxCircularProgress))
-                            TypeOfTag = 0;
+                            TypeOfTag = 1;
                         else
                             TypeOfTag = 3;
 
-                        ScadaItem.gridRows = MyDataAccessLayer.ReadTags("", TypeOfTag, iMenuOffsetRows, iMenuOffsetRows + 5);
+                        if (ScadaClasses.CurrentType == ScadaClasses.uxHistoryChart)
+                        {
+                            ScadaItem.gridRows = MyDataAccessLayer.ReadTags("", 0, iMenuOffsetRows, iMenuOffsetRows + 5);
+                        }
+                        else
+                        {
+                            ScadaItem.gridRows = MyDataAccessLayer.ReadTags("", TypeOfTag, iMenuOffsetRows, iMenuOffsetRows + 5);
+                        }
 
                         y = y + FloatPanel5.CornerRadius + 50;
                         foreach (gridRow row in ScadaItem.gridRows)

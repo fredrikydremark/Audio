@@ -524,15 +524,18 @@ namespace Scada
 
         protected override void OnPaintSurface(SKPaintSurfaceEventArgs e)
         {
+            const int cIndicator_0 = 0;
             const int cIndicator_1 = 1;
             const int cIndicator_2 = 2;
             const int cIndicator_3 = 3;
             const int cIndicator_4 = 4;
-            const int cIndicator_5 = 5;
-            const int cIndicator_6 = 6;
-            const int cIndicator_7 = 7;
-            const int cIndicator_8 = 8;
-
+            //const int cIndicator_5 = 5;
+            //const int cIndicator_6 = 6;
+            //const int cIndicator_7 = 7;
+            //const int cIndicator_8 = 8;
+            const int cIndicator_9 = 9;
+            const int cIndicator_10 = 10;
+            const int cIndicator_11 = 11;
 
             var info = e.Info;
             var canvas = e.Surface.Canvas;
@@ -577,7 +580,7 @@ namespace Scada
                 float xText = 22F;
                 float yText = h - (FontSize / 2);
                 canvas.Clear();
-                if (IndicatorType == 0)
+                if (IndicatorType == cIndicator_0)
                 {
                     canvas.DrawRoundRect(progressBar, facePaint);
                     NewTextPaint.MeasureText(ButtonText, ref textBounds);
@@ -586,10 +589,10 @@ namespace Scada
                     canvas.DrawText(ButtonText, x, y, NewTextPaint);
                 }
 
-                if (IndicatorType == 1)
+                if (IndicatorType == cIndicator_1)
                 {
-                    var indicatorPaint = new SKPaint { Color = Colors.Blue.ToSKColor(), TextSize = FontSize, FilterQuality = SKFilterQuality.High, IsAntialias = true };
-                    indicatorPaint.Color = IndicatorColor;
+                    //var indicatorPaint = new SKPaint { Color = Colors.Blue.ToSKColor(), TextSize = FontSize, FilterQuality = SKFilterQuality.High, IsAntialias = true };
+                    //indicatorPaint.Color = IndicatorColor;
                     canvas.DrawRoundRect(progressBar, facePaint);
                     //canvas.DrawRect((w / 10), (float)(h - (h / 3)), (float)(w - (2 * (w / 10))), (float)(h / 5), palPaint);
                     NewTextPaint.MeasureText(ButtonText, ref textBounds);
@@ -598,7 +601,7 @@ namespace Scada
                     canvas.DrawText(ButtonText, x, y, NewTextPaint);
                 }
 
-                if (IndicatorType == 2)
+                if (IndicatorType == cIndicator_2)
                 {
                     var circlePaint = new SKPaint
                     {
@@ -650,7 +653,7 @@ namespace Scada
                 }
 
 
-                if (IndicatorType == 3)
+                if (IndicatorType == cIndicator_3)
                 {
                     if (SvgBase64 == "") return;
 
@@ -689,7 +692,7 @@ namespace Scada
                     }
                 }
 
-                if (IndicatorType == 4)
+                if (IndicatorType == cIndicator_4)
                 {
                 }
 
@@ -712,7 +715,7 @@ namespace Scada
                 }
 
                 // Circular button Draw the svg indicator
-                if (IndicatorType == 9)
+                if (IndicatorType == cIndicator_9)
                 {
                     float h1 = info.Height;
                     float radius = (h1 / 2.5f);
@@ -744,12 +747,12 @@ namespace Scada
                     canvas.DrawText(ButtonText, xText + info.Height, yText, NewTextPaint);
                 }
 
-                if (IndicatorType == 10)
+                if (IndicatorType == cIndicator_10)
                 {
                     DrawRoundRectWithArrow(canvas, facePaint, 0, 0, w, h, 10);
                 }
 
-                if (IndicatorType == 11)
+                if (IndicatorType == cIndicator_11)
                 {
                     if (SvgBase64 == "") return;
 

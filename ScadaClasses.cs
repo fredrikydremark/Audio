@@ -206,7 +206,9 @@ namespace Scada
             public SKColor uxLightColor = new SKColor();
             public SKColor uxGridThinColor = new SKColor();
             public SKColor uxGridFatColor = new SKColor();
+            public SKColor uxTransparentButtonColor = new SKColor();
         }
+
         public class Telegram
         {
             public int PacketSeq { get; set; }

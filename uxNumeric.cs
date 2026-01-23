@@ -46,9 +46,7 @@ namespace Scada
                 }
                 i++;
             }
-
             //scb = (ScadaNumeric)AttachDesignEvents(scb, Item);
-
             scb.IsEnabled = true;
             scb.IsVisible = true;
             scb.EnableTouchEvents = true;

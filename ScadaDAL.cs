@@ -203,7 +203,7 @@ namespace Scada
                 };
                 Connection.Open();
                 string sqlGetData = "select tags.tagID,tags.Value from tags " +
-                                     "where (Driver<> 0) And (TypeOfTag= 0) And (tags.Value <> (select COALESCE ((select top 1 Value from ChannelData where tagID = tags.TagID order by time desc) ,-1)))";
+                                     "where (Driver<> 0) And (TypeOfTag= 1) And (tags.Value <> (select COALESCE ((select top 1 Value from ChannelData where tagID = tags.TagID order by time desc) ,-1)))";
 
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
                 cmdGetData.CommandText = sqlGetData;
@@ -1495,10 +1495,12 @@ namespace Scada
                         sTimeText = v.Hour.ToString("00") + ":" + v.Minute.ToString("00");
                     }
                     // No bar chart on this 10 minute scale
+                   /*
                     if (MyTag.TypeOfTag > 1)
                     {
                         MyTag.TypeOfTag = 1;
                     }
+                    */
                     TempValues.Add(new ScadaClasses.Value { X = sTimeText, Y = v.sValue, Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag });
                 }
                 TempValues[TempValues.Count - 1].Y = TempValues[TempValues.Count - 2].Y;
@@ -2479,7 +2481,7 @@ namespace Scada
                 };
                 Connection.Open();
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
-                sqlGetData = "select TagID,Description FROM( SELECT *, ROW_NUMBER() OVER (ORDER BY tagName) as row FROM tags WHERE ( Driver > 0 ) AND ( TypeOfTag = @TypeOfTag ) ) a WHERE ( Driver > 0 ) AND ( row > @StartRow and row <= @EndRow )";
+                sqlGetData = "select TagID,Description FROM( SELECT *, ROW_NUMBER() OVER (ORDER BY Description) as row FROM tags WHERE ( Driver > 0 ) ) a WHERE ( @TypeOfTag = TypeOfTag ) OR ( @TypeOfTag = 0 ) AND ( row > @StartRow and row <= @EndRow )";
                 cmdGetData.Parameters.AddWithValue("@StartRow", StartRow);
                 cmdGetData.Parameters.AddWithValue("@EndRow", EndRow);
                 cmdGetData.Parameters.AddWithValue("@TypeOfTag", TypeOfTag);

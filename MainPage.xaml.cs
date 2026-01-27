@@ -18,7 +18,6 @@ public partial class MainPage : ContentPage
     public System.Timers.Timer bcktimer = new System.Timers.Timer();
     public System.Timers.Timer uxtimer = new System.Timers.Timer();
 
-
     //private static WebSocket client;
     DataAccessLayer MyDataAccessLayer = new DataAccessLayer();
     ScadaPopups MyPopups = new ScadaPopups();
@@ -34,14 +33,11 @@ public partial class MainPage : ContentPage
     double OldXpos = 0, OldYpos = 0;
     double LastXpos = 0, LastYpos = 0;
 
-
     string sFilter = "";
     int iMenuOffsetRows = 0;
     float RampDirection = 2.0F;
     float StepSignal = 25F;
 
-
-    // User Experiences 
     // List<ContentView> ContentViews = new List<ContentView>();
     List<SKCanvasView> SKCanvasViews = new List<SKCanvasView>();
     List<SKCanvasView> SKCanvasPopupViews = new List<SKCanvasView>();
@@ -50,7 +46,6 @@ public partial class MainPage : ContentPage
     {
         Margin = new Thickness(0)
     };
-
     public MainPage()
     {
         InitializeComponent();
@@ -75,8 +70,6 @@ public partial class MainPage : ContentPage
         ScadaColor.uxTransparentButtonColor = RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_TransparentButtonColor"));
 
 
-
-
         if (MyDataAccessLayer.GetTagValueByName("System_EnableADAM") > 0.5)
         {
             MyDataAccessLayer.SetTagStatus(1, 1);
@@ -89,7 +82,6 @@ public partial class MainPage : ContentPage
         uxtimer.Elapsed += uxUpdate;
         uxtimer.Start();
     }
-
 
     static public SKColor RGBStringToColor(string RGBColor)
     {
@@ -153,13 +145,11 @@ public partial class MainPage : ContentPage
     void bckUpdate(object sender, EventArgs e)
     {
         MainThread.BeginInvokeOnMainThread(() =>
-        {
-          
+        {          
                 if (MyDataAccessLayer.GetTagValueByName("System_EnableADAM") > 0.5)
                 {
                     Adam AdamLayer = new Adam();
-                    AdamLayer.ReadADAM();
-                    
+                    AdamLayer.ReadADAM();                  
                 }
 
                 if (MyDataAccessLayer.GetTagValueByName("System_EnableSimulation") > 0.5)
@@ -199,12 +189,9 @@ public partial class MainPage : ContentPage
                 foreach (var Tag in ListOfDigitalTagsToStore)
                 {
                     MyDataAccessLayer.StoreTagValue(Tag.TagID, Tag.Value);
-                }
-
-         
+                }       
                 ScadaClasses.Refresh = true;
-                bcktimer.Interval = 10000;
-           
+                bcktimer.Interval = 10000;         
         });
     }
 
@@ -224,7 +211,6 @@ public partial class MainPage : ContentPage
             }
         });
     }
-
 
     static SKColor GetStatusColor(int status)
     {
@@ -255,8 +241,6 @@ public partial class MainPage : ContentPage
         }
         return c;
     }
-
-
 
     private void ScadaLogin(int InfoType)
     {
@@ -447,7 +431,6 @@ public partial class MainPage : ContentPage
         AbsoluteLayout.SetLayoutFlags(a1, AbsoluteLayoutFlags.None);
         SKCanvasPopupViews.Add(a1);
     }
-
 
 
     private void ScadaUpload()

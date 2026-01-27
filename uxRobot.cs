@@ -313,7 +313,7 @@ namespace Scada
                 {
                    Step = 0.01F;
                    if (UpperArm.Value > 0.5)
-                        { Step = 0F; }
+                      { Step = 0F; }
                 }
                 LowerArmAngle = LowerArmAngle - Step;
                 UpperArmAngle = UpperArmAngle + (Step * 3.0F);
@@ -325,12 +325,7 @@ namespace Scada
                       DVStep = (DV - OV) / 100.0F * -1.0F;
                       DV = DV + DVStep;
                    }
-
-                   AbsoluteLayout.SetLayoutBounds(this, new Rect(
-                        (WindowWidth / 100) * (Left + DV),
-                        (WindowHeight / 100) * (Top + YTraverse.Value),
-                        (WindowWidth / 100) * 12,
-                        (WindowHeight / 100) * 12));                        
+                   AbsoluteLayout.SetLayoutBounds(this, new Rect((WindowWidth / 100) * (Left + DV),(WindowHeight / 100) * (Top + YTraverse.Value),(WindowWidth / 100) * 12,(WindowHeight / 100) * 12));                        
                    AbsoluteLayout.SetLayoutFlags(this, AbsoluteLayoutFlags.None);          
                    InvalidateSurface();             
                 }

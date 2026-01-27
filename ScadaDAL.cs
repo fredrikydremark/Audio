@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.Data.SqlClient;
+using SkiaSharp.Views.Maui;
 using System.Globalization;
 using static Scada.ScadaClasses;
 
@@ -7,8 +8,8 @@ using static Scada.ScadaClasses;
 namespace Scada
 {
     public class DataAccessLayer
-    {    
-        public string LoadLibItem(string Name, int TypeInLib)
+    {
+       public string LoadLibItem(string Name, int TypeInLib)
         {
             try
             {
@@ -109,11 +110,11 @@ namespace Scada
 
 
 
-        public string ReadParameter(string Name )
+        public string ReadParameter(string Name)
         {
             try
             {
-                int ParameterType =-1;
+                int ParameterType = -1;
                 string sParam = "";
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
@@ -187,7 +188,7 @@ namespace Scada
                 Connection.Open();
                 string sqlDeleteData = "delete from Parameters where Name = @ParameterName";
                 SqlCommand cmdGetData = new SqlCommand(sqlDeleteData, Connection);
-                cmdGetData.Parameters.AddWithValue("@Name",Name);
+                cmdGetData.Parameters.AddWithValue("@Name", Name);
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
                 Connection.Close();
@@ -203,11 +204,6 @@ namespace Scada
             {
             }
         }
-
-
-
-
-
 
 
 
@@ -360,7 +356,7 @@ namespace Scada
                 SqlDataReader reader = cmdGetData.ExecuteReader();
 
                 var myTagParams = new List<gridRow>();
-                string tagname = "", description = "", HL = "", LL = "", Color = "",Unit="",TypeOfTag="";
+                string tagname = "", description = "", HL = "", LL = "", Color = "", Unit = "", TypeOfTag = "";
                 string AlarmEnable = "0", StoreIntervalSec = "0";
 
                 while (reader.Read())
@@ -610,7 +606,7 @@ namespace Scada
                     ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
                 };
                 Connection.Open();
-                string sqlGetData = "select tags.tagID,tags.driver,tags.tagname,tags.Description from tags " +                 
+                string sqlGetData = "select tags.tagID,tags.driver,tags.tagname,tags.Description from tags " +
                                      "WHERE Driver = 0 ";
 
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
@@ -628,8 +624,8 @@ namespace Scada
                     string TagName = reader.GetString(2);
                     string TagDesc = reader.GetString(3);
 
-              
-                   
+
+
                     gridRows.Add(new gridRow
                     {
                         Status = 0,
@@ -1600,12 +1596,12 @@ namespace Scada
                         sTimeText = v.Hour.ToString("00") + ":" + v.Minute.ToString("00");
                     }
                     // No bar chart on this 10 minute scale
-                   /*
-                    if (MyTag.TypeOfTag > 1)
-                    {
-                        MyTag.TypeOfTag = 1;
-                    }
-                    */
+                    /*
+                     if (MyTag.TypeOfTag > 1)
+                     {
+                         MyTag.TypeOfTag = 1;
+                     }
+                     */
                     TempValues.Add(new ScadaClasses.Value { X = sTimeText, Y = v.sValue, Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag });
                 }
                 TempValues[TempValues.Count - 1].Y = TempValues[TempValues.Count - 2].Y;
@@ -2764,7 +2760,7 @@ namespace Scada
                         oTempTele.gridRows = LoadParameters();
                     }
 
-                    if (oTempTele.ItemType == ScadaClasses.uxHistoryChart) 
+                    if (oTempTele.ItemType == ScadaClasses.uxHistoryChart)
                     {
                         oTempTele.Min = "0";
                         oTempTele.Max = "30";
@@ -2914,13 +2910,13 @@ namespace Scada
                 sqlGetData = "INSERT INTO alarms SELECT tags.tagID,tags.Value,tags.HL,tags.LL,null,null,GETDATE(),tags.description FROM tags where (tags.AlarmEnable > 0) and ((tags.Value > tags.HL) or(tags.Value < tags.LL))and(not exists(select top 1 tagID from alarms where ( deleted is null ) and (tags.tagID = alarms.tagID)))";
                 cmdGetData.CommandText = sqlGetData;
                 cmdGetData.ExecuteNonQuery();
-                
+
                 //check PV within limits when deleted                
-               /*
-                sqlGetData = "INSERT INTO alarms SELECT tags.tagID,tags.Value,tags.HL,tags.LL,null,null,GETDATE(),tags.description FROM tags where (tags.AlarmEnable > 0) and ((tags.Value > tags.HL) or(tags.Value < tags.LL)) and ((select top 1 deleted from alarms where (tags.tagID = alarms.tagID) order by alarmtime desc ) is not null )";
-                cmdGetData.CommandText = sqlGetData;
-                cmdGetData.ExecuteNonQuery();
-                */
+                /*
+                 sqlGetData = "INSERT INTO alarms SELECT tags.tagID,tags.Value,tags.HL,tags.LL,null,null,GETDATE(),tags.description FROM tags where (tags.AlarmEnable > 0) and ((tags.Value > tags.HL) or(tags.Value < tags.LL)) and ((select top 1 deleted from alarms where (tags.tagID = alarms.tagID) order by alarmtime desc ) is not null )";
+                 cmdGetData.CommandText = sqlGetData;
+                 cmdGetData.ExecuteNonQuery();
+                 */
                 //update PV in alarms on all non deleted alarms //,alarmtime = GetDate()
                 sqlGetData = "update alarms set PV = tags.Value,HL = tags.HL, LL = tags.LL  from alarms JOIN tags on tags.tagID = alarms.tagID where tags.tagID = alarms.tagID and ((tags.Value < tags.HL) or (tags.Value > tags.LL)) and alarms.deleted is null";
                 cmdGetData.CommandText = sqlGetData;
@@ -3149,7 +3145,7 @@ namespace Scada
                     }
                     else
                     {
-                        theID = -1 ;
+                        theID = -1;
                     }
                     if (reader.IsDBNull(1) == false)
                     {
@@ -3922,79 +3918,7 @@ namespace Scada
         }
 
 
-        /*
-
-        public int GetItemIsDigital(int ItemID)
-        {
-            int ItemType = 0;
-            try
-            {
-                var Connection = new Microsoft.Data.SqlClient.SqlConnection
-                {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog = scada; Integrated Security=true; TrustServerCertificate=true"
-                };
-                string sqlGetData = "SELECT ItemType FROM Items WHERE ItemID = @ItemID";
-                Connection.Open();
-                var cmdGetData = new Microsoft.Data.SqlClient.SqlCommand(sqlGetData, Connection);
-                cmdGetData.Parameters.AddWithValue("@ItemID", ItemID);
-                var reader = cmdGetData.ExecuteReader();
-                while (reader.Read())
-                {
-                    if (reader.IsDBNull(0) == false)
-                    {
-                        ItemType = reader.GetInt32(0);
-                    }
-                }
-                cmdGetData.Dispose();
-                cmdGetData = null;
-                Connection.Close();
-                Connection = null;
-
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.ToString(), ex);
-            }
-            finally
-            {
-            }
-
-            try
-            {
-                var Connection = new Microsoft.Data.SqlClient.SqlConnection
-                {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog = scada; Integrated Security=true; TrustServerCertificate=true"
-                };
-                int Digital = 0;
-                string sqlGetData = "SELECT Digital FROM ItemTypes WHERE ItemType = @ItemType";
-                Connection.Open();
-                var cmdGetData = new Microsoft.Data.SqlClient.SqlCommand(sqlGetData, Connection);
-                cmdGetData.Parameters.AddWithValue("@ItemType", ItemType);
-                var reader = cmdGetData.ExecuteReader();
-                while (reader.Read())
-                {
-                    if (reader.IsDBNull(0) == false)
-                    {
-                        Digital = reader.GetInt32(0);
-                    }
-                }
-                cmdGetData.Dispose();
-                cmdGetData = null;
-                Connection.Close();
-                Connection = null;
-
-                return Digital;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.ToString(), ex);
-            }
-            finally
-            {
-            }
-        }
-        */
-
+       
         public int GetTagType(int TagID)
         {
             try
@@ -4003,7 +3927,7 @@ namespace Scada
                 {
                     ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
                 };
-                int Digital = 0;
+                int TagType = 0;
                 string sqlGetData = "SELECT Digital FROM Tags WHERE TagID = @TagID";
                 Connection.Open();
                 var cmdGetData = new Microsoft.Data.SqlClient.SqlCommand(sqlGetData, Connection);
@@ -4013,14 +3937,14 @@ namespace Scada
                 {
                     if (reader.IsDBNull(0) == false)
                     {
-                        Digital = reader.GetInt32(0);
+                        TagType = reader.GetInt32(0);
                     }
                 }
                 cmdGetData.Dispose();
                 cmdGetData = null;
                 Connection.Close();
                 Connection = null;
-                return Digital;
+                return TagType;
             }
             catch (Exception ex)
             {
@@ -4099,7 +4023,6 @@ namespace Scada
             finally
             {
             }
-
         }
 
 
@@ -4138,7 +4061,6 @@ namespace Scada
             {
             }
         }
-
 
 
         public string GetTagColorByName(string sTagName)
@@ -4242,36 +4164,7 @@ namespace Scada
             }
         }
 
-        public string SetTagColorByTagName(string TagName, string sColor)
-        {
-            try
-            {
-                var Connection = new Microsoft.Data.SqlClient.SqlConnection
-                {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
-                };
-                string sqlGetData = "UPDATE Tags SET Color = @Color WHERE TagName = @TagName";
-                Connection.Open();
-                var cmdGetData = new SqlCommand(sqlGetData, Connection);
-                cmdGetData.Parameters.AddWithValue("@TagName", TagName);
-                cmdGetData.Parameters.AddWithValue("@Color", sColor);
-                cmdGetData.ExecuteNonQuery();
-                cmdGetData.Dispose();
-                cmdGetData = null;
-                Connection.Close();
-                Connection = null;
-                return sColor;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.ToString(), ex);
-            }
-            finally
-            {
-            }
-        }
-
-
+   
 
         public ScadaClasses.Tag GetTag(int TagID)
         {
@@ -4281,7 +4174,7 @@ namespace Scada
                 {
                     ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
                 };
-                string TagName = "";
+
                 string sqlGetData = "SELECT TagName,Description,Color,Unit FROM Tags WHERE TagID = @TagID";
                 Connection.Open();
                 var cmdGetData = new Microsoft.Data.SqlClient.SqlCommand(sqlGetData, Connection);
@@ -4396,8 +4289,7 @@ namespace Scada
             }
         }
 
-
-        public float GetPV(int ItemID)
+        public string SetTagColorByTagName(string TagName, string sColor)
         {
             try
             {
@@ -4405,30 +4297,17 @@ namespace Scada
                 {
                     ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
                 };
-                double Value = 0;
-                string sqlGetData = "SELECT Value FROM Tags LEFT JOIN Items on tags.tagID = Items.tagID WHERE Items.ItemID=@ItemID";
+                string sqlGetData = "UPDATE Tags SET Color = @Color WHERE TagName = @TagName";
                 Connection.Open();
-                var cmdGetData = new Microsoft.Data.SqlClient.SqlCommand(sqlGetData, Connection);
-                cmdGetData.Parameters.AddWithValue("@ItemID", ItemID);
-                var reader = cmdGetData.ExecuteReader();
-                while (reader.Read())
-                {
-                    if (reader.IsDBNull(0) == false)
-                    {
-
-                        Value = reader.GetDouble(0);
-                    }
-                    else
-                    {
-                        Value = 0;
-                    }
-                }
+                var cmdGetData = new SqlCommand(sqlGetData, Connection);
+                cmdGetData.Parameters.AddWithValue("@TagName", TagName);
+                cmdGetData.Parameters.AddWithValue("@Color", sColor);
+                cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
                 cmdGetData = null;
                 Connection.Close();
                 Connection = null;
-
-                return ((float)Value);
+                return sColor;
             }
             catch (Exception ex)
             {
@@ -4439,48 +4318,43 @@ namespace Scada
             }
         }
 
-
-        public float GetSV(int ItemID)
+        public void SetSystemColors(int ColorScheme)
         {
-            try
+            switch (ColorScheme)
             {
-                var Connection = new Microsoft.Data.SqlClient.SqlConnection
-                {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
-                };
-                double SV = 0;
-                string sqlGetData = "SELECT Value FROM Tags LEFT JOIN Items on tags.tagID = Items.tagID WHERE Items.ItemID=@ItemID";
+                case 0:
+                    SetTagColorByTagName("System_BackgroundColor", "rgba(0,0,0,255)");
+                    SetTagColorByTagName("System_PopupColor", "rgba(70,70,70,245)");
+                    SetTagColorByTagName("System_PopupItemColor", "rgba(120,120,120,50)");
+                    SetTagColorByTagName("System_ItemColor", "rgba(50,50,50,240)");
+                    SetTagColorByTagName("System_ItemBackgroundColor", "rgba(40,40,40,240)");
+                    SetTagColorByTagName("System_PanelColor", "rgba(30,30,30,150)");
+                    SetTagColorByTagName("System_TextColor", "rgba(250,250,250,220)");
+                    SetTagColorByTagName("System_HoverColor", "rgba(125,125,125,235)");
+                    SetTagColorByTagName("System_TouchColor", "rgba(128,128,128,235)");
+                    SetTagColorByTagName("System_OffColor", "rgba(118,118,118,235)");
+                    SetTagColorByTagName("System_LightColor", "rgba(52,52,52,240)");
+                    SetTagColorByTagName("System_GridThinColor", "rgba(40,40,40,200)");
+                    SetTagColorByTagName("System_GridFatColor", "rgba(45,45,45,200)");
+                    break;
 
-                Connection.Open();
-                var cmdGetData = new Microsoft.Data.SqlClient.SqlCommand(sqlGetData, Connection);
-                cmdGetData.Parameters.AddWithValue("@ItemID", ItemID);
-                var reader = cmdGetData.ExecuteReader();
-                while (reader.Read())
-                {
-                    if (reader.IsDBNull(0) == false)
-                    {
-                        SV = reader.GetDouble(0);
-                    }
-                    else
-                    {
-                        SV = 0;
-                    }
-                }
-                cmdGetData.Dispose();
-                cmdGetData = null;
-                Connection.Close();
-                Connection = null;
+                case 1:
+                    SetTagColorByTagName("System_BackgroundColor", "rgba(225,225,225,255)");
+                    SetTagColorByTagName("System_PopupColor", "rgba(170,170,170,245)");
+                    SetTagColorByTagName("System_PopupItemColor", "rgba(135,135,135,50)");
+                    SetTagColorByTagName("System_ItemColor", "rgba(180,180,180,255)");
+                    SetTagColorByTagName("System_ItemBackgroundColor", "rgba(200,200,200,255)");
+                    SetTagColorByTagName("System_PanelColor", "rgba(230,230,230,150)");
+                    SetTagColorByTagName("System_TextColor", "rgba(0,0,0,250)");
+                    SetTagColorByTagName("System_HoverColor", "rgba(210,210,210,245)");
+                    SetTagColorByTagName("System_TouchColor", "rgba(128,128,128,255)");
+                    SetTagColorByTagName("System_OffColor", "rgba(128,128,128,235)");
+                    SetTagColorByTagName("System_LightColor", "rgba(170,170,170,255)");
+                    SetTagColorByTagName("System_GridThinColor", "rgba(210,210,210,200)");
+                    SetTagColorByTagName("System_GridFatColor", "rgba(205,205,205,200)");
+                break;
 
-                return ((float)SV);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.ToString(), ex);
-            }
-            finally
-            {
-            }
+            };
         }
-
     }
 }

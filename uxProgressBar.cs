@@ -7,8 +7,6 @@ namespace Scada
 {
     public class ScadaProgress : SKCanvasView
     {
-        double intensity = 100f;
-
         public static BindableProperty ItemIDProperty = BindableProperty.Create(nameof(ItemID), typeof(int),
         typeof(ScadaProgress), 0, BindingMode.OneWay,
             validateValue: (_, value) => value != null,

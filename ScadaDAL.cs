@@ -107,6 +107,111 @@ namespace Scada
         }
 
 
+
+
+        public string ReadParameter(string Name )
+        {
+            try
+            {
+                int ParameterType =-1;
+                string sParam = "";
+                var Connection = new Microsoft.Data.SqlClient.SqlConnection
+                {
+                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                };
+                Connection.Open();
+                string sqlGetData = "select Value,Type from Parameters where Name = @Name";
+                SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
+                cmdGetData.Parameters.AddWithValue("@Name", Name);
+                cmdGetData.CommandText = sqlGetData;
+                SqlDataReader reader = cmdGetData.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    sParam = reader.GetString(0);
+                    ParameterType = reader.GetInt32(1);
+                }
+                cmdGetData.Dispose();
+                Connection.Close();
+                Connection = null;
+                return (sParam);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString(), ex);
+            }
+            finally
+            {
+            }
+        }
+
+        public int NewParameter(string Name, int Type, string Value)
+        {
+            try
+            {
+                var Connection = new Microsoft.Data.SqlClient.SqlConnection
+                {
+                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
+                };
+                Connection.Open();
+                string sqlInsertData = "insert into Parameters(Name,Value, Type ) values (@Name, @Value, @Type )";
+                SqlCommand cmdGetData = new SqlCommand(sqlInsertData, Connection);
+                cmdGetData.Parameters.AddWithValue("@Name", Name);
+                cmdGetData.Parameters.AddWithValue("@Type", Type);
+                cmdGetData.Parameters.AddWithValue("@Value", Value);
+                cmdGetData.ExecuteNonQuery();
+                cmdGetData.Dispose();
+                Connection.Close();
+                Connection = null;
+                return (0);
+            }
+            catch (Exception ex)
+            {
+                return (1);
+                throw new Exception(ex.ToString(), ex);
+            }
+            finally
+            {
+            }
+        }
+
+
+        public int DeleteParameter(string Name)
+        {
+            try
+            {
+                var Connection = new Microsoft.Data.SqlClient.SqlConnection
+                {
+                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
+                };
+                Connection.Open();
+                string sqlDeleteData = "delete from Parameters where Name = @ParameterName";
+                SqlCommand cmdGetData = new SqlCommand(sqlDeleteData, Connection);
+                cmdGetData.Parameters.AddWithValue("@Name",Name);
+                cmdGetData.ExecuteNonQuery();
+                cmdGetData.Dispose();
+                Connection.Close();
+                Connection = null;
+                return (0);
+            }
+            catch (Exception ex)
+            {
+                return (-1);
+                throw new Exception(ex.ToString(), ex);
+            }
+            finally
+            {
+            }
+        }
+
+
+
+
+
+
+
+
+
         public int InitTags()
         {
             try

@@ -13,21 +13,6 @@ namespace Scada;
 
 public partial class MainPage : ContentPage
 {
-    /*
-    SKColor uxBackGroundColor = new SKColor();
-    SKColor uxItemBackGroundColor = new SKColor();
-    SKColor uxPanelColor = new SKColor();
-    SKColor uxPopupColor = new SKColor();
-    SKColor uxPopupItemColor = new SKColor();
-    SKColor uxItemColor = new SKColor();
-    SKColor uxTouchColor = new SKColor();
-    SKColor uxHoverColor = new SKColor();
-    SKColor uxTextColor = new SKColor();
-    SKColor uxLightColor = new SKColor();
-    SKColor uxGridThinColor = new SKColor();
-    SKColor uxGridFatColor = new SKColor();
-    SKColor uxTransparentButtonColor = new SKColor();
-    */
     ScadaClasses.Colors ScadaColor = new ScadaClasses.Colors();
 
     public System.Timers.Timer bcktimer = new System.Timers.Timer();
@@ -78,6 +63,7 @@ public partial class MainPage : ContentPage
         ScadaColor.uxGradientStartColor = RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_ItemColor"));
         ScadaColor.uxGradientEndColor = RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_ItemColor"));
         ScadaColor.uxPopupColor= RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_PopupColor"));
+        ScadaColor.uxPopupItemColor = RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_PopupItemColor"));
         ScadaColor.uxTextColor = RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_TextColor"));
         ScadaColor.uxLightColor = RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_LightColor"));
         ScadaColor.uxHoverColor = RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_HoverColor"));
@@ -87,24 +73,8 @@ public partial class MainPage : ContentPage
         ScadaColor.uxGridThinColor = RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_GridThinColor"));
         ScadaColor.uxGridFatColor = RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_GridFatColor"));
         ScadaColor.uxTransparentButtonColor = RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_TransparentButtonColor"));
-       
 
-   
-        /*
-        ScadaColor.uxItemBackGroundColor = RGBStringToColor("rgba(50,50,50,200)");
-        ScadaColor.uxPanelColor = RGBStringToColor("rgba(30,30,30,200)");
-        ScadaColor.uxItemColor = RGBStringToColor("rgba(60,60,60,250)");
-        ScadaColor.uxGradientStartColor = RGBStringToColor("rgba(50,50,50,230)");
-        ScadaColor.uxGradientEndColor = RGBStringToColor("rgba(60,60,60,230)");
 
-        ScadaColor.uxTextColor = RGBStringToColor("rgba(255,255,255,240)");
-        ScadaColor.uxLightColor = RGBStringToColor("rgba(200,200,200,100)");
-        ScadaColor.uxHoverColor = RGBStringToColor("rgba(145,145,145,200)");
-        ScadaColor.uxTouchColor = RGBStringToColor("rgba(175,175,175,100)");
-        ScadaColor.uxOffColor = RGBStringToColor("rgba(175,175,175,175)");
-        ScadaColor.uxLightColor = RGBStringToColor("rgba(200,200,200,100)");
-        ScadaColor.uxTransparentButtonColor = RGBStringToColor("rgba(200,200,200,100)");
-        */
 
 
         if (MyDataAccessLayer.GetTagValueByName("System_EnableADAM") > 0.5)
@@ -2841,8 +2811,8 @@ public partial class MainPage : ContentPage
                             StyleId = "myTimeScaleButton",
                             WidthRequest = wTSButton,
                             HeightRequest = hTSButton,
-                            Background = ScadaColor.uxPanelColor.ToMauiColor(),
-                            BarBackgroundColor = ScadaColor.uxPanelColor,
+                            Background = null, //ScadaColor.uxPopupItemColor.ToMauiColor(),
+                            BarBackgroundColor =  ScadaColor.uxTransparentButtonColor,
                             IndicatorType = 1,
 
                             IndicatorColor = ScadaColor.uxPopupItemColor,

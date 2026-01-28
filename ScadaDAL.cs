@@ -7,16 +7,20 @@ using static Scada.ScadaClasses;
 
 namespace Scada
 {
+    
     public class DataAccessLayer
     {
-       public string LoadLibItem(string Name, int TypeInLib)
+        string sConnection = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true";
+
+
+        public string LoadLibItem(string Name, int TypeInLib)
         {
             try
             {
                 string sBase64 = "";
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 Connection.Open();
                 string sqlGetData = "select base64 from Library where Name = @Name";
@@ -51,7 +55,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 Connection.Open();
                 string sqlInsertData = "insert into Library(Type, Name, Base64 ) values (@TypeInLib, @Name, @Base64 )";
@@ -84,7 +88,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 Connection.Open();
                 string sqlDeleteData = "delete from Library where Name = @Name";
@@ -118,7 +122,7 @@ namespace Scada
                 string sParam = "";
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 Connection.Open();
                 string sqlGetData = "select Value,Type from Parameters where Name = @Name";
@@ -152,7 +156,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 Connection.Open();
                 string sqlInsertData = "insert into Parameters(Name,Value, Type ) values (@Name, @Value, @Type )";
@@ -183,7 +187,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 Connection.Open();
                 string sqlDeleteData = "delete from Parameters where Name = @ParameterName";
@@ -214,7 +218,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 Connection.Open();
                 string sqlGetData = "update tags set Value = -999999";
@@ -246,7 +250,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 Connection.Open();
                 string sqlGetData = "select tags.tagID,tags.Value from tags " +
@@ -300,7 +304,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 Connection.Open();
                 string sqlGetData = "select tags.tagID,tags.Value from tags " +
@@ -344,7 +348,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 Connection.Open();
                 string sqlGetData = "select tagname,description,HL,LL,Color,Unit,StoreIntervalSec,alarmenable,TypeOfTag from tags where TagID =@TagID";
@@ -519,7 +523,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 Connection.Open();
                 string sqlGetData = "select tags.tagID,tags.driver,tags.tagname,tags.Description,tags.Value,tags.HL,tags.LL,tags.Color,Adam.adress,Adam.channel,OpcUA.endpoint,mqtt.adress from tags " +
@@ -603,35 +607,25 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 Connection.Open();
-                string sqlGetData = "select tags.tagID,tags.driver,tags.tagname,tags.Description from tags " +
-                                     "WHERE Driver = 0 ";
-
+                string sqlGetData = "select Name,Value,Type from Parameters ";                        
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
-
-
                 cmdGetData.CommandText = sqlGetData;
                 SqlDataReader reader = cmdGetData.ExecuteReader();
-
                 var gridRows = new List<gridRow>();
                 int r = 0;
                 while (reader.Read())
                 {
-                    int TagID = reader.GetInt32(0);
-                    int Driver = reader.GetInt32(1);
-                    string TagName = reader.GetString(2);
-                    string TagDesc = reader.GetString(3);
-
-
-
+                    string Name = reader.GetString(0);
+                    string Value = reader.GetString(1);
+                    int Type = reader.GetInt32(2);
                     gridRows.Add(new gridRow
-                    {
-                        Status = 0,
-                        col1text = TagName,
+                    {              
+                        col1text = Name,
                         col1width = 250F,
-                        col2text = TagDesc,
+                        col2text = Value,
                         col2width = 250F,
                         col3text = "",
                         col3width = 50F,
@@ -641,15 +635,14 @@ namespace Scada
                         col5width = 50F,
                         col6text = "",
                         col6width = 50F,
-                        TagID = TagID,
+                        DataType = Type,
                         Row = r,
+                        Status = 0,
                         Id = 0
                     });
                     r++;
-
                 }
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (gridRows);
@@ -672,7 +665,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 Connection.Open();
                 string sqlUpdate = "update tags set AlarmEnable = @Enable where TagID = @TagID";
@@ -702,7 +695,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 Connection.Open();
                 string sqlUpdate = "update tags set StatusQuality = @Status where Driver = @Driver";
@@ -736,7 +729,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 Connection.Open();
                 string sqlGetData = "select name,base64 from Library";
@@ -771,7 +764,7 @@ namespace Scada
 
 
 
-        public static int newitem(ScadaClasses.Telegram oTelegram)
+        public int newitem(ScadaClasses.Telegram oTelegram)
 
         {
             if (oTelegram.Text == null)
@@ -782,7 +775,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 Connection.Open();
                 string sqlInsertData = "INSERT INTO items values( @page,@itemtype,@posLeft,@posTop,@posWidth,@posHeight,@Nextpage,@Action,@TagID,@Text,DEFAULT,@Radius )";
@@ -973,7 +966,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
 
                 string sqlGetData = "UPDATE Items SET itemtype = @Value,posWidth=@w,posHeight=@h WHERE ( ItemID = @ItemID )";
@@ -1009,7 +1002,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
 
                 string sqlGetData = "UPDATE Items SET posWidth=@w,posHeight=@h WHERE ( ItemID = @ItemID )";
@@ -1042,7 +1035,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
 
                 string sqlGetData = "UPDATE ItemTags SET TagID = @TagID  WHERE ( ItemID = @ItemID ) and ( TagSequence = @TagSequence )";
@@ -1076,7 +1069,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
 
                 string sqlGetData = "UPDATE Tags SET TagName = @TagName  WHERE ( TagID = @TagID )";
@@ -1107,7 +1100,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
 
                 string sqlGetData = "UPDATE Tags SET Description = @Description  WHERE ( TagID = @TagID )";
@@ -1137,7 +1130,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
 
                 string sqlGetData = "UPDATE Tags SET HL = @HL  WHERE ( TagID = @TagID )";
@@ -1169,7 +1162,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
 
                 string sqlGetData = "UPDATE Tags SET LL = @LL  WHERE ( TagID = @TagID )";
@@ -1200,7 +1193,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
 
                 string sqlGetData = "UPDATE Tags SET Color = @TagColor  WHERE ( TagID = @TagID )";
@@ -1231,7 +1224,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
 
                 string sqlGetData = "UPDATE Tags SET Unit = @TagUnit  WHERE ( TagID = @TagID )";
@@ -1263,7 +1256,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
 
                 string sqlGetData = "UPDATE Tags SET AlarmEnable = @AlarmEnable  WHERE ( TagID = @TagID )";
@@ -1294,7 +1287,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
 
                 string sqlGetData = "UPDATE Tags SET StoreIntervalSec = @StoreIntervalSec  WHERE ( TagID = @TagID )";
@@ -1324,7 +1317,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
 
                 string sqlGetData = "UPDATE Tags SET TypeOfTag = @TagType  WHERE ( TagID = @TagID )";
@@ -1355,7 +1348,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
 
                 string sqlGetData = "UPDATE Tags SET Value = @Value  WHERE ( TagID = @TagID )";
@@ -1388,7 +1381,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
 
                 string sqlGetData = "INSERT INTO ChannelData( tagID, Time, Value ) VALUES( @TagID, GetDate(), @Value )";
@@ -1431,7 +1424,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 string sqlGetData = "SELECT TOP(1) tagID,Time,Value FROM ChannelData WHERE( tagID = @sTag ) order by time desc";
                 Connection.Open();
@@ -1469,7 +1462,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 string sqlGetData = "SELECT TOP(1) tagID,Time,Value FROM ChannelData WHERE( tagID = @sTag ) AND (time<DateADD(second, -360, Getdate()) ) order by time desc";
                 Connection.Open();
@@ -1506,7 +1499,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
 
                 string sqlGetData = "SELECT Hour,Minute,Second,Max(Totals) AS[Value] FROM( " +
@@ -1644,7 +1637,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
 
                 string sqlGetData = "SELECT [Hour],[Minute],Max(Totals) AS[Value] FROM( " +
@@ -1780,7 +1773,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 string sqlGetData = "SELECT [Hour],[Minute],Max(Totals) AS[Value] FROM( " +
                         " SELECT " +
@@ -1914,7 +1907,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
 
                 string sqlGetData = "SELECT [Hour], Max(Totals) AS[Value] FROM( " +
@@ -2035,7 +2028,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 string sqlGetData = "SET datefirst 1 " +
                         "SELECT [Year],[Month],[WEEKDAY],[Hour], Max(Totals) AS[Value] FROM( " +
@@ -2107,7 +2100,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
 
                 string sqlGetData = "SELECT [Day], Max(Totals) AS[Value] FROM( " +
@@ -2192,7 +2185,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
 
                 string sqlGetData = "SELECT [Month], Max(Totals) AS[Value] FROM( " +
@@ -2264,7 +2257,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 string sqlGetData = "select Span,Year,Month,Week,Day,Hour,Minute from chartSettings where ItemID = @ItemID";
                 Connection.Open();
@@ -2325,7 +2318,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 string sqlGetData = "select ItemTags.tagID,tags.Color,tags.TypeOfTag from ItemTags left join tags on tags.tagID = ItemTags.tagID  where ItemID = @ItemID";
                 Connection.Open();
@@ -2366,7 +2359,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 string sqlGetData = "select nSize, Width, Height, sDescription from ItemSizes where ItemType = @ItemType order by nSize";
                 Connection.Open();
@@ -2410,7 +2403,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 string sqlGetData = "insert into ChartSettings Values( 1,2025,1,1,1,0,0, @ItemID ) ";
                 Connection.Open();
@@ -2440,7 +2433,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
 
                 string sqlGetData = "UPDATE chartSettings SET " +
@@ -2483,7 +2476,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 string sqlGetData = "UPDATE Alarms SET Deleted = GetDate()  WHERE ( ID = @ID )";
                 Connection.Open();
@@ -2513,7 +2506,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 string sqlGetData = "UPDATE Tags SET AlarmEnable = 0  WHERE ( TagID = @TagID )";
                 Connection.Open();
@@ -2545,7 +2538,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
 
                 string sqlGetData = "UPDATE Alarms SET Confirmed = GetDate()  WHERE ( ID = @ID )";
@@ -2578,7 +2571,7 @@ namespace Scada
                 string sqlGetData = "";
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 Connection.Open();
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
@@ -2638,7 +2631,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
 
                 string sqlGetData = "SELECT itemID,itemtype,posLeft,posTop,posWidth,posHeight,Value,HL,LL,page,nextpage,unit,Action,text,items.tagID,tags.tagName,tags.Color,radius,tags.StatusQuality FROM Items LEFT JOIN Tags on tags.tagID = Items.tagID WHERE ( Page = @Page )  ORDER BY itemtype asc";
@@ -2825,7 +2818,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 Connection.Open();
                 string sqlDeleteData = "delete from ItemTags where ItemID = @ItemID";
@@ -2855,7 +2848,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 Connection.Open();
                 string sqlDeleteData = "delete from ItemTags where ItemID = @ItemID and TagID = @TagID";
@@ -2891,7 +2884,7 @@ namespace Scada
                 string sqlGetData = "";
                 var Connection = new SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 Connection.Open();
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
@@ -3011,7 +3004,7 @@ namespace Scada
                 string sqlGetData = "";
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 Connection.Open();
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
@@ -3069,7 +3062,7 @@ namespace Scada
                 string sqlGetData = "";
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 Connection.Open();
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
@@ -3125,7 +3118,7 @@ namespace Scada
                 string sqlGetData = "";
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 Connection.Open();
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
@@ -3201,7 +3194,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 Connection.Open();
                 string sqlGetData = "select TagID,UxDescription,TagSequence from ItemTags where ItemID = @ItemID";
@@ -3257,7 +3250,7 @@ namespace Scada
                 string sqlGetData = "";
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 Connection.Open();
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
@@ -3311,7 +3304,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 Connection.Open();
                 string sqlInsertData = "insert into Tags(Driver,TagName,Value,HL,LL,Unit,Description,Color,TypeOfTag ,AlarmEnable,ValueTime,StoreIntervalSec,StatusQuality) " +
@@ -3351,7 +3344,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 Connection.Open();
                 string sqlDeleteData = "delete from tags where tagName LIKE( @TagName )";
@@ -3385,7 +3378,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 Connection.Open();
                 string sqlInsertData = "insert into ItemTags(ItemID, ItemType, TagID, TagSequence, UxDescription) values (@ItemID , @ItemType, @TagID, @TagSequence, @UxDescription )";
@@ -3534,7 +3527,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 Connection.Open();
                 string sqlInsertData = "insert into items( page, itemtype, posLeft, posTop, posWidth, posHeight, nextpage , action, tagID, text, radius ) " +
@@ -3568,7 +3561,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 string sqlGetData = "UPDATE Items SET posLeft = @posLeft, posTop = @PosTop WHERE ItemID = @ItemID";
                 Connection.Open();
@@ -3791,7 +3784,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 Connection.Open();
                 string sqlInsertData = "INSERT INTO items values( @page,@itemtype,@posLeft,@posTop,@posWidth,@posHeight,@Nextpage,@Action,@TagID,@Text,DEFAULT,@Radius )";
@@ -3831,7 +3824,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 string sqlGetData = "DELETE FROM Items WHERE ItemID = @ItemID";
                 Connection.Open();
@@ -3861,7 +3854,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 string sqlGetData = "UPDATE Items SET Page = @Page WHERE ItemID = @ItemID";
                 Connection.Open();
@@ -3892,7 +3885,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 string sqlGetData = "UPDATE Items SET NextPage = @NextPage WHERE ItemID = @ItemID";
                 Connection.Open();
@@ -3925,7 +3918,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 int TagType = 0;
                 string sqlGetData = "SELECT Digital FROM Tags WHERE TagID = @TagID";
@@ -3962,7 +3955,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 int TagID = 0;
                 string sqlGetData = "SELECT TagID FROM Tags WHERE TagName = @TagName";
@@ -4002,7 +3995,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 string sqlGetData = "UPDATE Tags SET Value = @Value WHERE TagName = @TagName";
                 Connection.Open();
@@ -4032,7 +4025,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 double Value = -1;
                 string sqlGetData = "SELECT Value FROM Tags WHERE TagName = @sTagName";
@@ -4069,7 +4062,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 string sColor = "";
                 string sqlGetData = "SELECT Color FROM Tags WHERE TagName = @sTagName";
@@ -4105,7 +4098,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 string sColor = "";
                 string sqlGetData = "SELECT Color FROM Tags WHERE TagID = @TagID";
@@ -4141,7 +4134,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 string sqlGetData = "UPDATE Tags SET Color = @Color WHERE TagID = @TagID";
                 Connection.Open();
@@ -4172,7 +4165,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
 
                 string sqlGetData = "SELECT TagName,Description,Color,Unit FROM Tags WHERE TagID = @TagID";
@@ -4222,7 +4215,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 string TagName = "";
                 string sqlGetData = "SELECT TagName FROM Tags WHERE TagID = @TagID";
@@ -4259,7 +4252,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 string Description = "";
                 string sqlGetData = "SELECT Description FROM Tags WHERE TagID = @TagID";
@@ -4295,7 +4288,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 string sqlGetData = "UPDATE Tags SET Color = @Color WHERE TagName = @TagName";
                 Connection.Open();

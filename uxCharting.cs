@@ -1,6 +1,7 @@
 ﻿using SkiaSharp;
 using SkiaSharp.Views.Maui;
 using SkiaSharp.Views.Maui.Controls;
+using System.Net;
 using System.Text.RegularExpressions;
 
 namespace Scada
@@ -308,7 +309,7 @@ end;
                 Color = new SKColor(128, 128, 128, 200),
                 StrokeWidth = 1
             };
-
+            /*
             SKPaint Line1Paint = new SKPaint
             {
                 IsAntialias = true,
@@ -335,7 +336,7 @@ end;
                 StrokeWidth = 0F,
                 StrokeCap = SKStrokeCap.Square
             };
-
+            */
 
             FontSize = 12F;
             var TextPaint = new SKPaint
@@ -364,7 +365,7 @@ end;
                         Color = theColor,
                         SubpixelText = true,
                         StrokeWidth = 3F,
-                        StrokeCap = SKStrokeCap.Butt
+                        StrokeCap = SKStrokeCap.Square
                     };
 
                     int Count = LocalValues.Count;
@@ -398,13 +399,12 @@ end;
                     var oldPoint = new SKPoint(-1, -1);
 
                     var pts = new List<SKPoint>();
-
-                    while (x > 0)
+                    int AddPoint = 0;
+                    while (x >= 0)
                     {
                         x = x - (w / Count);
-                        if (j > 0)
+                        if (j >= 0)
                         {
-                            //LocalValues[0].TypeOfTag = 0;
                             if (LocalValues[j].Y != "0")
                             {
                                 thePoint = new SKPoint(x, h - (float)(Convert.ToDouble(LocalValues[j].Y) / 100.0F) * h);
@@ -416,7 +416,7 @@ end;
                                     }
                                     if (LocalValues[0].TypeOfTag == 1)
                                     {
-                                        canvas.DrawRect(x - (w / Count) / 2, h - h / 6, (w / Count) * 4F, 5 * -(float)(Convert.ToDouble(LocalValues[j].Y) / 100.0F) * h, Line3Paint);
+                                        canvas.DrawRect(x - (w / Count) / 2, h - h / 6, (w / Count) * 4F, 5 * -(float)(Convert.ToDouble(LocalValues[j].Y) / 100.0F) * h, myPaint);
                                         //canvas.DrawLine(oldPoint, thePoint, LinePaint);                                         
                                         /*
                                         if (Math.Abs(thePoint.Y - oldPoint.Y) > 0.05F)
@@ -430,13 +430,26 @@ end;
                                     }
                                     if (LocalValues[0].TypeOfTag == 3)
                                     {
-                                        //canvas.DrawLine(oldPoint, thePoint, Line1Paint);
-                                        
-                                        if (Math.Abs(thePoint.Y - oldPoint.Y) > 0.05F)
+                                        canvas.DrawLine(oldPoint, thePoint, myPaint);
+
+                                        /*
+                                        if (pts.Count == 0)
                                         {
                                             pts.Add(new SKPoint(thePoint.X, thePoint.Y));
                                         }
-                                        
+                                        if (AddPoint < 3)
+                                        {
+                                            pts.Add(new SKPoint(thePoint.X, thePoint.Y));
+                                        }
+                                        if (Math.Abs(thePoint.Y - oldPoint.Y) > 0.05F)
+                                        {
+                                            AddPoint = 0;
+                                        }
+                                        else
+                                        {
+                                            AddPoint++;
+                                        }
+                                        */
 
                                         /*
                                         var R = new SKRect(thePoint.X, thePoint.Y, thePoint.X + ((w / Count) / 1.5F), thePoint.Y + h);
@@ -448,7 +461,7 @@ end;
                                 oldPoint = thePoint;
                             }
 
-
+                          
 
                             //X Scale
                             if (incColor == 1)
@@ -475,7 +488,14 @@ end;
 
                     if (LocalValues[0].TypeOfTag == 3)
                     {
-                        canvas.DrawPoints(SKPointMode.Polygon, pts.ToArray(), myPaint);
+                        //Some tests with Draw as polygon
+                        if (pts.Count > 0)
+                        {
+                            //pts.Add(new SKPoint(oldPoint.X, oldPoint.Y));
+                            //float latestY = pts[0].Y;
+                            //pts.Insert(0,new SKPoint(x+w-1, latestY));
+                            //canvas.DrawPoints(SKPointMode.Polygon, pts.ToArray(), myPaint);
+                        }
                     }
                     incColor++;
                 }

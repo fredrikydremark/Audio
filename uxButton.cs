@@ -44,8 +44,8 @@ namespace Scada
     {
         bool bFaceFade = true;
         bool bIndicatorFade = true;
-        float localBtnIndicatorIntensity = 255f;
-        float localBtnFaceIntensity = 255f;
+        float localBtnIndicatorIntensity = 70f;
+        float localBtnFaceIntensity = 70f;
       
         public ScadaButton Init(double wScale, double hScale, ScadaButton scb, ScadaClasses.Telegram Item, ScadaClasses.Colors Color)
         {
@@ -432,7 +432,7 @@ namespace Scada
             {
                 if (bFaceFade == true)
                 {
-                    if (localBtnFaceIntensity > 200)
+                    if (localBtnFaceIntensity > 60)  //Replace with color tag value set from button.Init
                     {
                         localBtnFaceIntensity = localBtnFaceIntensity - Step;
                         if (IsLoaded == true)
@@ -443,7 +443,7 @@ namespace Scada
                 }
                 if (bFaceFade == false)
                 {
-                    if (localBtnFaceIntensity < 250)
+                    if (localBtnFaceIntensity < 90) //Replace with color tag value set from button.Init
                     {
                         localBtnFaceIntensity = localBtnFaceIntensity + Step;                      
                         if (IsLoaded == true)
@@ -547,8 +547,16 @@ namespace Scada
             SKColor GrStart = GradientStartColor;
             SKColor GrEnd = GradientEndColor;
 
-            GrStart = GrStart.WithAlpha((byte)localBtnFaceIntensity);
-            GrEnd = GrEnd.WithAlpha((byte)localBtnFaceIntensity);
+            GrStart = GrStart.WithRed((byte)localBtnFaceIntensity);
+            GrStart = GrStart.WithGreen((byte)localBtnFaceIntensity);
+            GrStart = GrStart.WithBlue((byte)localBtnFaceIntensity);
+
+            GrEnd = GrEnd.WithRed((byte)localBtnFaceIntensity);
+            GrEnd = GrEnd.WithGreen((byte)localBtnFaceIntensity);
+            GrEnd = GrEnd.WithBlue((byte)localBtnFaceIntensity);
+          
+            //GrStart = GrStart.WithAlpha((byte)localBtnFaceIntensity);
+            //GrEnd = GrEnd.WithAlpha((byte)localBtnFaceIntensity);
 
             using (var facePaint = new SKPaint() { IsAntialias = true, FilterQuality = SKFilterQuality.High, BlendMode = SKBlendMode.Overlay })
             {

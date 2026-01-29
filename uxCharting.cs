@@ -361,13 +361,24 @@ end;
                     SKPaint myPaint = new SKPaint
                     {
                         IsAntialias = true,
-                        Style = SKPaintStyle.StrokeAndFill,
+                        Style = SKPaintStyle.Fill,
                         Color = theColor,
                         SubpixelText = true,
                         StrokeWidth = 3F,
+                        FilterQuality= SKFilterQuality.High,
                         StrokeCap = SKStrokeCap.Square
                     };
 
+                    SKPaint my2Paint = new SKPaint
+                    {
+                        IsAntialias = true,
+                        Style = SKPaintStyle.Fill,
+                        Color = theColor,
+                        SubpixelText = true,
+                        StrokeWidth = w/50,
+                        FilterQuality = SKFilterQuality.High,
+                        StrokeCap = SKStrokeCap.Round
+                    };
                     int Count = LocalValues.Count;
                     string sv = "0";
                     for (int m = 0; m < Count; m++)
@@ -430,6 +441,12 @@ end;
                                     }
                                     if (LocalValues[0].TypeOfTag == 3)
                                     {
+                                        /*
+                                        if (Math.Abs(thePoint.Y - oldPoint.Y) > 0.05F)
+                                        {
+                                            canvas.DrawLine(oldPoint, thePoint, myPaint);
+                                        }
+                                        */
                                         canvas.DrawLine(oldPoint, thePoint, myPaint);
 
                                         /*
@@ -457,6 +474,15 @@ end;
                                         canvas.DrawRoundRect(RR, LinePaint);
                                         */
                                     }
+                                    if (LocalValues[0].TypeOfTag == 4)
+                                    {
+                                        //canvas.DrawRect(thePoint.X, thePoint.Y, 1, thePoint.Y + h, my2Paint);
+                                        if (Math.Abs(thePoint.Y - oldPoint.Y) > 0.05F)
+                                        {
+                                            canvas.DrawLine(thePoint.X, thePoint.Y, thePoint.X, thePoint.Y + h, my2Paint);
+                                        }
+                                    }
+
                                 }
                                 oldPoint = thePoint;
                             }

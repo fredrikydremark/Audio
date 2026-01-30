@@ -364,7 +364,7 @@ end;
                         Style = SKPaintStyle.Fill,
                         Color = theColor,
                         SubpixelText = true,
-                        StrokeWidth = 3F,
+                        StrokeWidth = 2.5F,
                         FilterQuality= SKFilterQuality.High,
                         StrokeCap = SKStrokeCap.Square
                     };

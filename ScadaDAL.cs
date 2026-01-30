@@ -658,7 +658,6 @@ namespace Scada
 
 
 
-
         public int EnableAlarmOnTag(int TagID, bool Enable)
         {
             try
@@ -675,7 +674,6 @@ namespace Scada
 
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (0);
@@ -689,6 +687,7 @@ namespace Scada
             {
             }
         }
+
         public int SetTagStatus(int Driver, int StatusQuality)
         {
             try

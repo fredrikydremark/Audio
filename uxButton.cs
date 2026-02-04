@@ -45,8 +45,9 @@ namespace Scada
         bool bFaceFade = true;
         bool bIndicatorFade = true;
         float localBtnIndicatorIntensity = 70f;
-        float localBtnFaceIntensity = 70f;
-      
+        float localBtnFaceIntensity = 0f;
+        bool FaceFadeEnabled = false;
+
         public ScadaButton Init(double wScale, double hScale, ScadaButton scb, ScadaClasses.Telegram Item, ScadaClasses.Colors Color)
         {
             scb.AnchorX = 0;
@@ -427,14 +428,23 @@ namespace Scada
 
         public async void EnableFaceFade()
         {
-            float Step = 5.0F;
-            while (true)
+            FaceFadeEnabled = true;
+            float Step = 7.0F;
+            while (FaceFadeEnabled)
             {
                 if (bFaceFade == true)
                 {
-                    if (localBtnFaceIntensity > 60)  //Replace with color tag value set from button.Init
+                    if (localBtnFaceIntensity > GradientStartColor.Blue-20)  
                     {
                         localBtnFaceIntensity = localBtnFaceIntensity - Step;
+                        if (IsLoaded == true)
+                        {
+                            InvalidateSurface();
+                        }
+                    }
+                    if (localBtnFaceIntensity < GradientStartColor.Blue-20)  
+                    {
+                        localBtnFaceIntensity = localBtnFaceIntensity + Step;
                         if (IsLoaded == true)
                         {
                             InvalidateSurface();
@@ -443,7 +453,7 @@ namespace Scada
                 }
                 if (bFaceFade == false)
                 {
-                    if (localBtnFaceIntensity < 90) //Replace with color tag value set from button.Init
+                    if (localBtnFaceIntensity < GradientStartColor.Blue) 
                     {
                         localBtnFaceIntensity = localBtnFaceIntensity + Step;                      
                         if (IsLoaded == true)
@@ -547,16 +557,16 @@ namespace Scada
             SKColor GrStart = GradientStartColor;
             SKColor GrEnd = GradientEndColor;
 
-            GrStart = GrStart.WithRed((byte)localBtnFaceIntensity);
-            GrStart = GrStart.WithGreen((byte)localBtnFaceIntensity);
-            GrStart = GrStart.WithBlue((byte)localBtnFaceIntensity);
+            if (FaceFadeEnabled == true)
+            {
+                GrStart = GrStart.WithRed((byte)localBtnFaceIntensity);
+                GrStart = GrStart.WithGreen((byte)localBtnFaceIntensity);
+                GrStart = GrStart.WithBlue((byte)localBtnFaceIntensity);
 
-            GrEnd = GrEnd.WithRed((byte)localBtnFaceIntensity);
-            GrEnd = GrEnd.WithGreen((byte)localBtnFaceIntensity);
-            GrEnd = GrEnd.WithBlue((byte)localBtnFaceIntensity);
-          
-            //GrStart = GrStart.WithAlpha((byte)localBtnFaceIntensity);
-            //GrEnd = GrEnd.WithAlpha((byte)localBtnFaceIntensity);
+                GrEnd = GrEnd.WithRed((byte)localBtnFaceIntensity);
+                GrEnd = GrEnd.WithGreen((byte)localBtnFaceIntensity);
+                GrEnd = GrEnd.WithBlue((byte)localBtnFaceIntensity);
+            }
 
             using (var facePaint = new SKPaint() { IsAntialias = true, FilterQuality = SKFilterQuality.High, BlendMode = SKBlendMode.Overlay })
             {

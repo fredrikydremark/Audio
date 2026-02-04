@@ -349,6 +349,8 @@ end;
                 FilterQuality = SKFilterQuality.High,
                 StrokeWidth = 0.5F
             };
+            FontSize = 12F;
+     
             int incColor = 1;
             canvas.Clear();
             canvas.DrawRoundRect(backgroundBar, background);

@@ -273,6 +273,17 @@ namespace Scada
                 FilterQuality = SKFilterQuality.High,
                 StrokeWidth = 0.5F
             };
+         
+            var UnitTextPaint = new SKPaint
+            {
+                IsAntialias = true,
+                Style = SKPaintStyle.StrokeAndFill,
+                Color = TextColor,
+                TextSize = FontSize / 1.3F,
+                SubpixelText = true,
+                FilterQuality = SKFilterQuality.High,
+                StrokeWidth = 0.5F
+            };
 
             float d = 0;
             float r = info.Height;
@@ -296,7 +307,7 @@ namespace Scada
             }
 
             string Format = "0.0";
-            var bounds = new SKRect();
+         
 
             if (Math.Abs(OV - PV.Value) > 0.1)
             {
@@ -306,21 +317,31 @@ namespace Scada
             string s = "";
             if (PV.StatusQuality == 0)
             {
-                s = DV.ToString(Format) + sUnit;
+                s = DV.ToString(Format);
             }
             else
             {
-                s = "--.-" + sUnit;
+                s = "--.-";
             }
 
+            var boundsUnit = new SKRect();
+            TextPaint.MeasureText(sUnit, ref boundsUnit);
+            float UnitTextWidth = boundsUnit.Width;
+            UnitTextWidth = UnitTextWidth / 2;
+            TextPaint.TextSize = r / 1.5F;
 
-            TextPaint.MeasureText(s, ref bounds);
-            float TextWidth = bounds.Width;
+            var boundsValue = new SKRect();
+            TextPaint.MeasureText(s, ref boundsValue);
+            float TextWidth = boundsValue.Width;
             TextWidth = TextWidth / 2;
+            UnitTextPaint.TextSize = TextPaint.TextSize / 1.3F;
+
 
             canvas.Clear();
             canvas.DrawPath(path3, Backgroundpaint);
-            canvas.DrawText(s, w / 2 - TextWidth, r - r / 4, TextPaint);
+            canvas.DrawText(s, w / 2 - TextWidth -UnitTextWidth, r - r / 4, TextPaint);
+            canvas.DrawText(sUnit, w / 2 + TextWidth - UnitTextWidth + (UnitTextWidth/5.0F), r - r / 4, UnitTextPaint);
+       
         }
     }
 }

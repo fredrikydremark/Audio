@@ -197,19 +197,25 @@ public partial class MainPage : ContentPage
 
     void uxUpdate(object sender, EventArgs e)
     {
-        MainThread.BeginInvokeOnMainThread(() =>
+        try
         {
-            if (!Moving)
+            MainThread.BeginInvokeOnMainThread(() =>
             {
-                if (ScadaClasses.Refresh == true)
+                if (!Moving)
                 {
-                    var Items = MyDataAccessLayer.getItems(ScadaClasses.Currentpage);             
-                    Items = MyPopups.AddCurrentPopup(ScadaClasses.CurrentScadaPopup, ScadaClasses.Currentpage, ScadaClasses.CurrentTag, ScadaClasses.CurrentItem, Width, Height, Xpos, Ypos, Xwidth, Yheight, Items);
-                    UpdateGui(Items);
-                    ScadaClasses.Refresh = false;
+                    if (ScadaClasses.Refresh == true)
+                    {
+                        ScadaClasses.Refresh = false;
+                        var Items = MyDataAccessLayer.getItems(ScadaClasses.Currentpage);
+                        Items = MyPopups.AddCurrentPopup(ScadaClasses.CurrentScadaPopup, ScadaClasses.Currentpage, ScadaClasses.CurrentTag, ScadaClasses.CurrentItem, Width, Height, Xpos, Ypos, Xwidth, Yheight, Items);
+                        UpdateGui(Items);
+                    }
                 }
-            }
-        });
+            });
+        }
+        catch 
+        {
+        }
     }
 
     static SKColor GetStatusColor(int status)
@@ -257,9 +263,9 @@ public partial class MainPage : ContentPage
         gp.CornerRadius = 10;
         gp.BarBackgroundColor = ScadaColor.uxPanelColor;
         gp.BackgroundColor = ScadaColor.uxPanelColor.ToMauiColor();
-        gp.GradientStartColor = ScadaColor.uxPopupColor;
-        gp.GradientEndColor = ScadaColor.uxPopupColor;
-        gp.IndicatorColor = ScadaColor.uxPopupColor;
+        gp.GradientStartColor = ScadaColor.uxItemColor;
+        gp.GradientEndColor = ScadaColor.uxItemColor;
+        gp.IndicatorColor = ScadaColor.uxItemColor;
         gp.IndicatorType = 0;
         gp.WidthRequest = w;
         gp.HeightRequest = h;
@@ -729,8 +735,8 @@ public partial class MainPage : ContentPage
         popupAlarm.CornerRadius = 10;
         popupAlarm.BarBackgroundColor = ScadaColor.uxPanelColor;
         popupAlarm.BackgroundColor = ScadaColor.uxPanelColor.ToMauiColor();
-        popupAlarm.GradientStartColor = ScadaColor.uxPopupColor;//ScadaColor.uxItemBackGroundColor
-        popupAlarm.GradientEndColor = ScadaColor.uxPopupColor; //ScadaColor.uxItemBackGroundColor
+        popupAlarm.GradientStartColor = ScadaColor.uxItemColor;
+        popupAlarm.GradientEndColor = ScadaColor.uxItemColor; 
         popupAlarm.IndicatorColor = ScadaColor.uxPanelColor;
         popupAlarm.IndicatorType = 0;
         popupAlarm.WidthRequest = w;
@@ -739,6 +745,7 @@ public partial class MainPage : ContentPage
         popupAlarm.TextColor = ScadaColor.uxTextColor;
         popupAlarm.IsEnabled = true;
         popupAlarm.IsVisible = true;
+        //popupAlarm.EnableFaceFade();
         AbsoluteLayout.SetLayoutBounds(popupAlarm, new Rect(x, y, w, h));
         AbsoluteLayout.SetLayoutFlags(popupAlarm, AbsoluteLayoutFlags.None);
         SKCanvasViews.Add(popupAlarm);
@@ -835,10 +842,11 @@ public partial class MainPage : ContentPage
                 }
                 args.Handled = true;
             };
-            myRowButton.EnableIndicatorBlink();
+        
             myRowButton.InputTransparent = false;
             myRowButton.EnableTouchEvents = true;
-
+            myRowButton.EnableIndicatorBlink();
+            //myRowButton.EnableFaceFade();
             AbsoluteLayout.SetLayoutBounds(myRowButton, new Rect(x, y, myRowButton.WidthRequest, 26));
             AbsoluteLayout.SetLayoutFlags(myRowButton, AbsoluteLayoutFlags.None);          
             SKCanvasViews.Add(myRowButton);
@@ -861,9 +869,9 @@ public partial class MainPage : ContentPage
         popupAlarm.CornerRadius = 10;
         popupAlarm.BarBackgroundColor = ScadaColor.uxPanelColor;
         popupAlarm.BackgroundColor = ScadaColor.uxPanelColor.ToMauiColor();
-        popupAlarm.GradientStartColor = ScadaColor.uxPopupColor;//ScadaColor.uxItemBackGroundColor
-        popupAlarm.GradientEndColor = ScadaColor.uxPopupColor; //ScadaColor.uxItemBackGroundColor
-        popupAlarm.IndicatorColor = ScadaColor.uxPanelColor;
+        popupAlarm.GradientStartColor = ScadaColor.uxItemColor;//ScadaColor.uxItemBackGroundColor
+        popupAlarm.GradientEndColor = ScadaColor.uxItemColor; //ScadaColor.uxItemBackGroundColor
+        popupAlarm.IndicatorColor = ScadaColor.uxItemColor;
         popupAlarm.IndicatorType = 0;
         popupAlarm.WidthRequest = w;
         popupAlarm.HeightRequest = h;
@@ -957,6 +965,7 @@ public partial class MainPage : ContentPage
                         break;
 
                     case SKTouchAction.Exited:
+                        
                         if ((myRowButton.ButtonRow.Row % 2) == 0)
                         {
                             TheColor = ScadaColor.uxLightColor;
@@ -965,6 +974,7 @@ public partial class MainPage : ContentPage
                         {
                             TheColor = ScadaColor.uxItemColor;
                         }
+                        
                         myRowButton.GradientStartColor = TheColor;
                         myRowButton.GradientEndColor = TheColor;
                         myRowButton.IndicatorColor = TheColor;
@@ -998,8 +1008,8 @@ public partial class MainPage : ContentPage
         popupAlarm.CornerRadius = 10;
         popupAlarm.BarBackgroundColor = ScadaColor.uxPanelColor;
         popupAlarm.BackgroundColor = ScadaColor.uxPanelColor.ToMauiColor();
-        popupAlarm.GradientStartColor = ScadaColor.uxPopupColor;//ScadaColor.uxItemBackGroundColor
-        popupAlarm.GradientEndColor = ScadaColor.uxPopupColor; //ScadaColor.uxItemBackGroundColor
+        popupAlarm.GradientStartColor = ScadaColor.uxItemColor;
+        popupAlarm.GradientEndColor = ScadaColor.uxItemColor; 
         popupAlarm.IndicatorColor = ScadaColor.uxPanelColor;
         popupAlarm.IndicatorType = 0;
         popupAlarm.WidthRequest = w;
@@ -1135,9 +1145,9 @@ public partial class MainPage : ContentPage
         popupDesign.CornerRadius = 10;
         popupDesign.BarBackgroundColor = ScadaColor.uxPanelColor;
         popupDesign.BackgroundColor = ScadaColor.uxPanelColor.ToMauiColor();
-        popupDesign.GradientStartColor = ScadaColor.uxPopupColor;
-        popupDesign.GradientEndColor = ScadaColor.uxPopupColor;
-        popupDesign.IndicatorColor = ScadaColor.uxPopupColor;
+        popupDesign.GradientStartColor = ScadaColor.uxItemColor;
+        popupDesign.GradientEndColor = ScadaColor.uxItemColor;
+        popupDesign.IndicatorColor = ScadaColor.uxItemColor;
         popupDesign.IndicatorType = 0;
         popupDesign.WidthRequest = w;
         popupDesign.HeightRequest = h;

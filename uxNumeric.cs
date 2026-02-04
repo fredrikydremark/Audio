@@ -32,7 +32,7 @@ namespace Scada
             scb.PV.TagID = -1;
             scb.PV.Value = -1;
 
-            DataAccessLayer MyDataAccessLayer = new DataAccessLayer();           
+            DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);           
             var ItemValuesBtn = MyDataAccessLayer.ReadItemValues(scb.ItemID);
             int i = 0;
             foreach (var item in ItemValuesBtn)
@@ -238,6 +238,7 @@ namespace Scada
             }
         }
 
+        /*
         private async void RefreshTask()
         {
             DataAccessLayer MyDataAccessLayer = new DataAccessLayer();
@@ -248,6 +249,7 @@ namespace Scada
                 RefreshValues(ItemValues);
             }
         }
+        */
 
         protected override void OnPaintSurface(SKPaintSurfaceEventArgs e)
         {
@@ -328,7 +330,7 @@ namespace Scada
             TextPaint.MeasureText(sUnit, ref boundsUnit);
             float UnitTextWidth = boundsUnit.Width;
             UnitTextWidth = UnitTextWidth / 2;
-            TextPaint.TextSize = r / 1.5F;
+            TextPaint.TextSize = r / 1.4F;
 
             var boundsValue = new SKRect();
             TextPaint.MeasureText(s, ref boundsValue);

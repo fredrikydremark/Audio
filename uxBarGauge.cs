@@ -30,7 +30,7 @@ namespace Scada
             scb.PV = new ItemValue();
             scb.SV = new ItemValue();
             scb.Output = new ItemValue();
-            DataAccessLayer MyDataAccessLayer = new DataAccessLayer();
+            DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);
 
             var ItemValuesBtn = MyDataAccessLayer.ReadItemValues(scb.ItemID);
 

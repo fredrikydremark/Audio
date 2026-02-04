@@ -25,7 +25,7 @@ namespace Scada
             scb.ItemID = Item.ItemID;
             scb.StyleId = Item.ItemID.ToString();
           
-            DataAccessLayer MyDataAccessLayer = new DataAccessLayer();
+            DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);
  
             scb.SvgBase64 = MyDataAccessLayer.LoadLibItem(Item.Action, 1);
 

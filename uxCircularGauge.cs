@@ -29,7 +29,7 @@ namespace Scada
             scb.FontSize = 18.5F;
             scb.PV = new ItemValue();
             scb.SV = new ItemValue();
-            DataAccessLayer MyDataAccessLayer = new DataAccessLayer();
+            DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);
 
             var ItemValuesBtn = MyDataAccessLayer.ReadItemValues(scb.ItemID);
       

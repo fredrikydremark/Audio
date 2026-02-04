@@ -136,7 +136,7 @@ namespace Scada
 
         public void RefreshValues()
         {
-            DataAccessLayer MyDataAccessLayer = new DataAccessLayer();
+            DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);
       
             var ItemValues = MyDataAccessLayer.ReadItemValues(ItemID);
             foreach (var item in ItemValues)

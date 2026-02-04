@@ -36,7 +36,7 @@ namespace Scada
             scb.EnableIndicatorBlink();
             scb.PV = new ItemValue();
             scb.SV = new ItemValue();
-            DataAccessLayer MyDataAccessLayer = new DataAccessLayer();
+            DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);
 
             var ItemValuesBtn = MyDataAccessLayer.ReadItemValues(scb.ItemID);
             int i = 0;
@@ -329,7 +329,7 @@ namespace Scada
 
         public void RefreshValues()
         {
-            DataAccessLayer MyDataAccessLayer = new DataAccessLayer();
+            DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);
 
             var ItemValues = MyDataAccessLayer.ReadItemValues(ItemID);
             foreach (var item in ItemValues)

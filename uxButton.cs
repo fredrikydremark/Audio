@@ -88,7 +88,7 @@ namespace Scada
             scb.SV.TagID = -1;
             scb.SV.Value = -1;
 
-            DataAccessLayer MyDataAccessLayer = new DataAccessLayer();
+            DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);
             var ItemValuesBtn = MyDataAccessLayer.ReadItemValues(scb.ItemID);
             int idx = 0;
             foreach (var item in ItemValuesBtn)
@@ -523,7 +523,7 @@ namespace Scada
 
         private async void RefreshTask()
         {
-            DataAccessLayer MyDataAccessLayer = new DataAccessLayer();
+            DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);
             while (true)
             {
                 await Task.Delay(5000);

@@ -18,7 +18,7 @@ namespace Scada
             double y = (Height / 2) - ((panelHeight * Height)) / 2;
             double w = (panelWith * Width);
             double h = (panelHeight * Height);
-            DataAccessLayer MyDataAccessLayer = new DataAccessLayer();
+            DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);
 
             if (CurrentScadaPopup == ScadaClasses.uxPagesMenu)
             {

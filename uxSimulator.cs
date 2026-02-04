@@ -7,7 +7,7 @@ namespace Scada
 {
     public class Simulator : SKCanvasView
     {
-        DataAccessLayer MyDataAccessLayer = new DataAccessLayer();
+        //DataAccessLayer MyDataAccessLayer = new DataAccessLayer();
 
         public static BindableProperty ItemIDProperty = BindableProperty.Create(nameof(ItemID), typeof(int),
         typeof(Simulator), 0, BindingMode.OneWay,

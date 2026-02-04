@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Hosting;
 using SkiaSharp.Views.Maui;
 using System.Globalization;
 using static Scada.ScadaClasses;
@@ -7,11 +8,9 @@ using static Scada.ScadaClasses;
 
 namespace Scada
 {
-    
-    public class DataAccessLayer
+    public class DataAccessLayer(string s)
     {
-        string sConnection = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true";
-
+        private string sConnection = s; //"Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true";
 
         public string LoadLibItem(string Name, int TypeInLib)
         {

@@ -199,7 +199,7 @@ namespace Scada
         }
         private async void UpdateValue()
         {
-            DataAccessLayer MyDataAccessLayer = new DataAccessLayer();
+            DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);
             while (true)
             {
                 await Task.Delay(5000);             

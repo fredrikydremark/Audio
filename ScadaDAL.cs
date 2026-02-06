@@ -2468,98 +2468,7 @@ namespace Scada
             }
         }
 
-        public int deleteAlarm(ScadaClasses.Telegram oTelegram)
-        {
-            try
-            {
-                var Connection = new Microsoft.Data.SqlClient.SqlConnection
-                {
-                    ConnectionString = sConnection
-                };
-                string sqlGetData = "UPDATE Alarms SET Deleted = GetDate()  WHERE ( ID = @ID )";
-                Connection.Open();
-                SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
-                cmdGetData.Parameters.AddWithValue("@ID", oTelegram.TagID);
-                cmdGetData.ExecuteNonQuery();
-                cmdGetData.Dispose();
-                cmdGetData = null;
-                Connection.Close();
-                Connection = null;
-                return (1);
-            }
-            catch (Exception ex)
-            {
-                return (0);
-                throw new Exception(ex.ToString(), ex);
-            }
-            finally
-            {
-            }
-        }
-
-
-        public int disableAlarm(int TagID)
-        {
-            try
-            {
-                var Connection = new Microsoft.Data.SqlClient.SqlConnection
-                {
-                    ConnectionString = sConnection
-                };
-                string sqlGetData = "UPDATE Tags SET AlarmEnable = 0  WHERE ( TagID = @TagID )";
-                Connection.Open();
-                SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
-                cmdGetData.Parameters.AddWithValue("@TagID", TagID);
-                cmdGetData.ExecuteNonQuery();
-                cmdGetData.Dispose();
-                cmdGetData = null;
-                Connection.Close();
-                Connection = null;
-                return (1);
-            }
-            catch (Exception ex)
-            {
-                return (0);
-                throw new Exception(ex.ToString(), ex);
-            }
-            finally
-            {
-            }
-        }
-
-
-
-
-        public int confirmAlarm(ScadaClasses.Telegram oTelegram)
-        {
-            try
-            {
-                var Connection = new Microsoft.Data.SqlClient.SqlConnection
-                {
-                    ConnectionString = sConnection
-                };
-
-                string sqlGetData = "UPDATE Alarms SET Confirmed = GetDate()  WHERE ( ID = @ID )";
-                Connection.Open();
-                SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
-                cmdGetData.Parameters.AddWithValue("@ID", oTelegram.TagID);
-                cmdGetData.ExecuteNonQuery();
-                cmdGetData.Dispose();
-                cmdGetData = null;
-                Connection.Close();
-
-                Connection = null;
-                return (1);
-            }
-            catch (Exception ex)
-            {
-                return (0);
-                throw new Exception(ex.ToString(), ex);
-            }
-            finally
-            {
-            }
-        }
+    
 
 
         public List<gridRow> ReadTags(string Filter, int TypeOfTag, int StartRow, int EndRow)
@@ -2993,6 +2902,102 @@ namespace Scada
             {
             }
         }
+
+
+
+        public int deleteAlarm(ScadaClasses.Telegram oTelegram)
+        {
+            try
+            {
+                var Connection = new Microsoft.Data.SqlClient.SqlConnection
+                {
+                    ConnectionString = sConnection
+                };
+                string sqlGetData = "UPDATE Alarms SET Deleted = GetDate()  WHERE ( ID = @ID )";
+                Connection.Open();
+                SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
+                cmdGetData.Parameters.AddWithValue("@ID", oTelegram.TagID);
+                cmdGetData.ExecuteNonQuery();
+                cmdGetData.Dispose();
+                cmdGetData = null;
+                Connection.Close();
+                Connection = null;
+                return (1);
+            }
+            catch (Exception ex)
+            {
+                return (0);
+                throw new Exception(ex.ToString(), ex);
+            }
+            finally
+            {
+            }
+        }
+
+
+        public int disableAlarm(int TagID)
+        {
+            try
+            {
+                var Connection = new Microsoft.Data.SqlClient.SqlConnection
+                {
+                    ConnectionString = sConnection
+                };
+                string sqlGetData = "UPDATE Tags SET AlarmEnable = 0  WHERE ( TagID = @TagID )";
+                Connection.Open();
+                SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
+                cmdGetData.Parameters.AddWithValue("@TagID", TagID);
+                cmdGetData.ExecuteNonQuery();
+                cmdGetData.Dispose();
+                cmdGetData = null;
+                Connection.Close();
+                Connection = null;
+                return (1);
+            }
+            catch (Exception ex)
+            {
+                return (0);
+                throw new Exception(ex.ToString(), ex);
+            }
+            finally
+            {
+            }
+        }
+
+
+
+
+        public int confirmAlarm(ScadaClasses.Telegram oTelegram)
+        {
+            try
+            {
+                var Connection = new Microsoft.Data.SqlClient.SqlConnection
+                {
+                    ConnectionString = sConnection
+                };
+
+                string sqlGetData = "UPDATE Alarms SET Confirmed = GetDate()  WHERE ( ID = @ID )";
+                Connection.Open();
+                SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
+                cmdGetData.Parameters.AddWithValue("@ID", oTelegram.TagID);
+                cmdGetData.ExecuteNonQuery();
+                cmdGetData.Dispose();
+                cmdGetData = null;
+                Connection.Close();
+
+                Connection = null;
+                return (1);
+            }
+            catch (Exception ex)
+            {
+                return (0);
+                throw new Exception(ex.ToString(), ex);
+            }
+            finally
+            {
+            }
+        }
+
 
 
         public List<gridRow> ReadPages(string Filter, int StartRow, int EndRow)

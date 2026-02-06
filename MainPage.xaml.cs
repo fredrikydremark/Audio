@@ -2538,6 +2538,18 @@ public partial class MainPage : ContentPage
                         AbsoluteLayout.SetLayoutFlags(SKCircularGauge, AbsoluteLayoutFlags.None);
                         SKCanvasViews.Add(SKCircularGauge);
                         break;
+                    case ScadaClasses.uxDonutChart:
+                        var SKDonut = new DonutChart();
+                        SKDonut.Init(wScale, hScale, SKDonut, ScadaItem, ScadaColor);
+                        if (Designing == true)
+                        {
+                            SKDonut = (DonutChart)AttachDesignEvents(SKDonut, ScadaItem);
+                        }
+                        AbsoluteLayout.SetLayoutBounds(SKDonut, new Rect(wScale * ScadaItem.Left, hScale * ScadaItem.Top, wScale * ScadaItem.Width, hScale * ScadaItem.Height));
+                        AbsoluteLayout.SetLayoutFlags(SKDonut, AbsoluteLayoutFlags.None);
+                        SKCanvasViews.Add(SKDonut);
+                        break;
+
                     case ScadaClasses.uxBarGraph:
                         var SKBarGraph = new ScadaBarGraph();
                         SKBarGraph.Init(wScale, hScale, SKBarGraph, ScadaItem, ScadaColor);

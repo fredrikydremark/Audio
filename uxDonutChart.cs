@@ -8,14 +8,15 @@ using SkiaSharp.Views.Maui.Controls;
 
 namespace Scada
 {
-    public class CircularProgress : SKCanvasView
+    public class DonutChart : SKCanvasView
     {
         bool bFaceFade = true;
         bool bIndicatorFade = true;
         float localBtnIndicatorIntensity = 255f;
         float localBtnFaceIntensity = 255f;
-        
-        public CircularProgress Init(double w, double h, CircularProgress scb, ScadaClasses.Telegram Item, ScadaClasses.Colors Color)
+
+      
+        public DonutChart Init(double w, double h, DonutChart scb, ScadaClasses.Telegram Item, ScadaClasses.Colors Color)
         {
             scb.AnchorX = 0;
             scb.AnchorY = 0;
@@ -135,8 +136,10 @@ namespace Scada
         }
 
 
+
+
         public static BindableProperty ItemIDProperty = BindableProperty.Create(nameof(ItemID), typeof(int),
-        typeof(CircularProgress), 0, BindingMode.OneWay,
+        typeof(DonutChart), 0, BindingMode.OneWay,
             validateValue: (_, value) => value != null,
         propertyChanged: OnPropertyChangedInvalidate);
 
@@ -145,9 +148,10 @@ namespace Scada
             get => (int)GetValue(ItemIDProperty);
             set => SetValue(ItemIDProperty, value);
         }
-      
+
+       
         public static BindableProperty PVProperty = BindableProperty.Create(nameof(PV), typeof(ItemValue),
-           typeof(CircularProgress), null, BindingMode.OneWay,
+           typeof(DonutChart), null, BindingMode.OneWay,
            validateValue: (_, value) => value != null,
            propertyChanged: OnPropertyChangedInvalidate);
 
@@ -159,7 +163,7 @@ namespace Scada
 
 
         public static BindableProperty SVProperty = BindableProperty.Create(nameof(SV), typeof(ItemValue),
-           typeof(CircularProgress), null, BindingMode.OneWay,
+           typeof(DonutChart), null, BindingMode.OneWay,
            validateValue: (_, value) => value != null,
            propertyChanged: OnPropertyChangedInvalidate);
 
@@ -171,7 +175,7 @@ namespace Scada
 
 
         public static BindableProperty CornerRadiusProperty = BindableProperty.Create(nameof(CornerRadius), typeof(float),
-            typeof(CircularProgress), 0f, BindingMode.OneWay,
+            typeof(DonutChart), 0f, BindingMode.OneWay,
             validateValue: (_, value) => value != null && (float)value >= 0,
             propertyChanged: OnPropertyChangedInvalidate);
 
@@ -183,7 +187,7 @@ namespace Scada
         }
 
         public static BindableProperty BarBackgroundColorProperty = BindableProperty.Create(nameof(BarBackgroundColor), typeof(SKColor),
-            typeof(CircularProgress), SKColors.White, BindingMode.OneWay,
+            typeof(DonutChart), SKColors.White, BindingMode.OneWay,
             validateValue: (_, value) => value != null, propertyChanged: OnPropertyChangedInvalidate);
 
         public SKColor BarBackgroundColor
@@ -193,7 +197,7 @@ namespace Scada
         }
 
         public static BindableProperty FontSizeProperty = BindableProperty.Create(nameof(FontSize), typeof(float),
-            typeof(CircularProgress), 0f, BindingMode.OneWay,
+            typeof(DonutChart), 0f, BindingMode.OneWay,
             validateValue: (_, value) => value != null && (float)value >= 0,
             propertyChanged: OnPropertyChangedInvalidate);
 
@@ -204,7 +208,7 @@ namespace Scada
         }
 
         public static BindableProperty GradientStartColorProperty = BindableProperty.Create(nameof(GradientStartColor), typeof(SKColor),
-            typeof(CircularProgress), SKColors.Purple, BindingMode.OneWay,
+            typeof(DonutChart), SKColors.Purple, BindingMode.OneWay,
             validateValue: (_, value) => value != null, propertyChanged: OnPropertyChangedInvalidate);
 
         public SKColor GradientStartColor
@@ -214,7 +218,7 @@ namespace Scada
         }
 
         public static BindableProperty GradientEndColorProperty = BindableProperty.Create(nameof(GradientEndColor), typeof(SKColor),
-            typeof(CircularProgress), SKColors.Blue, BindingMode.OneWay,
+            typeof(DonutChart), SKColors.Blue, BindingMode.OneWay,
             validateValue: (_, value) => value != null, propertyChanged: OnPropertyChangedInvalidate);
 
         public SKColor GradientEndColor
@@ -224,7 +228,7 @@ namespace Scada
         }
 
         public static BindableProperty TextColorProperty = BindableProperty.Create(nameof(TextColor), typeof(SKColor),
-            typeof(CircularProgress), SKColors.Blue, BindingMode.OneWay,
+            typeof(DonutChart), SKColors.Blue, BindingMode.OneWay,
             validateValue: (_, value) => value != null, propertyChanged: OnPropertyChangedInvalidate);
 
         public SKColor TextColor
@@ -234,7 +238,7 @@ namespace Scada
         }
 
         public static BindableProperty AlternativeTextColorProperty = BindableProperty.Create(nameof(AlternativeTextColor), typeof(SKColor),
-            typeof(CircularProgress), SKColors.Blue, BindingMode.OneWay,
+            typeof(DonutChart), SKColors.Blue, BindingMode.OneWay,
             validateValue: (_, value) => value != null, propertyChanged: OnPropertyChangedInvalidate);
 
         public SKColor AlternativeTextColor
@@ -245,7 +249,7 @@ namespace Scada
 
         private static void OnPropertyChangedInvalidate(BindableObject bindable, object oldvalue, object newvalue)
         {
-            var control = (CircularProgress)bindable;
+            var control = (DonutChart)bindable;
             if (oldvalue != newvalue)
                 control.InvalidateSurface();
         }
@@ -361,6 +365,8 @@ namespace Scada
 
 
 
+
+
         private SKPoint PointFromDegrees(float degrees, int radius, SKRect rect, int padding = 0)
         {
             const int offset = 90;
@@ -374,16 +380,7 @@ namespace Scada
             IsAntialias = true,
             Style = SKPaintStyle.StrokeAndFill,
             Color = new SKColor(60, 60, 60, 220),
-            StrokeWidth = 0
-        };
-
-        SKPaint OnPaint = new SKPaint
-        {
-            IsAntialias = true,
-            Color = new SKColor(100, 100, 100, 255),
-            TextSize = 16.5F,
-            Style = SKPaintStyle.Stroke,
-            StrokeWidth = 7.5F,
+            StrokeWidth = 0,
             FilterQuality = SKFilterQuality.High
         };
 
@@ -392,8 +389,40 @@ namespace Scada
             IsAntialias = true,
             Style = SKPaintStyle.Stroke,
             Color = new SKColor(100, 100, 100, 220),
-            StrokeWidth = 7.5F
+            StrokeWidth = 7.5F,
+            FilterQuality = SKFilterQuality.High
         };
+
+        SKPaint RedPaint = new SKPaint
+        {
+            IsAntialias = true,
+            Color = new SKColor(200, 50, 50, 255),
+            TextSize = 16.5F,
+            Style = SKPaintStyle.Stroke,
+            StrokeWidth = 7.5F,
+            FilterQuality = SKFilterQuality.High
+        };
+
+        SKPaint GreenPaint = new SKPaint
+        {
+            IsAntialias = true,
+            Color = new SKColor(50, 200, 50, 255),
+            TextSize = 16.5F,
+            Style = SKPaintStyle.Stroke,
+            StrokeWidth = 7.5F,
+            FilterQuality = SKFilterQuality.High
+        };
+
+        SKPaint BluePaint = new SKPaint
+        {
+            IsAntialias = true,
+            Color = new SKColor(50, 50, 200, 255),
+            TextSize = 16.5F,
+            Style = SKPaintStyle.Stroke,
+            StrokeWidth = 7.5F,
+            FilterQuality = SKFilterQuality.High
+        };
+
 
 
         protected override void OnPaintSurface(SKPaintSurfaceEventArgs e)
@@ -415,21 +444,25 @@ namespace Scada
             float frame = radius / 4;
             float diam = radius * 2.0F;
             var center = new SKPoint(info.Rect.MidX, info.Rect.MidY);
-            var degrees = ( PV.Value / 100 ) * 360;
+
+            RedPaint.StrokeWidth = radius / 2.5F;
+            GreenPaint.StrokeWidth = radius / 2.5F;
+            BluePaint.StrokeWidth = radius / 2.5F;
+
+            var degrees1 = ( 25F / 100F ) * 360F;
+            var degrees2 = (25F / 100F) * 360F;
+            var degrees3 = (25F / 100F) * 360F;
 
             //Draw Circle        
             canvas.Clear();
             canvas.DrawArc(new SKRect(0, 0, info.Height, info.Height), -90, 360, false, Backgroundpaint);
-         
-            if (PV.Value > 0.5)
-            {
-                OnPaint.Color = new SKColor(3, 156, 35, (byte)localBtnIndicatorIntensity);
-                canvas.DrawArc(new SKRect(frame, frame, diam - frame, diam - frame), -90, degrees, false, OnPaint);               
-            }
-            else
-            {
-                canvas.DrawArc(new SKRect(frame, frame, diam - frame, diam - frame), -90, 360, false, OffPaint);
-            }                
+           
+            canvas.DrawArc(new SKRect(frame, frame, diam - frame, diam - frame), -90, degrees1,false,RedPaint);
+
+            canvas.DrawArc(new SKRect(frame, frame, diam - frame, diam - frame), -90 + degrees1,degrees2,false,GreenPaint);
+          
+            canvas.DrawArc(new SKRect(frame, frame, diam - frame, diam - frame), -90 + degrees1+degrees2,degrees3,false,BluePaint);
+
         }
     }
 }

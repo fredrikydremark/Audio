@@ -1092,6 +1092,64 @@ public partial class MainPage : ContentPage
             myRowButton.ButtonRow = gridRow;
             myRowButton.ButtonText = "";
 
+            //Add Toggle
+            var tgRow = new Toggle();
+            tgRow.CornerRadius = 1;
+            tgRow.BarBackgroundColor = ScadaColor.uxItemColor;
+            tgRow.BackgroundColor = ScadaColor.uxItemColor.ToMauiColor();
+            tgRow.GradientStartColor = ScadaColor.uxPopupItemColor;
+            tgRow.GradientEndColor = ScadaColor.uxItemColor;
+            tgRow.TextColor = ScadaColor.uxTextColor;
+            tgRow.WidthRequest = 50;
+            tgRow.HeightRequest = 22;
+            tgRow.FontSize = 18;
+            tgRow.PV = new ItemValue();
+            tgRow.SV = new ItemValue();
+            tgRow.IsEnabled = true;
+            tgRow.IsVisible = true;
+            tgRow.EnableTouchEvents = true;
+            tgRow.InputTransparent = false;
+            /*
+            if (Designing == true)
+            {
+                tgRow.SV.Value = 1;
+            }
+            else
+            {
+                tgRow.SV.Value = 0;
+            }
+            */
+            tgRow.Touch += (sender, args) =>
+            {
+                switch (args.ActionType)
+                {
+                    case SKTouchAction.Pressed:
+                        if (Designing == true)
+                        {
+                            Designing = false;
+                            tgRow.SV.Value = 0;
+                            tgRow.PV.Value = 0;
+                        }
+                        else
+                        {
+                            Designing = true;
+                            tgRow.SV.Value = 1;
+                            tgRow.PV.Value = 1;
+                        }
+                        ScadaClasses.Previouspage = -1;
+                        ScadaClasses.Refresh = true;
+
+                        tgRow.InvalidateSurface();
+                        break;
+                }
+                args.Handled = true;
+            };
+           
+          
+
+
+
+            /*
             myRowButton.Touch += (sender, args) =>
             {
                 var pt = args.Location;
@@ -1102,13 +1160,7 @@ public partial class MainPage : ContentPage
                         ScadaClasses.CurrentScadaPopup = ScadaClasses.uxTagSettings;
                         ScadaClasses.CurrentTag = myRowButton.ButtonRow.TagID;
                         ScadaClasses.Refresh = true;
-                        /*ScadaAlarmPopup(myRowButton.ButtonRow.Id, myRowButton.ButtonRow.TagID, myRowButton.ButtonRow.col2text);
-                        foreach (SKCanvasView viewItem in SKCanvasPopupViews)
-                        {
-                            absoluteLayout.Add(viewItem);
-                        }
-                        Content = absoluteLayout;
-                        */
+                       
                         break;
 
                     case SKTouchAction.Entered:
@@ -1133,13 +1185,17 @@ public partial class MainPage : ContentPage
                 }
                 args.Handled = true;
             };
+            */
             myRowButton.EnableIndicatorBlink();
-            myRowButton.InputTransparent = false;
-            myRowButton.EnableTouchEvents = true;
+            myRowButton.InputTransparent = true;
+            myRowButton.EnableTouchEvents = false;
 
             AbsoluteLayout.SetLayoutBounds(myRowButton, new Rect(x, y, myRowButton.WidthRequest, 26));
             AbsoluteLayout.SetLayoutFlags(myRowButton, AbsoluteLayoutFlags.None);
             SKCanvasViews.Add(myRowButton);
+            AbsoluteLayout.SetLayoutBounds(tgRow, new Rect(x + 600, y + 2, 50, 22));
+            AbsoluteLayout.SetLayoutFlags(tgRow, AbsoluteLayoutFlags.None);
+            SKCanvasViews.Add(tgRow);
             y = y + 26;
         }
     }
@@ -1246,7 +1302,7 @@ public partial class MainPage : ContentPage
             }
             args.Handled = true;
         };
-        AbsoluteLayout.SetLayoutBounds(tgDesign, new Rect(x + 260, y + 60, 50, 22));//307
+        AbsoluteLayout.SetLayoutBounds(tgDesign, new Rect(x + 260, y + 60, 50, 22));
         AbsoluteLayout.SetLayoutFlags(tgDesign, AbsoluteLayoutFlags.None);
         SKCanvasViews.Add(tgDesign);
         //tgDesign.InvalidateSurface();

@@ -297,7 +297,7 @@ namespace Scada
         }
 
 
-        public List<ScadaClasses.Tag> GetDigitalTagsToStore()
+        public List<ScadaClasses.Tag> GetDigitalTagsToStore(int iFilter)
         {
             try
             {
@@ -306,8 +306,17 @@ namespace Scada
                     ConnectionString = sConnection
                 };
                 Connection.Open();
-                string sqlGetData = "select tags.tagID,tags.Value from tags " +
-                                     "where (Driver<> 0) And (TypeOfTag= 1) And (tags.Value <> (select COALESCE ((select top 1 Value from ChannelData where tagID = tags.TagID order by time desc) ,-1)))";
+                string sqlGetData = "";
+                if (iFilter > 0)
+                {
+                    sqlGetData = "select tags.tagID,tags.Value from tags " +
+                                 "where (Driver<> 0) And (TypeOfTag= 1) And (tags.Value <> (select COALESCE ((select top 1 Value from ChannelData where tagID = tags.TagID order by time desc) ,-1)))";
+                }
+                else
+                {
+                    sqlGetData = "select tags.tagID,tags.Value from tags " +
+                                 "where (Driver<> 0) And (TypeOfTag=1)";
+                }
 
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
                 cmdGetData.CommandText = sqlGetData;

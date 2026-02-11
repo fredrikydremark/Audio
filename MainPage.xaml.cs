@@ -78,6 +78,13 @@ public partial class MainPage : ContentPage
         ScadaColor.uxTransparentButtonColor = RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_TransparentButtonColor"));
 
 
+        var ListOfDigitalTagsToStore = MyDataAccessLayer.GetDigitalTagsToStore(-1);
+        foreach (var Tag in ListOfDigitalTagsToStore)
+        {
+            MyDataAccessLayer.StoreTagValue(Tag.TagID, Tag.Value);
+        }
+
+
         if (MyDataAccessLayer.GetTagValueByName("System_EnableADAM") > 0.5)
         {
             MyDataAccessLayer.SetTagStatus(1, 1);
@@ -196,7 +203,7 @@ public partial class MainPage : ContentPage
                     MyDataAccessLayer.StoreTagValue(Tag.TagID, Tag.Value);
                 }
 
-                var ListOfDigitalTagsToStore = MyDataAccessLayer.GetDigitalTagsToStore();
+                var ListOfDigitalTagsToStore = MyDataAccessLayer.GetDigitalTagsToStore(1);
                 foreach (var Tag in ListOfDigitalTagsToStore)
                 {
                     MyDataAccessLayer.StoreTagValue(Tag.TagID, Tag.Value);
@@ -1772,9 +1779,9 @@ public partial class MainPage : ContentPage
         pnlTags.InputTransparent = true;
         AbsoluteLayout.SetLayoutBounds(pnlTags, new Rect(x + popupDesign.WidthRequest - (popupDesign.WidthRequest / 2) - (pnlTags.WidthRequest / 2), y + popupDesign.HeightRequest - pnlTags.HeightRequest * 3.27F, pnlTags.WidthRequest, pnlTags.HeightRequest));
         AbsoluteLayout.SetLayoutFlags(pnlTags, AbsoluteLayoutFlags.None);
+        SKCanvasPopupViews.Add(pnlTags);
 
-
-        SKCanvasPopupViews.Add(pnlTags); var btnTags = new ScadaButton();
+        var btnTags = new ScadaButton();
         btnTags.GradientStartColor = ScadaColor.uxItemColor;
         btnTags.GradientEndColor = ScadaColor.uxItemColor;
         btnTags.CornerRadius = 15;

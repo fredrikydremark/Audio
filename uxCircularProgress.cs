@@ -326,11 +326,9 @@ namespace Scada
         public void RefreshValues()
         {
             DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);
-
             var ItemValues = MyDataAccessLayer.ReadItemValues(ItemID);
             foreach (var item in ItemValues)
             {
-
                 if (item.TagID == PV.TagID)
                 {
                     PV.Value = item.Value;
@@ -341,7 +339,6 @@ namespace Scada
                     SV.Value = item.Value;
                     SV.StatusQuality = item.StatusQuality;
                 }
-
             }
             if (IsLoaded == true)
             {

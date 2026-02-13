@@ -216,6 +216,31 @@ namespace Scada
                 control.InvalidateSurface();
         }
 
+        public void RefreshValues()
+        {
+            DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);
+
+            var ItemValues = MyDataAccessLayer.ReadItemValues(ItemID);
+            foreach (var item in ItemValues)
+            {
+
+                if (item.TagID == PV.TagID)
+                {
+                    PV.Value = item.Value;
+                    PV.StatusQuality = item.StatusQuality;
+                }
+                if (item.TagID == SV.TagID)
+                {
+                    SV.Value = item.Value;
+                    SV.StatusQuality = item.StatusQuality;
+                }
+
+            }
+            if (IsLoaded == true)
+            {
+                InvalidateSurface();
+            }
+        }
 
         private double ValueToAngle(Double v)
         {

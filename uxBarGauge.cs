@@ -229,7 +229,41 @@ namespace Scada
                      control.InvalidateSurface();
             }
         }
-
+        public void Start()
+        {
+            UpdateValue();
+        }
+        private async void UpdateValue()
+        {
+            DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);
+            while (true)
+            {
+                await Task.Delay(5000);
+                var ItemValues = MyDataAccessLayer.ReadItemValues(ItemID);
+                foreach (var item in ItemValues)
+                {
+                    if (item.TagID == PV.TagID)
+                    {
+                        PV.Value = item.Value;
+                        PV.StatusQuality = item.StatusQuality;
+                    }
+                    if (item.TagID == SV.TagID)
+                    {
+                        SV.Value = item.Value;
+                        SV.StatusQuality = item.StatusQuality;
+                    }
+                    if (item.TagID == Output.TagID)
+                    {
+                        Output.Value = item.Value;
+                        Output.StatusQuality = item.StatusQuality;
+                    }
+                }
+                if (IsLoaded == true)
+                {
+                    InvalidateSurface();
+                }
+            }
+        }
 
         protected override void OnPaintSurface(SKPaintSurfaceEventArgs e)
         {

@@ -160,14 +160,15 @@ public partial class MainPage : ContentPage
   
     void bckUpdate(object sender, EventArgs e)
     {
- 
-        MainThread.BeginInvokeOnMainThread(() =>
+        try
         {
-            DataAccessLayer MyDataAccessLayer = new DataAccessLayer(ConnectionString);
-            if (MyDataAccessLayer.GetTagValueByName("System_EnableADAM") > 0.5)
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                DataAccessLayer MyDataAccessLayer = new DataAccessLayer(ConnectionString);
+                if (MyDataAccessLayer.GetTagValueByName("System_EnableADAM") > 0.5)
                 {
                     Adam AdamLayer = new Adam();
-                    AdamLayer.ReadADAM();                  
+                    AdamLayer.ReadADAM();
                 }
 
                 if (MyDataAccessLayer.GetTagValueByName("System_EnableSimulation") > 0.5)
@@ -207,10 +208,14 @@ public partial class MainPage : ContentPage
                 foreach (var Tag in ListOfDigitalTagsToStore)
                 {
                     MyDataAccessLayer.StoreTagValue(Tag.TagID, Tag.Value);
-                }       
+                }
                 ScadaClasses.Refresh = true;
-                bcktimer.Interval = 10000;         
-        });
+                bcktimer.Interval = 10000;
+            });
+        }
+        catch
+        {
+        }
     }
 
     void uxUpdate(object sender, EventArgs e)
@@ -1216,6 +1221,9 @@ public partial class MainPage : ContentPage
         double y = (Height / 2) - panelHeight * Height / 2;
         double w = (panelWith * Width);
         double h = (panelHeight * Height);
+        double pnlVertSpacing = h / 5;
+        double pnlVertPos = y + pnlVertSpacing;
+
 
         DataAccessLayer MyDataAccessLayer = new DataAccessLayer(ConnectionString);
         var popupDesign = new ScadaButton();
@@ -1309,7 +1317,7 @@ public partial class MainPage : ContentPage
             }
             args.Handled = true;
         };
-        AbsoluteLayout.SetLayoutBounds(tgDesign, new Rect(x + 260, y + 60, 50, 22));
+        AbsoluteLayout.SetLayoutBounds(tgDesign, new Rect(x + w/2 - 25 , y + 40, 50, 22));
         AbsoluteLayout.SetLayoutFlags(tgDesign, AbsoluteLayoutFlags.None);
         SKCanvasViews.Add(tgDesign);
         //tgDesign.InvalidateSurface();
@@ -1447,6 +1455,8 @@ public partial class MainPage : ContentPage
         AbsoluteLayout.SetLayoutFlags(btnClose, AbsoluteLayoutFlags.None);
         SKCanvasPopupViews.Add(btnClose);
 
+        
+
         var pnlPages = new ScadaButton();
         pnlPages.CornerRadius = 10;
         pnlPages.IndicatorType = 1;
@@ -1464,8 +1474,8 @@ public partial class MainPage : ContentPage
         pnlPages.IsVisible = true;
         pnlPages.EnableTouchEvents = false;
         pnlPages.InputTransparent = true;
-        AbsoluteLayout.SetLayoutBounds(pnlPages, new Rect(x + popupDesign.WidthRequest - (popupDesign.WidthRequest / 2) - (pnlPages.WidthRequest / 2), 261, pnlPages.WidthRequest, pnlPages.HeightRequest));
-        AbsoluteLayout.SetLayoutFlags(pnlPages, AbsoluteLayoutFlags.None);                                                                            //220
+        AbsoluteLayout.SetLayoutBounds(pnlPages, new Rect(x + popupDesign.WidthRequest - (popupDesign.WidthRequest / 2) - (pnlPages.WidthRequest / 2), pnlVertPos, pnlPages.WidthRequest, pnlPages.HeightRequest));
+        AbsoluteLayout.SetLayoutFlags(pnlPages, AbsoluteLayoutFlags.None);                                                                           
         SKCanvasPopupViews.Add(pnlPages);
 
 
@@ -1520,9 +1530,12 @@ public partial class MainPage : ContentPage
             }
             args.Handled = true;
         };
-        AbsoluteLayout.SetLayoutBounds(btnPages, new Rect(x + 376, y + 113, 25, 25));
+        AbsoluteLayout.SetLayoutBounds(btnPages, new Rect(x + pnlPages.WidthRequest - (pnlPages.WidthRequest / 5), pnlVertPos + (pnlPages.HeightRequest / 2) - 12.5, 25, 25));
         AbsoluteLayout.SetLayoutFlags(btnPages, AbsoluteLayoutFlags.None);
         SKCanvasPopupViews.Add(btnPages);
+
+
+        pnlVertPos = pnlVertPos + pnlVertSpacing;
 
         var pnlItems = new ScadaButton();
         pnlItems.CornerRadius = 10;
@@ -1541,7 +1554,7 @@ public partial class MainPage : ContentPage
         pnlItems.IsVisible = true;
         pnlItems.EnableTouchEvents = false;
         pnlItems.InputTransparent = true;
-        AbsoluteLayout.SetLayoutBounds(pnlItems, new Rect(x + popupDesign.WidthRequest - (popupDesign.WidthRequest / 2) - (pnlItems.WidthRequest / 2), 325, pnlItems.WidthRequest, pnlItems.HeightRequest));
+        AbsoluteLayout.SetLayoutBounds(pnlItems, new Rect(x + popupDesign.WidthRequest - (popupDesign.WidthRequest / 2) - (pnlItems.WidthRequest / 2), pnlVertPos, pnlItems.WidthRequest, pnlItems.HeightRequest));
         AbsoluteLayout.SetLayoutFlags(pnlItems, AbsoluteLayoutFlags.None);
         SKCanvasPopupViews.Add(pnlItems);
 
@@ -1595,10 +1608,11 @@ public partial class MainPage : ContentPage
             }
             args.Handled = true;
         };
-        AbsoluteLayout.SetLayoutBounds(btnItems, new Rect(x + 376, y + 177, 25, 25));
+        AbsoluteLayout.SetLayoutBounds(btnItems, new Rect(x + pnlItems.WidthRequest - (pnlItems.WidthRequest / 5), pnlVertPos + (pnlItems.HeightRequest / 2) - 12.5, 25, 25));
         AbsoluteLayout.SetLayoutFlags(btnItems, AbsoluteLayoutFlags.None);
         SKCanvasPopupViews.Add(btnItems);
 
+        pnlVertPos = pnlVertPos + pnlVertSpacing;
 
         var pnlParam = new ScadaButton();
         pnlParam.CornerRadius = 10;
@@ -1617,7 +1631,7 @@ public partial class MainPage : ContentPage
         pnlParam.IsVisible = true;
         pnlParam.EnableTouchEvents = false;
         pnlParam.InputTransparent = true;
-        AbsoluteLayout.SetLayoutBounds(pnlParam, new Rect(x + popupDesign.WidthRequest - (popupDesign.WidthRequest / 2) - (pnlParam.WidthRequest / 2), y + popupDesign.HeightRequest - pnlParam.HeightRequest * 2, pnlParam.WidthRequest, pnlParam.HeightRequest));
+        AbsoluteLayout.SetLayoutBounds(pnlParam, new Rect(x + popupDesign.WidthRequest - (popupDesign.WidthRequest / 2) - (pnlParam.WidthRequest / 2), pnlVertPos, pnlParam.WidthRequest, pnlParam.HeightRequest));
         AbsoluteLayout.SetLayoutFlags(pnlParam, AbsoluteLayoutFlags.None);
         SKCanvasPopupViews.Add(pnlParam);
 
@@ -1672,7 +1686,7 @@ public partial class MainPage : ContentPage
             }
             args.Handled = true;
         };
-        AbsoluteLayout.SetLayoutBounds(btnParam, new Rect(x + 376, y + 303, 25, 25));
+        AbsoluteLayout.SetLayoutBounds(btnParam, new Rect(x + pnlParam.WidthRequest - (pnlParam.WidthRequest / 5), pnlVertPos + (pnlParam.HeightRequest / 2) - 12.5, 25, 25));
         AbsoluteLayout.SetLayoutFlags(btnParam, AbsoluteLayoutFlags.None);
         SKCanvasPopupViews.Add(btnParam);
 
@@ -1760,6 +1774,8 @@ public partial class MainPage : ContentPage
         */
 
 
+        pnlVertPos = pnlVertPos + pnlVertSpacing;
+
         var pnlTags = new ScadaButton();
         pnlTags.CornerRadius = 10;
         pnlTags.IndicatorType = 1;
@@ -1777,7 +1793,7 @@ public partial class MainPage : ContentPage
         pnlTags.IsVisible = true;
         pnlTags.EnableTouchEvents = false;
         pnlTags.InputTransparent = true;
-        AbsoluteLayout.SetLayoutBounds(pnlTags, new Rect(x + popupDesign.WidthRequest - (popupDesign.WidthRequest / 2) - (pnlTags.WidthRequest / 2), y + popupDesign.HeightRequest - pnlTags.HeightRequest * 3.27F, pnlTags.WidthRequest, pnlTags.HeightRequest));
+        AbsoluteLayout.SetLayoutBounds(pnlTags, new Rect(x + popupDesign.WidthRequest - (popupDesign.WidthRequest / 2) - (pnlTags.WidthRequest / 2), pnlVertPos, pnlTags.WidthRequest, pnlTags.HeightRequest));
         AbsoluteLayout.SetLayoutFlags(pnlTags, AbsoluteLayoutFlags.None);
         SKCanvasPopupViews.Add(pnlTags);
 
@@ -1832,7 +1848,7 @@ public partial class MainPage : ContentPage
             }
             args.Handled = true;
         };
-        AbsoluteLayout.SetLayoutBounds(btnTags, new Rect(x + 376, y + 241, 25, 25));
+        AbsoluteLayout.SetLayoutBounds(btnTags, new Rect(x + pnlTags.WidthRequest - (pnlTags.WidthRequest/5), pnlVertPos+(pnlTags.HeightRequest/2)-12.5, 25, 25));
         AbsoluteLayout.SetLayoutFlags(btnTags, AbsoluteLayoutFlags.None);
         SKCanvasPopupViews.Add(btnTags);
     }
@@ -2620,6 +2636,7 @@ public partial class MainPage : ContentPage
                         {
                             SKBarGraph = (ScadaBarGraph)AttachDesignEvents(SKBarGraph, ScadaItem);
                         }
+                        SKBarGraph.Start();
                         AbsoluteLayout.SetLayoutBounds(SKBarGraph, new Rect(wScale * ScadaItem.Left, hScale * ScadaItem.Top, wScale * ScadaItem.Width, hScale * ScadaItem.Height));
                         AbsoluteLayout.SetLayoutFlags(SKBarGraph, AbsoluteLayoutFlags.None);
                         SKCanvasViews.Add(SKBarGraph);
@@ -3348,7 +3365,7 @@ public partial class MainPage : ContentPage
                         sim.EnableTouchEvents = true;
                         sim.InputTransparent = false;
                         sim.PV = new ItemValue();
-                        sim.Output = new ItemValue();
+                        sim.Acutator = new ItemValue();
                         var ItemValuesSim = MyDataAccessLayer.ReadItemValues(sim.ItemID);
                         int simVal = 0;
                         foreach (var item in ItemValuesSim)
@@ -3360,8 +3377,8 @@ public partial class MainPage : ContentPage
                             }
                             if (simVal == 1)
                             {
-                                sim.Output.TagID = item.TagID;
-                                sim.Output.Value = item.Value;
+                                sim.Acutator.TagID = item.TagID;
+                                sim.Acutator.Value = item.Value;
                             }
                             simVal++;
                         }
@@ -3374,7 +3391,63 @@ public partial class MainPage : ContentPage
                         AbsoluteLayout.SetLayoutFlags(sim, AbsoluteLayoutFlags.None);
                         SKCanvasViews.Add(sim);
                         break;
-                   
+
+
+                    case ScadaClasses.uxController:
+                        var controller = new Controller();
+                        controller.ItemID = ScadaItem.ItemID;
+                        controller.StyleId = ScadaItem.ItemID.ToString();
+                        controller.AnchorX = 0;
+                        controller.AnchorY = 0;
+                        controller.CornerRadius = 1;
+                        controller.BarBackgroundColor = ScadaColor.uxBackGroundColor;
+                        controller.BackgroundColor = ScadaColor.uxBackGroundColor.ToMauiColor();
+                        controller.GradientStartColor = ScadaColor.uxItemColor;
+                        controller.GradientEndColor = ScadaColor.uxItemColor;
+                        controller.WidthRequest = (Width / 100) * ScadaItem.Width;
+                        controller.HeightRequest = (Height / 100) * ScadaItem.Height;
+
+                        controller.IsEnabled = true;
+                        controller.IsVisible = true;
+                        controller.TextColor = ScadaColor.uxTextColor;
+                        controller.IsEnabled = true;
+                        controller.IsVisible = true;
+                        controller.EnableTouchEvents = true;
+                        controller.InputTransparent = false;
+                        controller.PV = new ItemValue();
+                        controller.SV = new ItemValue();
+                        controller.Output = new ItemValue();
+                        var ItemValuesController = MyDataAccessLayer.ReadItemValues(controller.ItemID);
+                        int contrVal = 0;
+                        foreach (var item in ItemValuesController)
+                        {
+                            if (contrVal == 0)
+                            {
+                                controller.PV.TagID = item.TagID;
+                                controller.PV.Value = item.Value;
+                            }
+                            if (contrVal == 1)
+                            {
+                                controller.SV.TagID = item.TagID;
+                                controller.SV.Value = item.Value;
+                            }
+                            if (contrVal == 2)
+                            {
+                                controller.Output.TagID = item.TagID;
+                                controller.Output.Value = item.Value;
+                            }
+                            contrVal++;
+                        }
+                        controller.Start();
+                        if (Designing == true)
+                        {
+                            controller = (Controller)AttachDesignEvents(controller, ScadaItem);
+                        }
+                        AbsoluteLayout.SetLayoutBounds(controller, new Rect(wScale * ScadaItem.Left, hScale * ScadaItem.Top, wScale * ScadaItem.Width, hScale * ScadaItem.Height));
+                        AbsoluteLayout.SetLayoutFlags(controller, AbsoluteLayoutFlags.None);
+                        SKCanvasViews.Add(controller);
+                        break;
+
                     case ScadaClasses.uxLoginMenu:
                         ScadaLogin(0);
                         break;
@@ -5084,7 +5157,33 @@ public partial class MainPage : ContentPage
                     dItem.InvalidateSurface();
                 }
             }
-
+            
+            
+            if (uxItem is Controller)
+            {
+                var dItem = uxItem as Controller;
+                var ItemValues = MyDataAccessLayer.ReadItemValues(dItem.ItemID);
+                foreach (var item in ItemValues)
+                {
+                    if (item.TagID == dItem.PV.TagID)
+                    {
+                        dItem.PV.Value = item.Value;
+                    }
+                    if (item.TagID == dItem.SV.TagID)
+                    {
+                        dItem.SV.Value = item.Value;
+                    }
+                    if (item.TagID == dItem.Output.TagID)
+                    {
+                        dItem.Output.Value = item.Value;
+                    }
+                }
+                if (dItem.IsLoaded)
+                {
+                    dItem.InvalidateSurface();
+                }
+            }
+            
 
             if (uxItem is Simulator)
             {
@@ -5096,9 +5195,9 @@ public partial class MainPage : ContentPage
                     {
                         dItem.PV.Value = item.Value;
                     }
-                    if (item.TagID == dItem.Output.TagID)
+                    if (item.TagID == dItem.Acutator.TagID)
                     {
-                        dItem.Output.Value = item.Value;
+                        dItem.Acutator.Value = item.Value;
                     }
                 }
                 if (dItem.IsLoaded)
@@ -5130,6 +5229,12 @@ public partial class MainPage : ContentPage
                 var dItem = uxItem as CircularProgress;
                 dItem.RefreshValues();
             }
+            if (uxItem is CircularGauge)
+            {
+                var dItem = uxItem as CircularGauge;
+                dItem.RefreshValues();
+            }
+
 
             if (uxItem is ScadaButton)
             {

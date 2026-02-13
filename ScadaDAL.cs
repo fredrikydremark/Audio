@@ -3648,8 +3648,8 @@ namespace Scada
                     break;
                 case ScadaClasses.uxRobot:
                     AddItemTag(Item.ItemID, Item.ItemType, -1, 1, "Gripper");
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 2, "LowerArm");
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 3, "UpperArm");
+                    AddItemTag(Item.ItemID, Item.ItemType, -1, 2, "Lower arm");
+                    AddItemTag(Item.ItemID, Item.ItemType, -1, 3, "Upper arm");
                     AddItemTag(Item.ItemID, Item.ItemType, -1, 4, "X Traverse");
                     AddItemTag(Item.ItemID, Item.ItemType, -1, 5, "Y Traverse");
                     break;
@@ -3665,8 +3665,8 @@ namespace Scada
                     break;
 
                 case ScadaClasses.uxSimulator:
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 1, "Input");
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 2, "Output");
+                    AddItemTag(Item.ItemID, Item.ItemType, -1, 1, "Process value");
+                    AddItemTag(Item.ItemID, Item.ItemType, -1, 2, "Acutator");
                     break;
 
                 case ScadaClasses.uxInterference:

@@ -3,14 +3,16 @@ using SkiaSharp;
 using SkiaSharp.Views.Maui;
 using SkiaSharp.Views.Maui.Controls;
 
+
 namespace Scada
 {
-    public class Simulator : SKCanvasView
+    public class Controller : SKCanvasView
     {
         DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);
+        PID MyPID = new PID();
 
         public static BindableProperty ItemIDProperty = BindableProperty.Create(nameof(ItemID), typeof(int),
-        typeof(Simulator), 0, BindingMode.OneWay,
+        typeof(Controller), 0, BindingMode.OneWay,
             validateValue: (_, value) => value != null,
         propertyChanged: OnPropertyChangedInvalidate);
 
@@ -20,8 +22,9 @@ namespace Scada
             set => SetValue(ItemIDProperty, value);
         }
 
+
         public static BindableProperty PVProperty = BindableProperty.Create(nameof(PV), typeof(ItemValue),
-             typeof(Simulator), null, BindingMode.OneWay,
+             typeof(Controller), null, BindingMode.OneWay,
              validateValue: (_, value) => value != null,
              propertyChanged: OnPropertyChangedInvalidate);
 
@@ -31,19 +34,33 @@ namespace Scada
             set => SetValue(PVProperty, value);
         }
 
-        public static BindableProperty AcutatorProperty = BindableProperty.Create(nameof(Acutator), typeof(ItemValue),
-           typeof(Simulator), null, BindingMode.OneWay,
+
+        public static BindableProperty SVProperty = BindableProperty.Create(nameof(SV), typeof(ItemValue),
+           typeof(Controller), null, BindingMode.OneWay,
            validateValue: (_, value) => value != null,
            propertyChanged: OnPropertyChangedInvalidate);
 
-        public ItemValue Acutator
+        public ItemValue SV
         {
-            get => (ItemValue)GetValue(AcutatorProperty);
-            set => SetValue(AcutatorProperty, value);
+            get => (ItemValue)GetValue(SVProperty);
+            set => SetValue(SVProperty, value);
         }
 
+
+        public static BindableProperty OutputProperty = BindableProperty.Create(nameof(Output), typeof(ItemValue),
+           typeof(Controller), null, BindingMode.OneWay,
+           validateValue: (_, value) => value != null,
+           propertyChanged: OnPropertyChangedInvalidate);
+
+        public ItemValue Output
+        {
+            get => (ItemValue)GetValue(OutputProperty);
+            set => SetValue(OutputProperty, value);
+        }
+
+
         public static BindableProperty CornerRadiusProperty = BindableProperty.Create(nameof(CornerRadius), typeof(float),
-            typeof(Simulator), 5f, BindingMode.OneWay,
+            typeof(Controller), 5f, BindingMode.OneWay,
             validateValue: (_, value) => value != null && (float)value >= 0,
             propertyChanged: OnPropertyChangedInvalidate);
 
@@ -55,7 +72,7 @@ namespace Scada
         }
 
         public static BindableProperty BarBackgroundColorProperty = BindableProperty.Create(nameof(BarBackgroundColor), typeof(SKColor),
-            typeof(Simulator), SKColors.White, BindingMode.OneWay,
+            typeof(Controller), SKColors.White, BindingMode.OneWay,
             validateValue: (_, value) => value != null, propertyChanged: OnPropertyChangedInvalidate);
 
         public SKColor BarBackgroundColor
@@ -65,7 +82,7 @@ namespace Scada
         }
 
         public static BindableProperty FontSizeProperty = BindableProperty.Create(nameof(FontSize), typeof(float),
-            typeof(Simulator), 12f, BindingMode.OneWay,
+            typeof(Controller), 12f, BindingMode.OneWay,
             validateValue: (_, value) => value != null && (float)value >= 0,
             propertyChanged: OnPropertyChangedInvalidate);
 
@@ -76,7 +93,7 @@ namespace Scada
         }
 
         public static BindableProperty GradientStartColorProperty = BindableProperty.Create(nameof(GradientStartColor), typeof(SKColor),
-            typeof(Simulator), SKColors.Purple, BindingMode.OneWay,
+            typeof(Controller), SKColors.Purple, BindingMode.OneWay,
             validateValue: (_, value) => value != null, propertyChanged: OnPropertyChangedInvalidate);
 
         public SKColor GradientStartColor
@@ -86,7 +103,7 @@ namespace Scada
         }
 
         public static BindableProperty GradientEndColorProperty = BindableProperty.Create(nameof(GradientEndColor), typeof(SKColor),
-            typeof(Simulator), SKColors.Blue, BindingMode.OneWay,
+            typeof(Controller), SKColors.Blue, BindingMode.OneWay,
             validateValue: (_, value) => value != null, propertyChanged: OnPropertyChangedInvalidate);
 
         public SKColor GradientEndColor
@@ -96,7 +113,7 @@ namespace Scada
         }
 
         public static BindableProperty TextColorProperty = BindableProperty.Create(nameof(TextColor), typeof(SKColor),
-            typeof(Simulator), SKColors.Blue, BindingMode.OneWay,
+            typeof(Controller), SKColors.Blue, BindingMode.OneWay,
             validateValue: (_, value) => value != null, propertyChanged: OnPropertyChangedInvalidate);
 
         public SKColor TextColor
@@ -106,7 +123,7 @@ namespace Scada
         }
 
         public static BindableProperty AlternativeTextColorProperty = BindableProperty.Create(nameof(AlternativeTextColor), typeof(SKColor),
-            typeof(Simulator), SKColors.Blue, BindingMode.OneWay,
+            typeof(Controller), SKColors.Blue, BindingMode.OneWay,
             validateValue: (_, value) => value != null, propertyChanged: OnPropertyChangedInvalidate);
 
         public SKColor AlternativeTextColor
@@ -117,47 +134,38 @@ namespace Scada
 
         private static void OnPropertyChangedInvalidate(BindableObject bindable, object oldvalue, object newvalue)
         {
-            var control = (Simulator)bindable;
+            var control = (Controller)bindable;
+
             if (oldvalue != newvalue)
                 control.InvalidateSurface();
         }
 
-
+    
+ 
         bool AnimationRunning = false;
         float DV = 0;
         float OV = 0;
 
         public void Start()
         {
+            MyPID.initPID(1.4, 0.05, 0, 100, 0, 100, 0);
             if (AnimationRunning == false)
                 UpdateAnimation();
         }
 
-
-        double green = 100f;
-
         private async void UpdateAnimation()
         {
             AnimationRunning = true;
-            var Step = 1;
+            DV = PV.Value;
+            OV = DV;
+
             while (AnimationRunning)
             {
-                if (green > 230)
-                {
-                    Step = -2;
-                }
-
-                if (green < 100)
-                {
-                    Step = 10;
-                }
-                green = green + Step;
-
                 await Task.Delay(50);
                 if (Math.Abs(DV - OV) > 0.05)
                 {
-                    float Step2 = (DV - OV) / 10 * -1;
-                    DV = DV + Step2;
+                    float Step = ((DV - OV) / 10) * -1;
+                    DV = DV + Step;
                     if (IsLoaded == true)
                     {
                         InvalidateSurface();
@@ -165,45 +173,55 @@ namespace Scada
                 }
             }
         }
-
+   
 
         protected override void OnPaintSurface(SKPaintSurfaceEventArgs e)
         {
             var info = e.Info;
             var canvas = e.Surface.Canvas;
-            float MaxValue = 100F;
-            float MinValue = 0F;
+            float MaxValue = 100;
+        
             var backgroundBar = new SKRoundRect(new SKRect(0, 0, info.Width, info.Height), 5, 5);
             var Background = new SKPaint { Color = GradientStartColor, IsAntialias = true };
 
-            var ProgressPaint = new SKPaint
-            {
-                IsAntialias = true,
-                Style = SKPaintStyle.Fill,
-                Color = new SKColor(100, (byte)(green), 100, 200),
-                StrokeWidth = 0
-            };
-
-            float DecInc = (50 - Acutator.Value)/25;
-
-            PV.Value = PV.Value - DecInc;           
-           
-            //Limiter
             if (PV.Value > MaxValue)
             {
                 PV.Value = MaxValue;
             }
-
-            if (PV.Value < MinValue)
+            
+            /*
+            if (Math.Abs(OV - PV.Value) > 0.1)
             {
-                PV.Value = MinValue;
+                OV = PV.Value;
             }
+            */
 
-            MyDataAccessLayer.UpdateTagValue(PV.TagID, PV.Value);
-            MyDataAccessLayer.StoreTagValue(PV.TagID, PV.Value);
+
+            //   On/Off Control 
+            
+            float Hysteresis = MaxValue/50.0F;
+
+            /*
+            if ( PV.Value > ( SV.Value + Hysteresis ) )
+            {
+               Output.Value = 0;
+            }
+            if ( PV.Value < ( SV.Value - Hysteresis ) )
+            {
+               Output.Value = 1;
+            }
+            */
+
+            MyPID.pv = PV.Value;
+            MyPID.sp = SV.Value;
+            Output.Value = (float)MyPID.ComputePID();
+
+            MyDataAccessLayer.UpdateTagValue(Output.TagID, Output.Value);
+            MyDataAccessLayer.StoreTagValue(Output.TagID, Output.Value);
+            
             canvas.Clear();
             canvas.DrawRoundRect(backgroundBar, Background);
-            canvas.DrawArc(new SKRect(5, 5, info.Height / 5, info.Height / 5), -90, 360, false, ProgressPaint);
+          
         }
     }
 }

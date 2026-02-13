@@ -228,7 +228,6 @@ namespace Scada
             float h = info.Height;
             // var progressBar = new SKRoundRect(new SKRect(0, 0, w, h), CornerRadius, CornerRadius);  
 
-
             using (var paint = new SKPaint() { IsAntialias = true, FilterQuality = SKFilterQuality.High, BlendMode = SKBlendMode.Overlay })
             {
                 var Rectangle = new SKRect(0, 0, w, h);

@@ -1,4 +1,5 @@
 ﻿
+
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
 using SkiaSharp.Views.Maui.Controls;
@@ -140,8 +141,9 @@ namespace Scada
                 control.InvalidateSurface();
         }
 
-    
- 
+
+        float PVold = 0F;
+        float IntegralSum = 0F;
         bool AnimationRunning = false;
         float DV = 0;
         float OV = 0;
@@ -158,7 +160,7 @@ namespace Scada
             AnimationRunning = true;
             DV = PV.Value;
             OV = DV;
-
+            PVold=PV.Value;
             while (AnimationRunning)
             {
                 await Task.Delay(50);
@@ -173,8 +175,8 @@ namespace Scada
                 }
             }
         }
-   
 
+    
         protected override void OnPaintSurface(SKPaintSurfaceEventArgs e)
         {
             var info = e.Info;
@@ -214,7 +216,37 @@ namespace Scada
 
             MyPID.pv = PV.Value;
             MyPID.sp = SV.Value;
-            Output.Value = (float)MyPID.ComputePID();
+
+            float kP = 10F;
+            float kI = 0;
+            float kD = 3F;
+
+            float P = kP * (SV.Value-PV.Value);
+            IntegralSum = IntegralSum + (SV.Value - PV.Value);
+            if (IntegralSum > 50)
+            {
+                IntegralSum = 50;
+            }
+            if (IntegralSum < -50)
+            {
+                IntegralSum = -50;
+            }
+            float I = kI + IntegralSum;
+            float D = kD * (PV.Value-PVold);
+
+            Output.Value = P + I + D;
+            if (Output.Value > 100)
+            {
+                Output.Value = 100;
+            }
+            if (Output.Value < 0)
+            {
+                Output.Value = 0;
+            }
+            PVold = PV.Value;
+
+       
+            //Output.Value = (float)MyPID.ComputePID();
 
             MyDataAccessLayer.UpdateTagValue(Output.TagID, Output.Value);
             MyDataAccessLayer.StoreTagValue(Output.TagID, Output.Value);

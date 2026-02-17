@@ -184,9 +184,8 @@ namespace Scada
                 StrokeWidth = 0
             };
 
-            float DecInc = (50 - Acutator.Value)/25;
-
-            PV.Value = PV.Value - DecInc;           
+            float DecreaseIncrease =  (50F - Acutator.Value)/25F;
+            PV.Value = PV.Value - DecreaseIncrease;           
            
             //Limiter
             if (PV.Value > MaxValue)

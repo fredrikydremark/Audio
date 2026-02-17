@@ -210,7 +210,7 @@ public partial class MainPage : ContentPage
                     MyDataAccessLayer.StoreTagValue(Tag.TagID, Tag.Value);
                 }
                 ScadaClasses.Refresh = true;
-                bcktimer.Interval = 10000;
+                bcktimer.Interval = 5000;
             });
         }
         catch

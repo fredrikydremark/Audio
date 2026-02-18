@@ -153,6 +153,19 @@ namespace Scada
                         }
                                  
             }
+
+            if (ItemID == -1)
+            {
+                string sParamVal = MyDataAccessLayer.ReadParameter(PV.TagID);
+                bool isNumeric = int.TryParse(sParamVal, out int iToggle );
+                if (isNumeric)
+                {
+                    PV.Value = (float)iToggle;
+                    SV.Value = (float)iToggle;
+                }
+            }
+
+
             if (IsLoaded == true)
             {
                 InvalidateSurface();

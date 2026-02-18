@@ -964,7 +964,6 @@ public partial class MainPage : ContentPage
             };
             myRowButton.ButtonRow = gridRow;
             myRowButton.ButtonText = "";
-
             myRowButton.Touch += (sender, args) =>
             {
                 var pt = args.Location;
@@ -1049,10 +1048,14 @@ public partial class MainPage : ContentPage
         SKCanvasViews.Add(popupAlarm);
         CreateCloseButton(x, y, w, h);
 
-        y = y + popupAlarm.CornerRadius;
+
+        DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);
+        var gridRows = MyDataAccessLayer.ReadParameters(sFilter,0,5);
+        int r = 0;
+         y = y + popupAlarm.CornerRadius;
         var TheColor = ScadaColor.uxItemColor;
         y = y + 20;
-        for (int r = 0; r < 17; r++)
+        foreach (gridRow myRow in gridRows)
         {
             if ((r % 2) == 0)
             {
@@ -1082,7 +1085,7 @@ public partial class MainPage : ContentPage
                 FontSize = 18.5F,
                 SvgBase64 = "",
             };
-
+            /*
             var gridRow = new gridRow
             {
                 Status = 0,
@@ -1098,14 +1101,19 @@ public partial class MainPage : ContentPage
                 col5width = 0F,
                 col6text = "",
                 col6width = 0F,
+                TagID = -1,
                 Row = r,
-                Id = -1
+                Id = myRow.Id
             };
-            myRowButton.ButtonRow = gridRow;
+            */
+       
+            myRowButton.ButtonRow = myRow;
             myRowButton.ButtonText = "";
 
             //Add Toggle
             var tgRow = new Toggle();
+            tgRow.ItemID = -1;
+            tgRow.StyleId = myRow.Row.ToString();
             tgRow.CornerRadius = 1;
             tgRow.BarBackgroundColor = ScadaColor.uxItemColor;
             tgRow.BackgroundColor = ScadaColor.uxItemColor.ToMauiColor();
@@ -1121,33 +1129,28 @@ public partial class MainPage : ContentPage
             tgRow.IsVisible = true;
             tgRow.EnableTouchEvents = true;
             tgRow.InputTransparent = false;
-            /*
-            if (Designing == true)
-            {
-                tgRow.SV.Value = 1;
-            }
-            else
-            {
-                tgRow.SV.Value = 0;
-            }
-            */
+            tgRow.StyleId = r.ToString();
+            tgRow.PV.TagID = myRowButton.ButtonRow.Id;
+            tgRow.SV.TagID = myRowButton.ButtonRow.Id;
+
             tgRow.Touch += (sender, args) =>
-            {
+            {       
                 switch (args.ActionType)
                 {
                     case SKTouchAction.Pressed:
-                        if (Designing == true)
-                        {
-                            Designing = false;
+                        if (tgRow.SV.Value > 0.5F)
+                        {                         
                             tgRow.SV.Value = 0;
-                            tgRow.PV.Value = 0;
+                            MyDataAccessLayer.UpdateParameterValue(myRowButton.ButtonRow.Id, tgRow.SV.Value.ToString() );
                         }
                         else
-                        {
-                            Designing = true;
+                        {                          
                             tgRow.SV.Value = 1;
-                            tgRow.PV.Value = 1;
+                            MyDataAccessLayer.UpdateParameterValue(myRowButton.ButtonRow.Id, tgRow.SV.Value.ToString());
                         }
+                        //ScadaClasses.CurrentScadaPopup = ScadaClasses.uxParamSettings;
+                        //ScadaClasses.CurrentTag = myRowButton.ButtonRow.TagID;
+                                        
                         ScadaClasses.Previouspage = -1;
                         ScadaClasses.Refresh = true;
 
@@ -1209,6 +1212,7 @@ public partial class MainPage : ContentPage
             AbsoluteLayout.SetLayoutFlags(tgRow, AbsoluteLayoutFlags.None);
             SKCanvasViews.Add(tgRow);
             y = y + 26;
+            r++;
         }
     }
 
@@ -5222,7 +5226,9 @@ public partial class MainPage : ContentPage
             if (uxItem is Toggle)
             {
                 var dItem = uxItem as Toggle;
-                dItem.RefreshValues(); 
+                dItem.RefreshValues();
+               
+
             }
             if (uxItem is CircularProgress)
             {

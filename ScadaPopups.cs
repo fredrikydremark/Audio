@@ -179,7 +179,7 @@ namespace Scada
                     SV = "0.0",
                     Text = " ",
                     Radius = 10,
-                    gridRows = MyDataAccessLayer.LoadParameters()
+                    gridRows = MyDataAccessLayer.ReadParameters("",0,5)
                 };
                 ScadaItems.Add(oMenuTelegram);
             }

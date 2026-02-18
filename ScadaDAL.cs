@@ -111,9 +111,64 @@ namespace Scada
         }
 
 
+        public List<gridRow> ReadParameters(string Filter, int StartRow, int EndRow)
+        {
+            try
+            {
+                string sqlGetData = "";
+                var Connection = new Microsoft.Data.SqlClient.SqlConnection
+                {
+                    ConnectionString = sConnection
+                };
+                Connection.Open();
+                SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
+                sqlGetData = "select ID,Name,Value,type FROM(SELECT *, ROW_NUMBER() OVER (ORDER BY Name) as row FROM [Parameters]) a WHERE (row > @StartRow and row <= @EndRow)";
+                cmdGetData.Parameters.AddWithValue("@StartRow", StartRow);
+                cmdGetData.Parameters.AddWithValue("@EndRow", EndRow);
+               
+                cmdGetData.CommandText = sqlGetData;
+                SqlDataReader reader = cmdGetData.ExecuteReader();
 
+                var gridRows = new List<gridRow>();
+                int row = 0;
+                while (reader.Read())
+                {
+                    gridRows.Add(new gridRow
+                    {
+                        Id = reader.GetInt32(0),
+                        col1text = reader.GetString(1),
+                        col1width = 100F,
+                        col2text = "",
+                        col2width = 10F,
+                        col3text = "",
+                        col3width = 10F,
+                        col4text = "",
+                        col4width = 10F,
+                        col5text = "",
+                        col5width = 10F,
+                        col6text = "",
+                        col6width = 10F,
+                        Status = -1,
+                        Row = row
+                    });
+                    row++;
+                }
+                cmdGetData.Dispose();
+                cmdGetData = null;
+                Connection.Close();
+                Connection = null;
+                return (gridRows);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString(), ex);
+            }
+            finally
+            {
+            }
+        }
 
-        public string ReadParameter(string Name)
+        public string ReadParameter(int ID)
         {
             try
             {
@@ -124,9 +179,9 @@ namespace Scada
                     ConnectionString = sConnection
                 };
                 Connection.Open();
-                string sqlGetData = "select Value,Type from Parameters where Name = @Name";
+                string sqlGetData = "select Value,Type from Parameters where ID = @ID";
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
-                cmdGetData.Parameters.AddWithValue("@Name", Name);
+                cmdGetData.Parameters.AddWithValue("@ID", ID);
                 cmdGetData.CommandText = sqlGetData;
                 SqlDataReader reader = cmdGetData.ExecuteReader();
 
@@ -178,6 +233,39 @@ namespace Scada
             {
             }
         }
+
+        public int UpdateParameterValue(int ID, string sValue )
+        {
+            try
+            {
+                var Connection = new Microsoft.Data.SqlClient.SqlConnection
+                {
+                    ConnectionString = sConnection
+                };
+
+                string sqlGetData = "UPDATE Parameters SET Value = @Value WHERE ( ID = @ID )";
+                Connection.Open();
+                SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
+                cmdGetData.Parameters.AddWithValue("@Value", sValue);
+                cmdGetData.Parameters.AddWithValue("@ID", ID);
+                
+                cmdGetData.ExecuteNonQuery();
+                cmdGetData.Dispose();
+                cmdGetData = null;
+                Connection.Close();
+                Connection = null;
+                return (0);
+            }
+            catch (Exception ex)
+            {
+                return (1);
+                throw new Exception(ex.ToString(), ex);
+            }
+            finally
+            {
+            }
+        }
+
 
 
         public int DeleteParameter(string Name)
@@ -608,7 +696,7 @@ namespace Scada
             {
             }
         }
-
+        /*
         public List<gridRow> LoadParameters()
         {
             try
@@ -618,7 +706,7 @@ namespace Scada
                     ConnectionString = sConnection
                 };
                 Connection.Open();
-                string sqlGetData = "select Name,Value,Type from Parameters ";                        
+                string sqlGetData = "select Name,Value,Type,ID from Parameters WHERE Type = 0";                        
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
                 cmdGetData.CommandText = sqlGetData;
                 SqlDataReader reader = cmdGetData.ExecuteReader();
@@ -629,6 +717,7 @@ namespace Scada
                     string Name = reader.GetString(0);
                     string Value = reader.GetString(1);
                     int Type = reader.GetInt32(2);
+                    int ID = reader.GetInt32(3);
                     gridRows.Add(new gridRow
                     {              
                         col1text = Name,
@@ -646,7 +735,7 @@ namespace Scada
                         DataType = Type,
                         Row = r,
                         Status = 0,
-                        Id = 0
+                        Id = ID
                     });
                     r++;
                 }
@@ -663,7 +752,7 @@ namespace Scada
             {
             }
         }
-
+        */
         public int EnableAlarmOnTag(int TagID, bool Enable)
         {
             try
@@ -2666,7 +2755,7 @@ namespace Scada
                     }
                     if (oTempTele.ItemType == ScadaClasses.uxParameters)
                     {
-                        oTempTele.gridRows = LoadParameters();
+                        oTempTele.gridRows = ReadParameters("",1,5);
                     }
 
                     if (oTempTele.ItemType == ScadaClasses.uxHistoryChart)

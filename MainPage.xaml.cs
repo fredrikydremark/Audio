@@ -3279,7 +3279,7 @@ public partial class MainPage : ContentPage
                                         {
                                             SKToggle.SV.Value = 1;
                                         }                                 
-                                        MyDataAccessLayer.UpdateTagValue(SKToggle.SV.TagID, SKToggle.SV.Value);                                  
+                                        MyDataAccessLayer.UpdateTagValue(SKToggle.SV.TagID, SKToggle.SV.Value,0);                                  
                                         MyDataAccessLayer.StoreTagValue(SKToggle.SV.TagID, SKToggle.SV.Value);
 
                                         ScadaClasses.Refresh = true;

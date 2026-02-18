@@ -127,20 +127,20 @@ namespace Scada
                                 {
                                     scb.SV.Value = 1;
                                 }                                                                                  
-                                MyDataAccessLayer.UpdateTagValue(scb.SV.TagID, scb.SV.Value);
+                                MyDataAccessLayer.UpdateTagValue(scb.SV.TagID, scb.SV.Value,0);
                                 MyDataAccessLayer.StoreTagValue(scb.SV.TagID, scb.SV.Value);
                              
                             }
                             else if (Item.Action == "ON")
                             {
                                 scb.SV.Value = 1;
-                                MyDataAccessLayer.UpdateTagValue(scb.SV.TagID, scb.SV.Value);
+                                MyDataAccessLayer.UpdateTagValue(scb.SV.TagID, scb.SV.Value,0);
                                 MyDataAccessLayer.StoreTagValue(scb.SV.TagID, scb.SV.Value);
                             }
                             else if (Item.Action == "OFF")
                             {
                                 scb.SV.Value = 0;
-                                MyDataAccessLayer.UpdateTagValue(scb.SV.TagID, scb.SV.Value);
+                                MyDataAccessLayer.UpdateTagValue(scb.SV.TagID, scb.SV.Value,0);
                                 MyDataAccessLayer.StoreTagValue(scb.SV.TagID, scb.SV.Value);
                             }
                             else if (Item.Action == "POPUPALARM")

@@ -7,8 +7,6 @@ namespace Scada
 {
     public class Toggle : SKCanvasView
     {
-       
-
         public static BindableProperty ItemIDProperty = BindableProperty.Create(nameof(ItemID), typeof(int),
         typeof(Toggle), 0, BindingMode.OneWay,
             validateValue: (_, value) => value != null,

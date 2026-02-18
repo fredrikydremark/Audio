@@ -198,7 +198,7 @@ namespace Scada
                 PV.Value = MinValue;
             }
 
-            MyDataAccessLayer.UpdateTagValue(PV.TagID, PV.Value);
+            MyDataAccessLayer.UpdateTagValue(PV.TagID, PV.Value,0);
             MyDataAccessLayer.StoreTagValue(PV.TagID, PV.Value);
             canvas.Clear();
             canvas.DrawRoundRect(backgroundBar, Background);

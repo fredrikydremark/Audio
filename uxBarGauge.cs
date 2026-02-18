@@ -67,7 +67,7 @@ namespace Scada
 
                     case SKTouchAction.Released:
                         scb.State = 2;
-                        MyDataAccessLayer.UpdateTagValue(scb.SV.TagID, scb.SV.Value);
+                        MyDataAccessLayer.UpdateTagValue(scb.SV.TagID, scb.SV.Value,0);
                         MyDataAccessLayer.StoreTagValue(scb.SV.TagID, scb.SV.Value);
                         ScadaClasses.Refresh = true;
                         break;

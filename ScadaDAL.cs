@@ -664,8 +664,6 @@ namespace Scada
             }
         }
 
-
-
         public int EnableAlarmOnTag(int TagID, bool Enable)
         {
             try
@@ -1349,7 +1347,7 @@ namespace Scada
             }
         }
 
-        public int UpdateTagValue(int TagID, double dValue)
+        public int UpdateTagValue(int TagID, double dValue,int Status)
         {
             try
             {
@@ -1358,11 +1356,13 @@ namespace Scada
                     ConnectionString = sConnection
                 };
 
-                string sqlGetData = "UPDATE Tags SET Value = @Value  WHERE ( TagID = @TagID )";
+                string sqlGetData = "UPDATE Tags SET Value = @Value, StatusQuality = @Status WHERE ( TagID = @TagID )";
                 Connection.Open();
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
                 cmdGetData.Parameters.AddWithValue("@Value", dValue);
                 cmdGetData.Parameters.AddWithValue("@TagID", TagID);
+                cmdGetData.Parameters.AddWithValue("@Status", Status);
+
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
                 cmdGetData = null;

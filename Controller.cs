@@ -248,7 +248,7 @@ namespace Scada
        
             //Output.Value = (float)MyPID.ComputePID();
 
-            MyDataAccessLayer.UpdateTagValue(Output.TagID, Output.Value);
+            MyDataAccessLayer.UpdateTagValue(Output.TagID, Output.Value, 0);
             MyDataAccessLayer.StoreTagValue(Output.TagID, Output.Value);
             
             canvas.Clear();

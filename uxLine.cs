@@ -124,6 +124,8 @@ namespace Scada
                 IsAntialias = true,
                 Style = SKPaintStyle.Fill,
                 Color = new SKColor(148, 34, 204, 200),
+                BlendMode = SKBlendMode.Overlay,
+                FilterQuality = SKFilterQuality.High,
                 StrokeWidth = 0
             };
 

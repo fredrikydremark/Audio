@@ -72,6 +72,85 @@ namespace Scada
         SKPoint MiddleJoint = new SKPoint(0, 0);
         SKPoint GripperJoint = new SKPoint(0, 0);
 
+        public ScadaRobot Init(double wScale, double hScale, ScadaRobot scb, ScadaClasses.Telegram Item, ScadaClasses.Colors Color)
+        {
+            scb.AnchorX = 0;
+            scb.AnchorY = 0;
+            scb.CornerRadius = 10;
+            scb.BarBackgroundColor = Color.uxBackGroundColor;
+            scb.BackgroundColor = Color.uxPanelColor.ToMauiColor();
+            scb.GradientStartColor = Color.uxItemColor;
+            scb.GradientEndColor = Color.uxItemColor;
+            scb.WidthRequest = wScale * Item.Width;
+            scb.HeightRequest = hScale * Item.Height;
+            scb.AlternativeTextColor = Color.uxTextColor;
+            scb.TextColor = Color.uxTextColor;
+            scb.ItemID = Item.ItemID;
+            scb.StyleId = Item.ItemID.ToString();
+            scb.FontSize = 18.5F;
+
+            scb.LowerArm = new ItemValue();
+            scb.LowerArm.TagID = -1;
+            scb.LowerArm.Value = -1;
+
+            scb.UpperArm = new ItemValue();
+            scb.UpperArm.TagID = -1;
+            scb.UpperArm.Value = -1;
+
+            scb.Gripper = new ItemValue();
+            scb.Gripper.TagID = -1;
+            scb.Gripper.Value = -1;
+
+            scb.XTraverse = new ItemValue();
+            scb.XTraverse.TagID = -1;
+            scb.XTraverse.Value = -1;
+
+            scb.YTraverse = new ItemValue();
+            scb.YTraverse.TagID = -1;
+            scb.YTraverse.Value = -1;
+
+            DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);
+            var ItemValuesBtn = MyDataAccessLayer.ReadItemValues(scb.ItemID);
+            int idx = 0;
+            foreach (var item in ItemValuesBtn)
+            {
+                if (idx == 0)
+                {
+                    scb.Gripper.TagID = item.TagID;
+                    scb.Gripper.Value = item.Value;    
+                }
+                if (idx == 1)
+                {
+                    scb.LowerArm.TagID = item.TagID;
+                    scb.LowerArm.Value = item.Value;          
+                }
+                if (idx == 2)
+                {
+                    scb.UpperArm.TagID = item.TagID;
+                    scb.UpperArm.Value = item.Value;
+                }
+                if (idx == 3)
+                {
+                    scb.XTraverse.TagID = item.TagID;
+                    scb.XTraverse.Value = item.Value;
+                }
+                if (idx == 4)
+                {
+                    scb.YTraverse.TagID = item.TagID;
+                    scb.YTraverse.Value = item.Value;
+                }
+                idx++;
+            }
+
+            scb.IsEnabled = true;
+            scb.IsVisible = true;
+            scb.EnableTouchEvents = true;
+            scb.InputTransparent = false;
+            scb.Start();
+            return scb;
+        }
+
+
         public static BindableProperty ItemIDProperty = BindableProperty.Create(nameof(ItemID), typeof(int),
         typeof(ScadaRobot), 0, BindingMode.OneWay,
             validateValue: (_, value) => value != null,
@@ -274,7 +353,6 @@ namespace Scada
         public void Stop()
         {
             AnimationRunning = false;
-
         }
 
         private async void UpdateArc()
@@ -325,13 +403,58 @@ namespace Scada
                       DVStep = (DV - OV) / 100.0F * -1.0F;
                       DV = DV + DVStep;
                    }
-                   AbsoluteLayout.SetLayoutBounds(this, new Rect((WindowWidth / 100) * (Left + DV),(WindowHeight / 100) * (Top + YTraverse.Value),(WindowWidth / 100) * 12,(WindowHeight / 100) * 12));                        
+                   AbsoluteLayout.SetLayoutBounds(this, new Rect((WindowWidth / 100) * (Left + DV),(WindowHeight / 100) * (Top + DV/*yTraverse.Value*/),(WindowWidth / 100) * 12,(WindowHeight / 100) * 12));                        
                    AbsoluteLayout.SetLayoutFlags(this, AbsoluteLayoutFlags.None);          
                    InvalidateSurface();             
                 }
                 await Task.Delay(20);
             }         
         }
+
+
+        public void RefreshValues()
+        {
+            DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);
+
+            var ItemValues = MyDataAccessLayer.ReadItemValues(ItemID);
+            foreach (var item in ItemValues)
+            {
+                if (item.TagID == Gripper.TagID)
+                {
+                    Gripper.TagID = item.TagID;
+                    Gripper.Value = item.Value;
+                }
+                if (item.TagID == LowerArm.TagID)
+                {
+                    LowerArm.TagID = item.TagID;
+                    LowerArm.Value = item.Value;
+                }
+                if (item.TagID == UpperArm.TagID)
+                {
+                    UpperArm.TagID = item.TagID;
+                    UpperArm.Value = item.Value;
+                }
+         
+                if (item.TagID == XTraverse.TagID)
+                {
+                    XTraverse.TagID = item.TagID;
+                    XTraverse.Value = item.Value;
+                }
+                if (item.TagID == YTraverse.TagID)
+                {
+                    YTraverse.TagID = item.TagID;
+                    YTraverse.Value = item.Value;
+                }
+            
+            }
+
+          
+            if (IsLoaded == true)
+            {
+                InvalidateSurface();
+            }
+        }
+
 
 
         protected override void OnPaintSurface(SKPaintSurfaceEventArgs e)

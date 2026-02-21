@@ -229,10 +229,10 @@ namespace Scada
                     PV.Value = item.Value;
                     PV.StatusQuality = item.StatusQuality;
                 }
-                if (item.TagID == SV.TagID)
+         
+                if ((item.TagID == SV.TagID) && (State == 2))
                 {
                     SV.Value = item.Value;
-                    SV.StatusQuality = item.StatusQuality;
                 }
 
             }

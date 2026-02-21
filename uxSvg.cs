@@ -7,10 +7,7 @@ using System.Text;
 namespace Scada
 {
     public class ScadaSvg : SKCanvasView
-    {
-
-
-        public ScadaSvg Init(double w, double h, ScadaSvg scb, ScadaClasses.Telegram Item, ScadaClasses.Colors Color)
+    {   public ScadaSvg Init(double w, double h, ScadaSvg scb, ScadaClasses.Telegram Item, ScadaClasses.Colors Color)
         {
             scb.AnchorX = 0;
             scb.AnchorY = 0;
@@ -21,23 +18,18 @@ namespace Scada
             scb.GradientEndColor = Color.uxGradientEndColor;
             scb.WidthRequest = w * Item.Width;
             scb.HeightRequest = h  * Item.Height;
-
             scb.ItemID = Item.ItemID;
-            scb.StyleId = Item.ItemID.ToString();
-          
+            scb.StyleId = Item.ItemID.ToString();       
             DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);
- 
             scb.SvgBase64 = MyDataAccessLayer.LoadLibItem(Item.Action, 1);
-
             scb.IsEnabled = true;
             scb.IsVisible = true;
             scb.EnableTouchEvents = true;
-            scb.InputTransparent = false;
-        
+            scb.InputTransparent = false;    
             return (scb);
         }
 
-        public static BindableProperty ItemIDProperty = BindableProperty.Create(nameof(ItemID), typeof(int),
+       public static BindableProperty ItemIDProperty = BindableProperty.Create(nameof(ItemID), typeof(int),
        typeof(ScadaSvg), 0, BindingMode.OneWay,
            validateValue: (_, value) => value != null,
        propertyChanged: OnPropertyChangedInvalidate);
@@ -121,11 +113,9 @@ namespace Scada
             set => SetValue(sProperty, value);
         }
 
-
         private static void OnPropertyChangedInvalidate(BindableObject bindable, object oldvalue, object newvalue)
         {
             var control = (ScadaSvg)bindable;
-
             if (oldvalue != newvalue)
                 control.InvalidateSurface();
         }

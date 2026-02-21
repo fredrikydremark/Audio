@@ -1,7 +1,6 @@
-﻿using Microsoft.Data.SqlClient;
+﻿
+using Microsoft.Data.SqlClient;
 using Microsoft.Maui.Layouts;
-using Microsoft.Maui.Storage;
-using Scada;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
 using SkiaSharp.Views.Maui.Controls;
@@ -1141,19 +1140,13 @@ public partial class MainPage : ContentPage
                         if (tgRow.SV.Value > 0.5F)
                         {                         
                             tgRow.SV.Value = 0;
-                            MyDataAccessLayer.UpdateParameterValue(myRowButton.ButtonRow.Id, tgRow.SV.Value.ToString() );
+                            MyDataAccessLayer.UpdateParameterValue(myRowButton.ButtonRow.Id, tgRow.SV.Value.ToString());
                         }
                         else
                         {                          
                             tgRow.SV.Value = 1;
                             MyDataAccessLayer.UpdateParameterValue(myRowButton.ButtonRow.Id, tgRow.SV.Value.ToString());
                         }
-                        //ScadaClasses.CurrentScadaPopup = ScadaClasses.uxParamSettings;
-                        //ScadaClasses.CurrentTag = myRowButton.ButtonRow.TagID;
-                                        
-                        ScadaClasses.Previouspage = -1;
-                        ScadaClasses.Refresh = true;
-
                         tgRow.InvalidateSurface();
                         break;
                 }
@@ -2864,6 +2857,18 @@ public partial class MainPage : ContentPage
                         AbsoluteLayout.SetLayoutFlags(SKButton, AbsoluteLayoutFlags.None);
                         SKCanvasViews.Add(SKButton);
                      break;
+                    case ScadaClasses.uxRobot:
+                        var SKRobot = new ScadaRobot();
+                        SKRobot.Init(wScale, hScale, SKRobot, ScadaItem, ScadaColor);
+                        if (Designing == true)
+                        {
+                            SKRobot = (ScadaRobot)AttachDesignEvents(SKRobot, ScadaItem);
+                        }
+                        AbsoluteLayout.SetLayoutBounds(SKRobot, new Rect(wScale * ScadaItem.Left, hScale * ScadaItem.Top, wScale * ScadaItem.Width, hScale * ScadaItem.Height));
+                        AbsoluteLayout.SetLayoutFlags(SKRobot, AbsoluteLayoutFlags.None);
+                        SKCanvasViews.Add(SKRobot);
+                       
+                        break;
 
                     case ScadaClasses.uxHistoryChart:
                         var trh = new HistGraph();
@@ -5120,27 +5125,17 @@ public partial class MainPage : ContentPage
             ScadaClasses.Previouspage = ScadaClasses.Currentpage;
         }
 
-        //when update only 
-        /*
-        foreach (SKCanvasView uxItem in SKCanvasViews)
-        {
-            if (uxItem.IsLoaded)
-            {
-                uxItem.InvalidateSurface();
-            }    
-        }
-        */
-
         foreach (SKCanvasView uxItem in SKCanvasViews)
         {
             if (uxItem is ScadaSvg)
             {
                 var dItem = uxItem as ScadaSvg;
-                AbsoluteLayout.SetLayoutBounds(dItem, new Rect(
+               /* AbsoluteLayout.SetLayoutBounds(dItem, new Rect(
                                           (Width / 100) * dItem.XPosition,
                                           (Height / 100) * dItem.YPosition,
                                           (Width / 100) * dItem.Width,
                                           (Height / 100) * dItem.Height));
+                */
             }
 
             if (uxItem is HistGraph)
@@ -5226,10 +5221,28 @@ public partial class MainPage : ContentPage
             if (uxItem is Toggle)
             {
                 var dItem = uxItem as Toggle;
-                dItem.RefreshValues();
-               
-
+                  dItem.RefreshValues();
             }
+
+            if (uxItem is ScadaRobot)
+            {
+                var dItem = uxItem as ScadaRobot;
+                if (Designing == false)
+                {
+                    dItem.RefreshValues();
+                }
+                /*
+                foreach (var Item in ScadaItems)
+                {
+                    if (dItem.ItemID == Item.ItemID)
+                    {
+                        dItem.RefreshValues();
+                       // dItem.RefreshValues(Item.ItemValues);
+                    }
+                }
+                */
+            }
+
             if (uxItem is CircularProgress)
             {
                 var dItem = uxItem as CircularProgress;
@@ -5240,7 +5253,140 @@ public partial class MainPage : ContentPage
                 var dItem = uxItem as CircularGauge;
                 dItem.RefreshValues();
             }
+            /*
+            if (uxItem is CircularGauge)
+            {
+                var dItem = uxItem as CircularGauge;
+               
+                var ItemValues = MyDataAccessLayer.ReadItemValues(dItem.ItemID);
+                foreach (var item in ItemValues)
+                {
+                    if (item.TagID == dItem.PV.TagID)
+                    {
+                        dItem.PV.Value = item.Value;
+                    }
+                    if ((item.TagID == dItem.SV.TagID) && (dItem.State == 2))
+                    {
+                        dItem.SV.Value = item.Value;
+                    }
+                }
+                if (dItem.IsLoaded == true)
+                {
+                    dItem.InvalidateSurface();
+                }
+                dItem = null;
+            }
+            */
 
+            /*
+            if (uxItem is Compass)
+            {
+                var dItem = uxItem as Compass;
+                var ItemValues = MyDataAccessLayer.ReadItemValues(dItem.ItemID);
+                foreach (var item in ItemValues)
+                {
+                    if (item.TagID == dItem.PV.TagID)
+                    {
+                        dItem.PV.Value = item.Value;
+                    }
+                    if (item.TagID == dItem.SV.TagID)
+                    {
+                        dItem.SV.Value = item.Value;
+                    }
+                }
+                dItem.InvalidateSurface();
+            }
+
+            if (uxItem is Gyroscope)
+            {
+                var dItem = uxItem as Gyroscope;
+                var ItemValues = MyDataAccessLayer.ReadItemValues(dItem.ItemID);
+                foreach (var item in ItemValues)
+                {
+                    if (item.TagID == dItem.BankAngle.TagID)
+                    {
+                        dItem.BankAngle.Value = item.Value;
+                    }
+                }
+                dItem.InvalidateSurface();
+            }
+            if (uxItem is Altimeter)
+            {
+                var dItem = uxItem as Altimeter;
+                var ItemValues = MyDataAccessLayer.ReadItemValues(dItem.ItemID);
+                foreach (var item in ItemValues)
+                {
+                    if (item.TagID == dItem.PV.TagID)
+                    {
+                        dItem.PV.Value = item.Value;
+                    }
+                    if (item.TagID == dItem.SV.TagID)
+                    {
+                        dItem.SV.Value = item.Value;
+                    }
+                }
+                dItem.InvalidateSurface();
+                dItem = null;
+            }
+
+            if (uxItem is Airspeed)
+            {
+                var dItem = uxItem as Airspeed;
+                var ItemValues = MyDataAccessLayer.ReadItemValues(dItem.ItemID);
+                foreach (var item in ItemValues)
+                {
+                    if (item.TagID == dItem.PV.TagID)
+                    {
+                        dItem.PV.Value = item.Value;
+                    }
+                    if (item.TagID == dItem.SV.TagID)
+                    {
+                        dItem.SV.Value = item.Value;
+                    }
+                }
+                dItem.InvalidateSurface();
+                dItem = null;
+            }
+            */
+            /*
+            if (uxItem is ScadaRobot)
+            {
+                var dItem = uxItem as ScadaRobot;
+                var ItemValues = MyDataAccessLayer.ReadItemValues(dItem.ItemID);
+
+                if (Designing == false)
+                {
+                    foreach (var item in ItemValues)
+                    {
+                        if (item.TagID == dItem.Gripper.TagID)
+                        {
+                            dItem.Gripper.Value = item.Value;
+                        }
+                        if (item.TagID == dItem.LowerArm.TagID)
+                        {
+                            dItem.LowerArm.Value = item.Value;
+                        }
+                        if (item.TagID == dItem.UpperArm.TagID)
+                        {
+                            dItem.UpperArm.Value = item.Value;
+                        }
+                        if (item.TagID == dItem.XTraverse.TagID)
+                        {
+                            dItem.XTraverse.Value = item.Value;
+                        }
+                        if (item.TagID == dItem.YTraverse.TagID)
+                        {
+                            dItem.YTraverse.Value = item.Value;
+                        }
+                    }
+                    dItem.InvalidateSurface();
+                }
+            }
+            */
+
+
+
+       
 
             if (uxItem is ScadaButton)
             {

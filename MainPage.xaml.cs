@@ -2857,6 +2857,7 @@ public partial class MainPage : ContentPage
                         AbsoluteLayout.SetLayoutFlags(SKButton, AbsoluteLayoutFlags.None);
                         SKCanvasViews.Add(SKButton);
                      break;
+
                     case ScadaClasses.uxRobot:
                         var SKRobot = new ScadaRobot();
                         SKRobot.Init(wScale, hScale, SKRobot, ScadaItem, ScadaColor);

@@ -643,7 +643,7 @@ namespace Scada
                     }
 
                     float h1 = info.Height;
-                    float radius = (h1 / 2.5f);
+                    float radius = (h1 / 3f);
                     var center = new SKPoint(radius + 2.5f, (info.Height / 2) + 0.5f);
                     NewTextPaint.MeasureText(ButtonRow.col6text, ref textBounds);
                     float y = info.Height / 2 - textBounds.MidY;

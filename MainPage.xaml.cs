@@ -2863,6 +2863,15 @@ public partial class MainPage : ContentPage
                         if (Designing == true)
                         {
                             SKRobot = (ScadaRobot)AttachDesignEvents(SKRobot, ScadaItem);
+                            SKRobot.EnableTouchEvents = true;
+                            SKRobot.InputTransparent = false;
+                            SKRobot.Stop();
+                        }
+                        else
+                        {
+                            SKRobot.EnableTouchEvents = false;
+                            SKRobot.InputTransparent = true;
+                            SKRobot.Start();
                         }
                         AbsoluteLayout.SetLayoutBounds(SKRobot, new Rect(wScale * ScadaItem.Left, hScale * ScadaItem.Top, wScale * ScadaItem.Width, hScale * ScadaItem.Height));
                         AbsoluteLayout.SetLayoutFlags(SKRobot, AbsoluteLayoutFlags.None);

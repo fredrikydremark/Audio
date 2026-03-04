@@ -144,9 +144,7 @@ namespace Scada
 
             scb.IsEnabled = true;
             scb.IsVisible = true;
-            scb.EnableTouchEvents = true;
-            scb.InputTransparent = false;
-            scb.Start();
+      
             return scb;
         }
 
@@ -421,11 +419,11 @@ namespace Scada
                       YDV = YDV + DVStep;
                    }
 
-                    AbsoluteLayout.SetLayoutBounds(this, new Rect((WindowWidth / 100) * (Left + XDV),(WindowHeight / 100) * (Top + YDV),(WindowWidth / 100) * 12,(WindowHeight / 100) * 12));                        
+                   AbsoluteLayout.SetLayoutBounds(this, new Rect((WindowWidth / 100) * (Left + XDV),(WindowHeight / 100) * (Top + YDV),(WindowWidth / 100) * 12,(WindowHeight / 100) * 12));                        
                    AbsoluteLayout.SetLayoutFlags(this, AbsoluteLayoutFlags.None);          
                    InvalidateSurface();             
                 }
-                await Task.Delay(20);
+                await Task.Delay(15);
             }         
         }
 

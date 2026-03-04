@@ -341,8 +341,11 @@ namespace Scada
         }
 
         bool AnimationRunning = false;
-        float DV = 0;
-        float OV = 0;
+        float XDV = 0;
+        float XOV = 0;
+        float YDV = 0;
+        float YOV = 0;
+
 
         public void Start()
         {
@@ -359,8 +362,11 @@ namespace Scada
         {
             AnimationRunning = true;
            
-            DV = XTraverse.Value;
-            OV = DV;
+            XDV = XTraverse.Value;
+            XOV = XDV;
+
+            YDV = YTraverse.Value;
+            YOV = YDV;
 
             float Step = 0.0F;
             float DVStep;
@@ -376,11 +382,7 @@ namespace Scada
             }
           
             while (AnimationRunning)
-            {
-                if (Math.Abs(OV - XTraverse.Value) > 0.1F)
-                {
-                   OV = XTraverse.Value + 1F;
-                }
+            {            
                 if (UpperArmAngle > (3.14F / 4))
                 {
                    Step = -0.01F;
@@ -396,14 +398,30 @@ namespace Scada
                 LowerArmAngle = LowerArmAngle - Step;
                 UpperArmAngle = UpperArmAngle + (Step * 3.0F);
 
+                if (Math.Abs(XOV - XTraverse.Value) > 0.1F)
+                {
+                    XOV = XTraverse.Value + 1F;
+                }
+
+                if (Math.Abs(YOV - YTraverse.Value) > 0.1F)
+                {
+                    YOV = YTraverse.Value + 1F;
+                }
+
                 if (IsLoaded == true)
                 {
-                   if (Math.Abs(DV - OV) > 0.1F)
+                   if (Math.Abs(XDV - XOV) > 0.1F)
                    {
-                      DVStep = (DV - OV) / 100.0F * -1.0F;
-                      DV = DV + DVStep;
+                      DVStep = (XDV - XOV) / 100.0F * -1.0F;
+                      XDV = XDV + DVStep;
                    }
-                   AbsoluteLayout.SetLayoutBounds(this, new Rect((WindowWidth / 100) * (Left + DV),(WindowHeight / 100) * (Top + DV/*yTraverse.Value*/),(WindowWidth / 100) * 12,(WindowHeight / 100) * 12));                        
+                   if (Math.Abs(YDV - YOV) > 0.1F)
+                   {
+                      DVStep = (YDV - YOV) / 100.0F * -1.0F;
+                      YDV = YDV + DVStep;
+                   }
+
+                    AbsoluteLayout.SetLayoutBounds(this, new Rect((WindowWidth / 100) * (Left + XDV),(WindowHeight / 100) * (Top + YDV),(WindowWidth / 100) * 12,(WindowHeight / 100) * 12));                        
                    AbsoluteLayout.SetLayoutFlags(this, AbsoluteLayoutFlags.None);          
                    InvalidateSurface();             
                 }

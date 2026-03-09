@@ -42,7 +42,6 @@ namespace Scada
                     cmdIns.Parameters.AddWithValue("@Value", Value);
                     cmdIns.ExecuteNonQuery();
                     cmdIns.Dispose();
-                    cmdIns = null;
                 }
                 catch (Exception ex)
                 {
@@ -98,8 +97,6 @@ namespace Scada
                 DigOutput = sDigital.ToString();
                 reader.Close();
                 cmdGetData.Dispose();
-
-                cmdGetData = null;
                 myConnection.Close();
                 myConnection.Dispose();
                 myConnection = null;
@@ -295,7 +292,6 @@ namespace Scada
                                 cmdIns.Parameters.AddWithValue("@Value", Value);
                                 cmdIns.ExecuteNonQuery();
                                 cmdIns.Dispose();
-                                cmdIns = null;
                             }
                             catch (Exception ex)
                             {

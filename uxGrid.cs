@@ -231,11 +231,9 @@ namespace Scada
         {
             var canvas = e.Surface.Canvas;
 
-            using (var paint = new SKPaint() { IsAntialias = true })
-            {
-                canvas.Clear();
-                DrawGrid(canvas, 0, 0, (float)Width, (float)Height);
-            }
+            using var paint = new SKPaint() { IsAntialias = true };
+            canvas.Clear();
+            DrawGrid(canvas, 0, 0, (float)Width, (float)Height);
         }
     }
 }

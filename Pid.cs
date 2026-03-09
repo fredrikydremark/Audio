@@ -37,7 +37,7 @@ namespace Scada
             private double outMin;
 
             //Threading and Timing
-            private double computeHz = 1.0f;
+           // private double computeHz = 1.0f;
             private Thread runThread;
 
             #endregion

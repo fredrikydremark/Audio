@@ -29,7 +29,7 @@ public partial class MainPage : ContentPage
 
     bool Designing = false;
     bool Moving = false;
-    bool uxDarkMode = true;
+    //bool uxDarkMode = true;
 
     double Xpos = 0, Ypos = 0, Xwidth = 0, Yheight = 0;
     double OldXpos = 0, OldYpos = 0;
@@ -2538,8 +2538,8 @@ public partial class MainPage : ContentPage
         double hScale = Height / 100;
         Window.MaximumWidth = 4000;
         Window.MaximumHeight = 2000;
-        Window.MinimumWidth = 1440;
-        Window.MinimumHeight = 900;
+        Window.MinimumWidth = 1280;
+        Window.MinimumHeight = 600;
         Window.IsMaximizable = true;
         DataAccessLayer MyDataAccessLayer = new DataAccessLayer(ConnectionString);
 
@@ -2907,7 +2907,7 @@ public partial class MainPage : ContentPage
                         trh.HeightRequest = (Height / 100) * ScadaItem.Height;
                         trh.AlternativeTextColor = ScadaColor.uxTextColor;
                         trh.TextColor = ScadaColor.uxTextColor;
-
+                        /*
                         try
                         {
                             trh.SV = float.Parse(ScadaItem.SV, CultureInfo.InvariantCulture);
@@ -2915,6 +2915,7 @@ public partial class MainPage : ContentPage
                         catch
                         {
                         }
+                        */
                         trh.IsEnabled = true;
                         trh.IsVisible = true;
                         trh.EnableTouchEvents = true;

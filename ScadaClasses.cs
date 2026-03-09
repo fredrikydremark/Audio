@@ -215,25 +215,25 @@ namespace Scada
             public int MessageType { get; set; }
             public int ItemID { get; set; }
             public int TagID { get; set; }
-            public string TagName { get; set; }
+            public string ?TagName { get; set; }
             public int Page { get; set; }
             public int ItemType { get; set; }
             public double Left { get; set; }
             public double Top { get; set; }
             public double Width { get; set; }
             public double Height { get; set; }
-            public string PV { get; set; }                 
-            public string HL { get; set; }                
-            public string LL { get; set; }                 
-            public string SV { get; set; }                  
-            public string Max { get; set; }
-            public string Min { get; set; }
-            public string Unit { get; set; }                
-            public string Color { get; set; }               
-            public string Analyze { get; set; }                   
-            public string Status { get; set; }
-            public string Text { get; set; }
-            public string Time { get; set; }
+            public string ?PV { get; set; }                 
+            public string ?HL { get; set; }                
+            public string ?LL { get; set; }                 
+            public string ?SV { get; set; }                  
+            public string ?Max { get; set; }
+            public string ?Min { get; set; }
+            public string ?Unit { get; set; }                
+            public string ?Color { get; set; }               
+            public string ?Analyze { get; set; }                   
+            public string ?Status { get; set; }
+            public string ?Text { get; set; }
+            public string ?Time { get; set; }
             public int Hoover { get; set; }
             public int Fade { get; set; }
             public double Radius { get; set; }       
@@ -241,8 +241,8 @@ namespace Scada
             public string Action { get; set; } = string.Empty;
             public int size { get; set; }        
             public List<List<Value>> ListOfValues = new List<List<Value>>() { };
-            public List<gridRow> gridRows { get; set; }
-            public List<ItemValue> ItemValues { get; set; }
+            public List<gridRow> ?gridRows { get; set; }
+            public List<ItemValue> ?ItemValues { get; set; }
   
         }
     }

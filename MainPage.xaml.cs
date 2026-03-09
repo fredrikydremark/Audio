@@ -96,7 +96,11 @@ public partial class MainPage : ContentPage
         uxtimer.Interval = 100;
         uxtimer.Elapsed += uxUpdate;
         uxtimer.Start();
+
     }
+
+
+
 
     static public SKColor RGBStringToColor(string RGBColor)
     {
@@ -2532,6 +2536,11 @@ public partial class MainPage : ContentPage
         double x = 0, y = 0, w = 0, h = 0;   
         double wScale = Width / 100;
         double hScale = Height / 100;
+        Window.MaximumWidth = 4000;
+        Window.MaximumHeight = 2000;
+        Window.MinimumWidth = 1440;
+        Window.MinimumHeight = 900;
+        Window.IsMaximizable = true;
         DataAccessLayer MyDataAccessLayer = new DataAccessLayer(ConnectionString);
 
         if ((ScadaClasses.Previouspage != ScadaClasses.Currentpage) && (ScadaItems.Count > 0))
@@ -2545,20 +2554,22 @@ public partial class MainPage : ContentPage
                 grdSnap.ItemID = 0;
                 grdSnap.AnchorX = 0;
                 grdSnap.AnchorY = 0;
-                grdSnap.CornerRadius = 0;
+               // grdSnap.CornerRadius = 0;
                 grdSnap.BarBackgroundColor = ScadaColor.uxPanelColor;
                 grdSnap.BackgroundColor = ScadaColor.uxPanelColor.ToMauiColor();
                 grdSnap.GridThinColor = ScadaColor.uxGridThinColor;
                 grdSnap.GridFatColor = ScadaColor.uxGridFatColor;
-                grdSnap.WidthRequest = Width;
-                grdSnap.HeightRequest = Height;
-                grdSnap.AlternativeTextColor = ScadaColor.uxPanelColor;
-                grdSnap.TextColor = ScadaColor.uxTextColor;
+                grdSnap.WidthRequest = Window.Width;
+                grdSnap.HeightRequest = Window.Height;
+                //grdSnap.AlternativeTextColor = ScadaColor.uxPanelColor;
+               // grdSnap.TextColor = ScadaColor.uxTextColor;
                 grdSnap.IsEnabled = true;
                 grdSnap.IsVisible = true;
-
-                AbsoluteLayout.SetLayoutBounds(grdSnap, new Rect(0, 0, Width, Height));
+                AbsoluteLayout.SetLayoutBounds(grdSnap, new Rect(0, 0, Window.Width, Window.Height));            
                 AbsoluteLayout.SetLayoutFlags(grdSnap, AbsoluteLayoutFlags.None);
+
+                //AbsoluteLayout.SetLayoutBounds(grdSnap, new Rect(0, 0, Width, Height));
+                //AbsoluteLayout.SetLayoutFlags(grdSnap, AbsoluteLayoutFlags.None);
                 SKCanvasViews.Add(grdSnap);
             }
 
@@ -3429,8 +3440,6 @@ public partial class MainPage : ContentPage
                         controller.IsEnabled = true;
                         controller.IsVisible = true;
                         controller.TextColor = ScadaColor.uxTextColor;
-                        controller.IsEnabled = true;
-                        controller.IsVisible = true;
                         controller.EnableTouchEvents = true;
                         controller.InputTransparent = false;
                         controller.PV = new ItemValue();
@@ -5263,6 +5272,7 @@ public partial class MainPage : ContentPage
                 var dItem = uxItem as CircularGauge;
                 dItem.RefreshValues();
             }
+
             /*
             if (uxItem is CircularGauge)
             {
@@ -5320,6 +5330,7 @@ public partial class MainPage : ContentPage
                 }
                 dItem.InvalidateSurface();
             }
+
             if (uxItem is Altimeter)
             {
                 var dItem = uxItem as Altimeter;
@@ -5358,6 +5369,7 @@ public partial class MainPage : ContentPage
                 dItem = null;
             }
             */
+
             /*
             if (uxItem is ScadaRobot)
             {

@@ -132,18 +132,21 @@ namespace Scada
                 string decodedString = Encoding.UTF8.GetString(data);
                 SKSvg svg = new SKSvg();
                 var picture = svg.FromSvg(decodedString);
-                var dimensions = new SKSizeI
-                (
-                     (int)Math.Ceiling(info.Width * 1.0),
-                     (int)Math.Ceiling(info.Height * 1.0)
-                );
+                if (picture != null)
+                {
+                    var dimensions = new SKSizeI
+                    (
+                         (int)Math.Ceiling(info.Width * 1.0),
+                         (int)Math.Ceiling(info.Height * 1.0)
+                    );
 
-                float ScaleX = info.Width / picture.CullRect.Width;
-                float ScaleY = info.Height / picture.CullRect.Height;
-                SKMatrix matrix = SKMatrix.CreateScale(ScaleX, ScaleY);
-                SKImage image = SKImage.FromPicture(picture, dimensions, matrix);
-                canvas.Clear();
-                canvas.DrawImage(image, new SKPoint(0, 0));
+                    float ScaleX = info.Width / picture.CullRect.Width;
+                    float ScaleY = info.Height / picture.CullRect.Height;
+                    SKMatrix matrix = SKMatrix.CreateScale(ScaleX, ScaleY);
+                    SKImage image = SKImage.FromPicture(picture, dimensions, matrix);
+                    canvas.Clear();
+                    canvas.DrawImage(image, new SKPoint(0, 0));
+                }
             }
             catch
             {

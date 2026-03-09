@@ -18,7 +18,7 @@ namespace Scada
             get => (int)GetValue(ItemIDProperty);
             set => SetValue(ItemIDProperty, value);
         }
-
+        /*
         public static BindableProperty PercentageProperty = BindableProperty.Create(nameof(Percentage), typeof(float),
             typeof(ScadaGrid), 0f, BindingMode.OneWay,
             validateValue: (_, value) => value != null,
@@ -28,9 +28,9 @@ namespace Scada
         {
             get => (float)GetValue(PercentageProperty);
             set => SetValue(PercentageProperty, value);
-        }
-
-        public static BindableProperty CornerRadiusProperty = BindableProperty.Create(nameof(Percentage), typeof(float),
+        }*/
+        /*
+        public static BindableProperty CornerRadiusProperty = BindableProperty.Create(nameof(CornerRadius), typeof(float),
             typeof(ScadaGrid), 5f, BindingMode.OneWay,
             validateValue: (_, value) => value != null && (float)value >= 0,
             propertyChanged: OnPropertyChangedInvalidate);
@@ -40,6 +40,7 @@ namespace Scada
             get => (float)GetValue(CornerRadiusProperty);
             set => SetValue(CornerRadiusProperty, value);
         }
+        */
 
         public static BindableProperty BarBackgroundColorProperty = BindableProperty.Create(nameof(BarBackgroundColor), typeof(SKColor),
             typeof(ScadaGrid), SKColors.White, BindingMode.OneWay,
@@ -50,7 +51,7 @@ namespace Scada
             get => (SKColor)GetValue(BarBackgroundColorProperty);
             set => SetValue(BarBackgroundColorProperty, value);
         }
-
+        /*
         public static BindableProperty FontSizeProperty = BindableProperty.Create(nameof(FontSize), typeof(float),
             typeof(ScadaGrid), 12f, BindingMode.OneWay,
             validateValue: (_, value) => value != null && (float)value >= 0,
@@ -61,6 +62,7 @@ namespace Scada
             get => (float)GetValue(FontSizeProperty);
             set => SetValue(FontSizeProperty, value);
         }
+        */
 
         public static BindableProperty GridThinColorProperty = BindableProperty.Create(nameof(GridThinColor), typeof(SKColor),
             typeof(ScadaGrid), SKColors.Purple, BindingMode.OneWay,
@@ -81,7 +83,7 @@ namespace Scada
             get => (SKColor)GetValue(GridFatColorProperty);
             set => SetValue(GridFatColorProperty, value);
         }
-
+        /*
         public static BindableProperty TextColorProperty = BindableProperty.Create(nameof(TextColor), typeof(SKColor),
             typeof(ScadaGrid), SKColors.Blue, BindingMode.OneWay,
             validateValue: (_, value) => value != null, propertyChanged: OnPropertyChangedInvalidate);
@@ -101,14 +103,16 @@ namespace Scada
             get => (SKColor)GetValue(AlternativeTextColorProperty);
             set => SetValue(AlternativeTextColorProperty, value);
         }
-
+        */
+        
         private static void OnPropertyChangedInvalidate(BindableObject bindable, object oldvalue, object newvalue)
         {
-            var control = (ScadaGrid)bindable;
+           /* var control = (ScadaGrid)bindable;
             if (oldvalue != newvalue)
                 control.InvalidateSurface();
+           */
         }
-
+        
         public void DrawGrid(SKCanvas c, float Top, float Left, float bw, float bh)
         {
             var HorzPaint = new SKPaint
@@ -153,8 +157,10 @@ namespace Scada
             //var effect = SKPathEffect.CreateDash(new[] { 10f, 20f }, 25);
             //var paint = new SKPaint { Color = SKColors.Black, IsStroke = true, StrokeWidth = 1, PathEffect = effect };
 
-            float h = Top + bh;
-            float w = Left + bw;
+            float h = (float)Window.MaximumHeight;
+            float w = (float)Window.MaximumWidth;
+            //float h = Top + bh;
+            //float w = Left + bw;
 
             for (float x = Left; x < w; x += 10)
             {

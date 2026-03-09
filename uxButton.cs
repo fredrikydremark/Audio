@@ -751,18 +751,21 @@ namespace Scada
 
                     var svg2 = new SKSvg();
                     var picture = svg2.FromSvg(decodedString);
-                    var dimension = new SkiaSharp.SKSizeI
-                    (
-                         (int)Math.Ceiling(info.Height * 1.0),
-                         (int)Math.Ceiling(info.Height * 1.0)
-                    );
-                    float Offset = info.Height - h + info.Height * Padding;
-                    float ScaleX = (info.Height / picture.CullRect.Width) * 0.6F;
-                    float ScaleY = (info.Height / picture.CullRect.Height) * 0.6F;
-                    var matrix = SKMatrix.CreateScale(ScaleX * (1 - Padding * 2), ScaleY * (1 - Padding * 2));
-                    var img = SKImage.FromPicture(picture, dimension, matrix);
-                    canvas.DrawImage(img, new SKPoint(Offset + 8, Offset + 10));
-                    canvas.DrawText(ButtonText, xText + info.Height, yText, NewTextPaint);
+                    if (picture != null)
+                    {
+                        var dimension = new SkiaSharp.SKSizeI
+                        (
+                             (int)Math.Ceiling(info.Height * 1.0),
+                             (int)Math.Ceiling(info.Height * 1.0)
+                        );
+                        float Offset = info.Height - h + info.Height * Padding;
+                        float ScaleX = (info.Height / picture.CullRect.Width) * 0.6F;
+                        float ScaleY = (info.Height / picture.CullRect.Height) * 0.6F;
+                        var matrix = SKMatrix.CreateScale(ScaleX * (1 - Padding * 2), ScaleY * (1 - Padding * 2));
+                        var img = SKImage.FromPicture(picture, dimension, matrix);
+                        canvas.DrawImage(img, new SKPoint(Offset + 8, Offset + 10));
+                        canvas.DrawText(ButtonText, xText + info.Height, yText, NewTextPaint);
+                    }
                 }
 
                 if (IndicatorType == cIndicator_10)
@@ -778,28 +781,32 @@ namespace Scada
                     string sBase64Svg = SvgBase64;
                     byte[] data = Convert.FromBase64String(sBase64Svg);
                     string decodedString = Encoding.UTF8.GetString(data);
+
+            
                     var picture = svg2.FromSvg(decodedString);
+                    if (picture != null)
+                    {
+                        var dimension = new SkiaSharp.SKSizeI
+                        (
+                             (int)Math.Ceiling(info.Height * 1.0),
+                             (int)Math.Ceiling(info.Height * 1.0)
+                        );
 
-                    var dimension = new SkiaSharp.SKSizeI
-                    (
-                         (int)Math.Ceiling(info.Height * 1.0),
-                         (int)Math.Ceiling(info.Height * 1.0)
-                    );
+                        //float Offset = info.Height - h + info.Height * Padding;
+                        float ScaleX = (info.Height / picture.CullRect.Width) * 0.6F;
+                        float ScaleY = (info.Height / picture.CullRect.Height) * 0.6F;
+                        var matrix = SKMatrix.CreateScale(ScaleX * (1 - Padding * 2), ScaleY * (1 - Padding * 2));
+                        var img = SKImage.FromPicture(picture, dimension, matrix);
 
-                    float Offset = info.Height - h + info.Height * Padding;
-                    float ScaleX = (info.Height / picture.CullRect.Width) * 0.6F;
-                    float ScaleY = (info.Height / picture.CullRect.Height) * 0.6F;
-                    var matrix = SKMatrix.CreateScale(ScaleX * (1 - Padding * 2), ScaleY * (1 - Padding * 2));
-                    var img = SKImage.FromPicture(picture, dimension, matrix);
+                        canvas.DrawRoundRect(progressBar, facePaint);
+                        canvas.DrawImage(img, new SKPoint(16, 6));
 
-                    canvas.DrawRoundRect(progressBar, facePaint);
-                    canvas.DrawImage(img, new SKPoint(16, 6));
+                        //NewTextPaint.MeasureText(ButtonText, ref textBounds);
+                        //float x = info.Width / 2 - textBounds.MidX;
+                        //canvas.DrawText(ButtonText, x, yText, NewTextPaint);
 
-                    //NewTextPaint.MeasureText(ButtonText, ref textBounds);
-                    //float x = info.Width / 2 - textBounds.MidX;
-                    //canvas.DrawText(ButtonText, x, yText, NewTextPaint);
-
-                    canvas.DrawText(ButtonText, xText + info.Height, yText, NewTextPaint);
+                        canvas.DrawText(ButtonText, xText + info.Height, yText, NewTextPaint);
+                    }
                 }
 
             }

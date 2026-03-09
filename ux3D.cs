@@ -228,7 +228,7 @@ namespace Scada
                 StrokeWidth = 0.5F
             };
 
-            float d = 0;
+
             float h = info.Height;
             float w = info.Width;
 

@@ -9,7 +9,6 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 using static Scada.DataAccessLayer;
 
-
 namespace Scada;
 
 public partial class MainPage : ContentPage
@@ -885,8 +884,8 @@ public partial class MainPage : ContentPage
 
     private void ScadaTagsGrid()
     {
-        double panelWith = 0.7;
-        double panelHeight = 0.7;
+        double panelWith = 0.4;
+        double panelHeight = 0.55;
 
         double x = (Width / 2) - panelWith * Width / 2;
         double y = (Height / 2) - panelHeight * Height / 2;
@@ -915,8 +914,8 @@ public partial class MainPage : ContentPage
 
         y = y + popupAlarm.CornerRadius;
         var TheColor = ScadaColor.uxItemColor;
-        y = y + 20;
-        for (int r = 0; r < 17; r++)
+        y = y + 30;
+        for (int r = 0; r < 14; r++)
         {
             if ((r % 2) == 0)
             {
@@ -1023,8 +1022,8 @@ public partial class MainPage : ContentPage
 
     private void ScadaParameters()
     {
-        double panelWith = 0.7;
-        double panelHeight = 0.7;
+        double panelWith = 0.4;
+        double panelHeight = 0.55;
 
         double x = (Width / 2) - panelWith * Width / 2;
         double y = (Height / 2) - panelHeight * Height / 2;
@@ -1057,7 +1056,7 @@ public partial class MainPage : ContentPage
         int r = 0;
          y = y + popupAlarm.CornerRadius;
         var TheColor = ScadaColor.uxItemColor;
-        y = y + 20;
+        y = y + 30;
         foreach (gridRow myRow in gridRows)
         {
             if ((r % 2) == 0)
@@ -1205,7 +1204,7 @@ public partial class MainPage : ContentPage
             AbsoluteLayout.SetLayoutBounds(myRowButton, new Rect(x, y, myRowButton.WidthRequest, 26));
             AbsoluteLayout.SetLayoutFlags(myRowButton, AbsoluteLayoutFlags.None);
             SKCanvasViews.Add(myRowButton);
-            AbsoluteLayout.SetLayoutBounds(tgRow, new Rect(x + 600, y + 2, 50, 22));
+            AbsoluteLayout.SetLayoutBounds(tgRow, new Rect(x + 520, y + 2, 50, 22));
             AbsoluteLayout.SetLayoutFlags(tgRow, AbsoluteLayoutFlags.None);
             SKCanvasViews.Add(tgRow);
             y = y + 26;

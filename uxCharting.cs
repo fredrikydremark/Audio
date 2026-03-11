@@ -450,7 +450,8 @@ end;
                                         }
                                         */
                                         canvas.DrawLine(oldPoint, thePoint, myPaint);
-
+                                     
+                                        
                                         /*
                                         if (pts.Count == 0)
                                         {
@@ -469,6 +470,7 @@ end;
                                             AddPoint++;
                                         }
                                         */
+
 
                                         /*
                                         var R = new SKRect(thePoint.X, thePoint.Y, thePoint.X + ((w / Count) / 1.5F), thePoint.Y + h);

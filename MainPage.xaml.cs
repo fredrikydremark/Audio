@@ -471,6 +471,7 @@ public partial class MainPage : ContentPage
     {
         double panelWith = 0.4;
         double panelHeight = 0.55;
+
         DataAccessLayer MyDataAccessLayer = new DataAccessLayer(ConnectionString);
         SKCanvasPopupViews.Clear();
         var gp = new ScadaButton();
@@ -519,6 +520,7 @@ public partial class MainPage : ContentPage
         AbsoluteLayout.SetLayoutBounds(s2, new Rect(x, y - 150, w, h));
         AbsoluteLayout.SetLayoutFlags(s2, AbsoluteLayoutFlags.None);
         SKCanvasPopupViews.Add(s2);
+
         /*
          var t1 = new ScadaText();
          t1.CornerRadius = 1;
@@ -916,6 +918,7 @@ public partial class MainPage : ContentPage
         AbsoluteLayout.SetLayoutFlags(popupAlarm, AbsoluteLayoutFlags.None);
         SKCanvasViews.Add(popupAlarm);
         CreateCloseButton(x, y, w, h);
+        CreateAddTagButton(x, y, w, h);
 
         y = y + popupAlarm.CornerRadius;
         var TheColor = ScadaColor.uxItemColor;

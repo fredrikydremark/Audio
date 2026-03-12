@@ -3360,7 +3360,6 @@ namespace Scada
                 cmdGetData.Parameters.AddWithValue("@TypeOfTag", myTag.TypeOfTag);
                 cmdGetData.Parameters.AddWithValue("@AlarmEnable", myTag.AlarmEnable);
                 cmdGetData.Parameters.AddWithValue("@StoreIntervalSec", myTag.StoreIntervalSec);
-
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
                 Connection.Close();

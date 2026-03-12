@@ -477,12 +477,16 @@ public partial class MainPage : ContentPage
         gp.AnchorX = 0;
         gp.AnchorY = 0;
         gp.CornerRadius = 10;
+        gp.IndicatorType = 1;
         gp.BarBackgroundColor = ScadaColor.uxPanelColor;
         gp.BackgroundColor = ScadaColor.uxPanelColor.ToMauiColor();
-        gp.GradientStartColor = ScadaColor.uxPopupColor;
-        gp.GradientEndColor = ScadaColor.uxPopupColor;
-        gp.IndicatorColor = ScadaColor.uxPopupColor;
-        gp.IndicatorType = 0;
+        gp.GradientStartColor = ScadaColor.uxItemColor;
+        gp.GradientEndColor = ScadaColor.uxItemColor;
+        gp.IndicatorColor = ScadaColor.uxPanelColor;
+        gp.TextColor = ScadaColor.uxTextColor;
+   
+
+
         double x = (Width / 2) - ((panelWith * Width)) / 2;
         double y = (Height / 2) - ((panelHeight * Height)) / 2;
         double w = (panelWith * Width);
@@ -582,6 +586,7 @@ public partial class MainPage : ContentPage
             }
             args.Handled = true;
         };
+        //x = x + 30;
         AbsoluteLayout.SetLayoutBounds(btnPages, new Rect(x + gp.WidthRequest - btnPages.WidthRequest - (btnPages.WidthRequest / 4), y + btnPages.HeightRequest / 4, 25, 25));
         AbsoluteLayout.SetLayoutFlags(btnPages, AbsoluteLayoutFlags.None);
         SKCanvasPopupViews.Add(btnPages);
@@ -5129,7 +5134,7 @@ public partial class MainPage : ContentPage
                 edtInputText.HeightRequest = 30;
 
                 edtInputText.TextColor = ScadaColor.uxTextColor.ToMauiColor();
-                edtInputText.BackgroundColor = ScadaColor.uxItemColor.ToMauiColor();
+                edtInputText.BackgroundColor = ScadaColor.uxPopupItemColor.ToMauiColor();
                 edtInputText.PlaceholderColor = ScadaColor.uxItemColor.ToMauiColor();
                 edtInputText.FontAttributes = FontAttributes.Bold;
                 edtInputText.IsVisible = true;

@@ -35,8 +35,9 @@ namespace Scada
         public int TagID { get; set; }
         public int TagSequence { get; set; }
         public int Status { get; set; }
-        public int Row { get; set; }
+        public string ?Color { get; set; }
         public int DataType { get; set; }
+        public int Row { get; set; }    
         public int Id { get; set; }
     }
 

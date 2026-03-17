@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Hosting;
+using ObjCBindings;
 using SkiaSharp.Views.Maui;
 using System.Globalization;
 using static Scada.ScadaClasses;
@@ -425,6 +426,104 @@ namespace Scada
             }
         }
 
+        public List<gridRow> GetDataSources()
+        {
+            try
+            {
+                var Connection = new Microsoft.Data.SqlClient.SqlConnection
+                {
+                    ConnectionString = sConnection
+                };
+                Connection.Open();
+                string sqlGetData = "select Value,Category from Parameters where Name ='Name' order by Name";
+
+                SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
+                cmdGetData.CommandText = sqlGetData;
+                SqlDataReader reader = cmdGetData.ExecuteReader();
+                var myDataSources = new List<gridRow>();
+                int nRow = 0;
+                while (reader.Read())
+                {
+                    myDataSources.Add(new gridRow
+                    {
+                        col1text = "Datasource",
+                        col1width = 300,
+                        col2text = reader.GetString(0),
+                        col2width = 400,
+                        col3text = "",
+                        col4text = "",
+                        col5text = "",
+                        col6text = "",
+                        DataType = 1,
+                        Id = reader.GetInt32(1),
+                        Row = nRow
+                    });
+                    nRow++;
+                }
+                cmdGetData.Dispose();
+                Connection.Close();
+                Connection = null;
+                return (myDataSources);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString(), ex);
+            }
+            finally
+            {
+            }
+        }
+
+
+
+        public List<gridRow> GetParams(int Category)
+        {
+            try
+            {
+                var Connection = new Microsoft.Data.SqlClient.SqlConnection
+                {
+                    ConnectionString = sConnection
+                };
+                Connection.Open();
+                string sqlGetData = "select Name,Value from Parameters where Category =@Category";
+
+                SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
+                cmdGetData.CommandText = sqlGetData;
+                cmdGetData.Parameters.AddWithValue("@Category", Category);
+                SqlDataReader reader = cmdGetData.ExecuteReader();
+                var myTagParams = new List<gridRow>();
+                int nRow = 0;
+                while (reader.Read())
+                {
+                    myTagParams.Add(new gridRow
+                    {
+                        col1text = reader.GetString(0),
+                        col1width = 300,
+                        col2text = reader.GetString(1),
+                        col2width = 400,
+                        col3text = "",
+                        col4text = "",
+                        col5text = "",
+                        col6text = "",
+                        DataType = 1,
+                        Row = nRow
+                    });
+                    nRow++;
+                }
+
+                cmdGetData.Dispose();
+                Connection.Close();
+                Connection = null;
+                return (myTagParams);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString(), ex);
+            }
+            finally
+            {
+            }
+        }
 
 
 
@@ -437,8 +536,7 @@ namespace Scada
                     ConnectionString = sConnection
                 };
                 Connection.Open();
-                string sqlGetData = "select tagname,description,HL,LL,Color,Unit,StoreIntervalSec,alarmenable,TypeOfTag from tags where TagID =@TagID";
-
+                string sqlGetData = "select tagname,description,HL,LL,Color,Unit,StoreIntervalSec,alarmenable,TypeOfTag,driver from tags where TagID =@TagID";
 
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
                 cmdGetData.CommandText = sqlGetData;
@@ -447,7 +545,7 @@ namespace Scada
 
                 var myTagParams = new List<gridRow>();
                 string tagname = "", description = "", HL = "", LL = "", Color = "", Unit = "", TypeOfTag = "";
-                string AlarmEnable = "0", StoreIntervalSec = "0";
+                string AlarmEnable = "0", StoreIntervalSec = "0", Driver = "0"; 
 
                 while (reader.Read())
                 {
@@ -460,6 +558,7 @@ namespace Scada
                     StoreIntervalSec = reader.GetInt32(6).ToString();
                     AlarmEnable = reader.GetInt32(7).ToString();
                     TypeOfTag = reader.GetInt32(8).ToString();
+                    Driver = reader.GetInt32(9).ToString();
                 }
 
                 myTagParams.Add(new gridRow
@@ -531,6 +630,7 @@ namespace Scada
                     DataType = 0,
                     Row = 4
                 });
+
                 myTagParams.Add(new gridRow
                 {
                     col1text = "Unit",
@@ -544,6 +644,7 @@ namespace Scada
                     DataType = 0,
                     Row = 5
                 });
+
                 myTagParams.Add(new gridRow
                 {
                     col1text = "StoreInterval Sec",
@@ -571,6 +672,7 @@ namespace Scada
                     DataType = 0,
                     Row = 7
                 });
+
                 myTagParams.Add(new gridRow
                 {
                     col1text = "Type of tag",
@@ -584,9 +686,21 @@ namespace Scada
                     DataType = 0,
                     Row = 8
                 });
+                myTagParams.Add(new gridRow
+                {
+                    col1text = "Driver",
+                    col1width = 300,
+                    col2text = Driver.ToString(),
+                    col2width = 400,
+                    col3text = "",
+                    col4text = "",
+                    col5text = "",
+                    col6text = "",
+                    DataType = 0,
+                    Row = 9
+                });
 
-                cmdGetData.Dispose();
-            
+                cmdGetData.Dispose();        
                 Connection.Close();
                 Connection = null;
                 return (myTagParams);
@@ -610,18 +724,12 @@ namespace Scada
                     ConnectionString = sConnection
                 };
                 Connection.Open();
-                string sqlGetData = "select tags.tagID,tags.driver,tags.tagname,tags.Description,tags.Value,tags.HL,tags.LL,tags.Color,Adam.adress,Adam.channel,OpcUA.endpoint,mqtt.adress from tags " +
-                                     "left join Adam on Adam.tagID = tags.tagID " +
-                                     "left join OpcUA on OpcUA.tagID = tags.tagID " +
-                                     "left join MQTT on MQTT.tagID = tags.tagID " +
-                                     "WHERE Driver <> 0 ";
+                string sqlGetData = "select tagID,driver,tagname,description,value,HL,LL,Unit,Color from tags " +                                
+                                    "WHERE Driver <> 0 ";
 
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
-
-
                 cmdGetData.CommandText = sqlGetData;
                 SqlDataReader reader = cmdGetData.ExecuteReader();
-
                 var gridRows = new List<gridRow>();
                 int r = 0;
                 while (reader.Read())
@@ -644,16 +752,15 @@ namespace Scada
 
                     string sLL = reader.GetDouble(5).ToString("0.0");
                     string sHL = reader.GetDouble(6).ToString("0.0");
-                    string sColor = reader.GetString(7);
-                    sColor = "";
-                    
+                    string sUnit = reader.GetString(7);
+                    string sColor = reader.GetString(8);
 
                     gridRows.Add(new gridRow
                     {
                         Status = 0,
                         col1text = TagDesc,
-                        col1width = 300F,
-                        col2text = sPV,
+                        col1width = 340F,
+                        col2text = sPV + sUnit,
                         col2width = 100F,
                         col3text = "",
                         col3width = 50F,
@@ -665,6 +772,7 @@ namespace Scada
                         col6width = 50F,
                         TagID = TagID,
                         Row = r,
+                        Color = sColor,
                         Id = 0
                     });
                     r++;
@@ -2522,7 +2630,6 @@ namespace Scada
         }
 
     
-
 
         public List<gridRow> ReadTags(string Filter, int TypeOfTag, int StartRow, int EndRow)
         {

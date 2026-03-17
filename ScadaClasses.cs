@@ -246,6 +246,8 @@ namespace Scada
         public const int uxItemSizeMenu = 52;
         public const int uxEditText = 53;
         public const int uxParameters = 54;
+        public const int uxDataSources = 55;
+        public const int uxDataSourcesSettings = 56;
 
         public const int CmdInvalid = -1;
         public const int Cmdgetpictures = 1;
@@ -270,6 +272,11 @@ namespace Scada
         public static int Previouspage = -1;
         public static bool Refresh = false;
 
+        //Parameter categories
+        public const int CategoryAdam = 1;
+        public const int CategoryMQTT = 2;
+        public const int CategoryOpcUA = 3;
+
         /*
 
         public class Param
@@ -279,27 +286,27 @@ namespace Scada
 
         }
         */
-    /*
-public class PopupRow
-{
-   public int ItemID { get; set; }
-   public int TagID { get; set; }
-   public int Left { get; set; }
-   public int Top { get; set; }
-   public int Width { get; set; }
-   public int Height { get; set; }
-   public int ItemType { get; set; }
-   public string InputType { get; set; }
-   public string GridAction { get; set; }
-   public string Action { get; set; }
-   public string Text { get; set; }
-   public string Destination { get; set; }
-   public string DestinationType { get; set; }
-   public string Value { get; set; }
-}
-*/
+        /*
+    public class PopupRow
+    {
+       public int ItemID { get; set; }
+       public int TagID { get; set; }
+       public int Left { get; set; }
+       public int Top { get; set; }
+       public int Width { get; set; }
+       public int Height { get; set; }
+       public int ItemType { get; set; }
+       public string InputType { get; set; }
+       public string GridAction { get; set; }
+       public string Action { get; set; }
+       public string Text { get; set; }
+       public string Destination { get; set; }
+       public string DestinationType { get; set; }
+       public string Value { get; set; }
+    }
+    */
 
-    public class Tag
+        public class Tag
         {
             public int TagID { get; set; }
             public double Value { get; set; }
@@ -317,9 +324,9 @@ public class PopupRow
 
         public class LibItem
         {
-            public string sTypeInLib { get; set; }
-            public string sNameInLib { get; set; }
-            public string sBase64 { get; set; }
+            public string ?sTypeInLib { get; set; }
+            public string ?sNameInLib { get; set; }
+            public string ?sBase64 { get; set; }
         }
 
         public class ChartSetting

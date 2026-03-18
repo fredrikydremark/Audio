@@ -1,8 +1,5 @@
 ﻿
 using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Hosting;
-using ObjCBindings;
-using SkiaSharp.Views.Maui;
 using System.Globalization;
 using static Scada.ScadaClasses;
 
@@ -475,7 +472,6 @@ namespace Scada
         }
 
 
-
         public List<gridRow> GetParams(int Category)
         {
             try
@@ -485,7 +481,7 @@ namespace Scada
                     ConnectionString = sConnection
                 };
                 Connection.Open();
-                string sqlGetData = "select Name,Value from Parameters where Category =@Category";
+                string sqlGetData = "select Name,Value,ID from Parameters where Category =@Category";
 
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
                 cmdGetData.CommandText = sqlGetData;
@@ -506,6 +502,7 @@ namespace Scada
                         col5text = "",
                         col6text = "",
                         DataType = 1,
+                        Id = reader.GetInt32(2),
                         Row = nRow
                     });
                     nRow++;

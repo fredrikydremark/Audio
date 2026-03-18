@@ -244,10 +244,11 @@ namespace Scada
         public const int uxTagsGrid = 50;
         public const int uxTagSettings = 51;
         public const int uxItemSizeMenu = 52;
-        public const int uxEditText = 53;
+        public const int uxEditTagText = 53;
         public const int uxParameters = 54;
-        public const int uxDataSources = 55;
-        public const int uxDataSourcesSettings = 56;
+        public const int uxEditParameterText = 55;
+        public const int uxDataSources = 56;
+        public const int uxDataSourcesSettings = 57;
 
         public const int CmdInvalid = -1;
         public const int Cmdgetpictures = 1;
@@ -269,13 +270,15 @@ namespace Scada
         public static int CurrentRow = 0;
         public static int CurrentType = 0;
         public static int CurrentTag = 0;
+        public static int CurrentID = -1;
+
         public static int Previouspage = -1;
         public static bool Refresh = false;
 
         //Parameter categories
-        public const int CategoryAdam = 1;
-        public const int CategoryMQTT = 2;
-        public const int CategoryOpcUA = 3;
+        public const int CategoryAdam = 101;
+        public const int CategoryMQTT = 102;
+        public const int CategoryOpcUA = 103;
 
         /*
 

@@ -30,7 +30,7 @@ namespace Scada
 
                 string sqlUpdate = "UPDATE Tags SET Value = @Value FROM Tags " +
                                    "JOIN Adam on Tags.TagID = Adam.TagID " +
-                                   "WHERE(Tags.TagID = Adam.TagID) AND ( Channel = @Channel AND Adress = @Adress) AND ( out=0 )";
+                                   "WHERE(Tags.TagID = Adam.TagID) AND ( Channel = @Channel AND Adress = @Adress )";
 
 
                 try

@@ -1681,7 +1681,7 @@ namespace Scada
 
                                 "Totals = Max(Value) " +
                                 "FROM ChannelData " +
-                                "WHERE ( tagID = @sTag ) AND (time > DateADD(second, -360, Getdate()) AND (time < DateADD(mi, 0, Getdate() )))" +                        // time < Getdate()
+                                "WHERE ( tagID = @sTag ) AND (time > DateADD(second, -360, Getdate()) AND (time < DateADD(mi, 0, Getdate() )))" +     // time < Getdate()
                                 "GROUP BY " +
                                   "DATEPART(YEAR, [time]), " +
                                   "DATEPART(MONTH, [time]), " +
@@ -1785,8 +1785,6 @@ namespace Scada
                     TempValues[0].Y = BeyondValue.v.ToString("0.0");
                     TempValues[TempValues.Count - 1].Y = LatestValue.v.ToString("0.0");
                 }
-
-
                 return (TempValues);
             }
             catch (Exception ex)

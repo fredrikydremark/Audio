@@ -5615,7 +5615,8 @@ public partial class MainPage : ContentPage
                 absoluteLayout.Add(edtSvgEditor);
             }
 
-            if ((ScadaClasses.CurrentScadaPopup == ScadaClasses.uxEditTagText) || (ScadaClasses.CurrentScadaPopup == ScadaClasses.uxEditParameterText))
+            if ((ScadaClasses.CurrentScadaPopup == ScadaClasses.uxEditTagText) ||
+                (ScadaClasses.CurrentScadaPopup == ScadaClasses.uxEditParameterText))
             {
                 edtInputText.Placeholder = "EditText";
                 edtInputText.WidthRequest = 340;

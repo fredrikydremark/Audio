@@ -3,6 +3,7 @@ using SkiaSharp.Views.Maui;
 using SkiaSharp.Views.Maui.Controls;
 using System.Net;
 using System.Text.RegularExpressions;
+using static Scada.ScadaClasses;
 
 namespace Scada
 {
@@ -291,6 +292,132 @@ end;
 
 
 
+        public class ValuePoint
+        {
+            public double Y { get; set; }
+            public ValuePoint(double y) { Y = y; }
+        }
+
+
+        // ---------------------------------------------------------------
+        public static List<ValuePoint> LinearInterpolate( List<double> samples,int targetCount)
+        {
+            int sampleCount = samples.Count;           // e.g. 30
+            var result = new List<ValuePoint>(targetCount);
+
+            for (int i = 0; i < targetCount; i++)
+            {
+                // Map position i → fractional index in the sample array
+                double t = (double)i / (targetCount - 1)        // 0.0 → 1.0
+                         * (sampleCount - 1);                   // 0.0 → 29.0
+
+                int lo = (int)Math.Floor(t);                    // lower sample index
+                int hi = Math.Min(lo + 1, sampleCount - 1);    // upper sample index
+                double frac = t - lo;                           // fractional part [0,1)
+
+                double y = samples[lo] + frac * (samples[hi] - samples[lo]);
+                result.Add(new ValuePoint(y));
+            }
+
+            return result;
+        }
+
+        
+        public static List<ValuePoint> CubicInterpolate( List<double> samples,int targetCount )
+        {
+            int sampleCount = samples.Count;
+            var result = new List<ValuePoint>(targetCount);
+
+            for (int i = 0; i < targetCount; i++)
+            {
+                double t = (double)i / (targetCount - 1) * (sampleCount - 1);
+                int p1 = (int)Math.Floor(t);
+                double frac = t - p1;
+
+                // Clamp neighbour indices to valid range
+                int p0 = Math.Max(p1 - 1, 0);
+                int p2 = Math.Min(p1 + 1, sampleCount - 1);
+                int p3 = Math.Min(p1 + 2, sampleCount - 1);
+
+                double v0 = samples[p0];
+                double v1 = samples[p1];
+                double v2 = samples[p2];
+                double v3 = samples[p3];
+
+                // Catmull-Rom formula
+                double y = 0.5 * (
+                    (2.0 * v1) +
+                    (-v0 + v2) * frac +
+                    (2.0 * v0 - 5.0 * v1 + 4.0 * v2 - v3) * frac * frac +
+                    (-v0 + 3.0 * v1 - 3.0 * v2 + v3) * frac * frac * frac
+                );
+                result.Add(new ValuePoint(y));
+            }
+            return result;
+        }
+
+        // Step 1: Extract the change points (X and Y) from the flat 360-array
+        public static List<(int X, double Y)> ExtractChangePoints(List<ValuePoint> values)
+        {
+            var changePoints = new List<(int X, double Y)>();
+
+            // Always include the first point
+            changePoints.Add((0, values[0].Y));
+
+            for (int i = 1; i < values.Count; i++)
+            {
+                if (values[i].Y != values[i - 1].Y)
+                    changePoints.Add((i, values[i].Y));  // X = position where it changed
+            }
+
+            // Always include the last point
+            int last = values.Count - 1;
+            if (changePoints[^1].X != last)
+                changePoints.Add((last, values[last].Y));
+
+            return changePoints;
+        }
+
+        // Step 2: Interpolate between change points back into the 360-array
+        public static List<ValuePoint> InterpolateFromChangePoints(
+            List<(int X, double Y)> changePoints,
+            int targetCount)
+        {
+            var result = new double[targetCount];
+
+            for (int seg = 0; seg < changePoints.Count - 1; seg++)
+            {
+                int x0 = changePoints[seg].X;
+                int x1 = changePoints[seg + 1].X;
+                double y0 = changePoints[seg].Y;
+                double y1 = changePoints[seg + 1].Y;
+
+                // Use Catmull-Rom neighbours for smooth curve
+                double yPrev = seg > 0
+                    ? changePoints[seg - 1].Y : y0;
+                double yNext = seg < changePoints.Count - 2
+                    ? changePoints[seg + 2].Y : y1;
+
+                int segLen = x1 - x0;
+                for (int i = 0; i <= segLen; i++)
+                {
+                    double t = (double)i / segLen;
+
+                    // Catmull-Rom cubic
+                    result[x0 + i] = 0.5 * (
+                        (2.0 * y0) +
+                        (-yPrev + y1) * t +
+                        (2.0 * yPrev - 5.0 * y0 + 4.0 * y1 - yNext) * t * t +
+                        (-yPrev + 3.0 * y0 - 3.0 * y1 + yNext) * t * t * t
+                    );
+                }
+            }
+
+            return result.Select(y => new ValuePoint(y)).ToList();
+        }
+
+
+
         protected override void OnPaintSurface(SKPaintSurfaceEventArgs e)
         {
             var info = e.Info;
@@ -368,7 +495,7 @@ end;
                         SubpixelText = true,
                         StrokeWidth = 2.5F,
                         FilterQuality= SKFilterQuality.High,
-                        StrokeCap = SKStrokeCap.Square
+                        StrokeCap = SKStrokeCap.Butt
                     };
 
                     SKPaint my2Paint = new SKPaint
@@ -381,6 +508,32 @@ end;
                         FilterQuality = SKFilterQuality.High,
                         StrokeCap = SKStrokeCap.Round
                     };
+
+                    var InterpolateValues = new List<ValuePoint>();
+                    double OldValue=0;
+                    foreach (var Value in LocalValues)
+                    {
+                        if (Double.TryParse(Value.Y, out double dValue))
+                        {
+                           InterpolateValues.Insert(0,new ValuePoint(dValue));
+                            OldValue = dValue;
+                        }
+                        else
+                        {
+                           InterpolateValues.Insert(0, new ValuePoint(OldValue));
+                        }
+                    }
+
+                    var changePoints = ExtractChangePoints(InterpolateValues);
+                    List<ValuePoint> SmoothedValues = InterpolateFromChangePoints(changePoints, LocalValues.Count);
+                    
+                    int idx= LocalValues.Count-1;
+                    foreach (var v in SmoothedValues) 
+                    {
+                        LocalValues[idx].Y =  v.Y.ToString("##.#");
+                        idx--;
+                    }
+
                     int Count = LocalValues.Count;
                     string sv = "0";
                     for (int m = 0; m < Count; m++)
@@ -412,7 +565,7 @@ end;
                     var oldPoint = new SKPoint(-1, -1);
 
                     var pts = new List<SKPoint>();
-                    int AddPoint = 0;
+                   // int AddPoint = 0;
                     while (x >= 0)
                     {
                         x = x - (w / Count);
@@ -470,7 +623,6 @@ end;
                                             AddPoint++;
                                         }
                                         */
-
 
                                         /*
                                         var R = new SKRect(thePoint.X, thePoint.Y, thePoint.X + ((w / Count) / 1.5F), thePoint.Y + h);

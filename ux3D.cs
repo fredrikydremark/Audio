@@ -10,7 +10,7 @@ namespace Scada
 
     public class Scada3D : SKCanvasView
     {
-        public Scada3D Init(double w, double h, Scada3D scb, ScadaClasses.Telegram Item, ScadaClasses.Colors Color)
+        public Scada3D Init(double w, double h, Scada3D scb, ScadaClasses.Telegram Item, ScadaClasses.SystemColors Color)
         {
             scb.AnchorX = 0;
             scb.AnchorY = 0;

@@ -603,8 +603,7 @@ end;
                                         }
                                         */
                                         canvas.DrawLine(oldPoint, thePoint, myPaint);
-                                     
-                                        
+                                                                           
                                         /*
                                         if (pts.Count == 0)
                                         {

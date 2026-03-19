@@ -11,7 +11,7 @@ namespace Scada
         public float LastY;
 
 
-        public CircularGauge Init(double w, double h, CircularGauge scb, ScadaClasses.Telegram Item, ScadaClasses.Colors Color)
+        public CircularGauge Init(double w, double h, CircularGauge scb, ScadaClasses.Telegram Item, ScadaClasses.SystemColors Color)
         {
             scb.AnchorX = 0;
             scb.AnchorY = 0;

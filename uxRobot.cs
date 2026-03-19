@@ -72,7 +72,7 @@ namespace Scada
         SKPoint MiddleJoint = new SKPoint(0, 0);
         SKPoint GripperJoint = new SKPoint(0, 0);
 
-        public ScadaRobot Init(double wScale, double hScale, ScadaRobot scb, ScadaClasses.Telegram Item, ScadaClasses.Colors Color)
+        public ScadaRobot Init(double wScale, double hScale, ScadaRobot scb, ScadaClasses.Telegram Item, ScadaClasses.SystemColors Color)
         {
             scb.AnchorX = 0;
             scb.AnchorY = 0;

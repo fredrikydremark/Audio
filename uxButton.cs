@@ -49,7 +49,7 @@ namespace Scada
         float localBtnFaceIntensity = 0f;
         bool FaceFadeEnabled = false;
 
-        public ScadaButton Init(double wScale, double hScale, ScadaButton scb, ScadaClasses.Telegram Item, ScadaClasses.Colors Color)
+        public ScadaButton Init(double wScale, double hScale, ScadaButton scb, ScadaClasses.Telegram Item, ScadaClasses.SystemColors Color)
         {
             scb.AnchorX = 0;
             scb.AnchorY = 0;

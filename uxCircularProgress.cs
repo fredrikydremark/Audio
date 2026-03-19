@@ -11,7 +11,7 @@ namespace Scada
         float localBtnIndicatorIntensity = 255f;
         float localBtnFaceIntensity = 255f;
         
-        public CircularProgress Init(double w, double h, CircularProgress scb, ScadaClasses.Telegram Item, ScadaClasses.Colors Color)
+        public CircularProgress Init(double w, double h, CircularProgress scb, ScadaClasses.Telegram Item, ScadaClasses.SystemColors Color)
         {
             scb.AnchorX = 0;
             scb.AnchorY = 0;
@@ -362,14 +362,7 @@ namespace Scada
             return new SKPoint(x, y);
         }
 
-        SKPaint Backgroundpaint = new SKPaint
-        {
-            IsAntialias = true,
-            Style = SKPaintStyle.StrokeAndFill,
-            Color = new SKColor(60, 60, 60, 220),
-            StrokeWidth = 0
-        };
-
+    
         SKPaint OnPaint = new SKPaint
         {
             IsAntialias = true,
@@ -393,8 +386,19 @@ namespace Scada
         {
             var info = e.Info;
             var canvas = e.Surface.Canvas;          
-            float MaxValue = 100;         
-    
+            float MaxValue = 100;
+
+
+            SKPaint Backgroundpaint = new SKPaint
+            {
+                IsAntialias = true,
+                Style = SKPaintStyle.StrokeAndFill,
+                Color = GradientStartColor,
+                StrokeWidth = 0,
+                FilterQuality = SKFilterQuality.High
+            };
+
+
             if (PV.Value > MaxValue ) 
             {
                PV.Value = (float)(MaxValue);

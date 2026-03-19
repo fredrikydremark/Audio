@@ -12,7 +12,7 @@ namespace Scada
         float DV = 0;
         float OV = 0;
 
-        public ScadaNumeric Init(double w, double h, ScadaNumeric scb, ScadaClasses.Telegram Item, ScadaClasses.Colors Color)
+        public ScadaNumeric Init(double w, double h, ScadaNumeric scb, ScadaClasses.Telegram Item, ScadaClasses.SystemColors Color)
         {
             scb.AnchorX = 0;
             scb.AnchorY = 0;

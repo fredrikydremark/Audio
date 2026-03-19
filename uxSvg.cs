@@ -7,7 +7,7 @@ using System.Text;
 namespace Scada
 {
     public class ScadaSvg : SKCanvasView
-    {   public ScadaSvg Init(double w, double h, ScadaSvg scb, ScadaClasses.Telegram Item, ScadaClasses.Colors Color)
+    {   public ScadaSvg Init(double w, double h, ScadaSvg scb, ScadaClasses.Telegram Item, ScadaClasses.SystemColors Color)
         {
             scb.AnchorX = 0;
             scb.AnchorY = 0;

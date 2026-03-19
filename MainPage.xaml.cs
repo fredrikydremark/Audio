@@ -13,7 +13,7 @@ namespace Scada;
 
 public partial class MainPage : ContentPage
 {
-    ScadaClasses.Colors ScadaColor = new ScadaClasses.Colors();
+    ScadaClasses.SystemColors ScadaColor = new ScadaClasses.SystemColors();
 
     public System.Timers.Timer bcktimer = new System.Timers.Timer();
     public System.Timers.Timer uxtimer = new System.Timers.Timer();
@@ -54,34 +54,55 @@ public partial class MainPage : ContentPage
         Preferences.Default.Set("ConnectionString", "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true");
         ConnectionString = Preferences.Default.Get("ConnectionString", ".\\SQLExpress");
         DataAccessLayer MyDataAccessLayer = new DataAccessLayer(ConnectionString);
-
         List<ScadaClasses.Telegram> ScadaItems = new List<ScadaClasses.Telegram>();
-       
-        Background = RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_BackgroundColor")).ToMauiColor();
-        ScadaColor.uxItemBackGroundColor = RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_ItemBackgroundColor"));
-        ScadaColor.uxPanelColor = RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_PanelColor"));
-        ScadaColor.uxItemColor = RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_ItemColor"));
-        ScadaColor.uxGradientStartColor = RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_ItemColor"));
-        ScadaColor.uxGradientEndColor = RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_ItemColor"));
-        ScadaColor.uxPopupColor= RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_PopupColor"));
-        ScadaColor.uxPopupItemColor = RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_PopupItemColor"));
-        ScadaColor.uxTextColor = RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_TextColor"));
-        ScadaColor.uxLightColor = RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_LightColor"));
-        ScadaColor.uxHoverColor = RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_HoverColor"));
-        ScadaColor.uxTouchColor = RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_TouchColor"));
-        ScadaColor.uxOffColor = RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_OffColor"));
-        ScadaColor.uxLightColor = RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_LightColor"));
-        ScadaColor.uxGridThinColor = RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_GridThinColor"));
-        ScadaColor.uxGridFatColor = RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_GridFatColor"));
-        ScadaColor.uxTransparentButtonColor = RGBStringToColor(MyDataAccessLayer.GetTagColorByName("System_TransparentButtonColor"));
 
+        if (MyDataAccessLayer.ReadParameterByName("DARK") == "1")
+        {
+            ScadaColor.uxBackGroundColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkBackgroundColor"));
+            ScadaColor.uxItemBackGroundColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkItemBackgroundColor"));
+            ScadaColor.uxPanelColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkPanelColor"));
+            ScadaColor.uxItemColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkItemColor"));
+            ScadaColor.uxGradientStartColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkItemColor"));
+            ScadaColor.uxGradientEndColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkItemColor"));
+            ScadaColor.uxPopupColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkPopupColor"));
+            ScadaColor.uxPopupItemColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkPopupItemColor"));
+            ScadaColor.uxTextColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkTextColor"));
+            ScadaColor.uxLightColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkLightColor"));
+            ScadaColor.uxHoverColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkHoverColor"));
+            ScadaColor.uxTouchColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkTouchColor"));
+            ScadaColor.uxOffColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkOffColor"));
+            ScadaColor.uxLightColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkLightColor"));
+            ScadaColor.uxGridThinColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkGridThinColor"));
+            ScadaColor.uxGridFatColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkGridFatColor"));
+            ScadaColor.uxTransparentButtonColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkTransparentButtonColor"));
+        }
+        else
+        {
+            ScadaColor.uxBackGroundColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtBackgroundColor"));
+            ScadaColor.uxItemBackGroundColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtItemBackgroundColor"));
+            ScadaColor.uxPanelColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtPanelColor"));
+            ScadaColor.uxItemColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtItemColor"));
+            ScadaColor.uxGradientStartColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtItemColor"));
+            ScadaColor.uxGradientEndColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtItemColor"));
+            ScadaColor.uxPopupColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtPopupColor"));
+            ScadaColor.uxPopupItemColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtPopupItemColor"));
+            ScadaColor.uxTextColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtTextColor"));
+            ScadaColor.uxLightColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtLightColor"));
+            ScadaColor.uxHoverColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtHoverColor"));
+            ScadaColor.uxTouchColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtTouchColor"));
+            ScadaColor.uxOffColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtOffColor"));
+            ScadaColor.uxLightColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtLightColor"));
+            ScadaColor.uxGridThinColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtGridThinColor"));
+            ScadaColor.uxGridFatColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtGridFatColor"));
+            ScadaColor.uxTransparentButtonColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtTransparentButtonColor"));
+        }
+        Background = ScadaColor.uxBackGroundColor.ToMauiColor();
 
         var ListOfDigitalTagsToStore = MyDataAccessLayer.GetDigitalTagsToStore(-1);
         foreach (var Tag in ListOfDigitalTagsToStore)
         {
             MyDataAccessLayer.StoreTagValue(Tag.TagID, Tag.Value);
         }
-
 
         if (MyDataAccessLayer.GetTagValueByName("System_EnableADAM") > 0.5)
         {
@@ -95,10 +116,7 @@ public partial class MainPage : ContentPage
         uxtimer.Interval = 100;
         uxtimer.Elapsed += uxUpdate;
         uxtimer.Start();
-
     }
-
-
 
 
     static public SKColor RGBStringToColor(string RGBColor)
@@ -121,45 +139,6 @@ public partial class MainPage : ContentPage
     }
 
 
-    public static SKColor HexStringToColor(string hexColor)
-    {
-        string hc = ExtractHexDigits(hexColor);
-
-        string r = hc.Substring(0, 2);
-        string g = hc.Substring(2, 2);
-        string b = hc.Substring(4, 2);
-        string a = hc.Substring(6, 2);
-        SKColor color;
-        try
-        {
-            byte ri = Byte.Parse(r, NumberStyles.HexNumber);
-            byte gi = Byte.Parse(g, NumberStyles.HexNumber);
-            byte bi = Byte.Parse(b, NumberStyles.HexNumber);
-            byte ai = Byte.Parse(a, NumberStyles.HexNumber);
-            color = new SKColor(ri, gi, bi, ai);
-        }
-        catch
-        {
-            color = SKColor.Empty;
-        }
-        return color;
-    }
-
-
-    public static string ExtractHexDigits(string input)
-    {
-        // remove any characters that are not digits (like #)
-        var isHexDigit = new Regex("[abcdefABCDEF\\d]+", RegexOptions.Compiled);
-        string newnum = "";
-        foreach (char c in input)
-        {
-            if (isHexDigit.IsMatch(c.ToString()))
-                newnum += c.ToString();
-        }
-        return newnum;
-    }
-
-  
     void bckUpdate(object sender, EventArgs e)
     {
         try
@@ -188,7 +167,6 @@ public partial class MainPage : ContentPage
                         StepSignal = 25F;
                     }
                     RampSignal = RampSignal + RampDirection;
-
 
                     MyDataAccessLayer.SetTagValueByName("RampSignal", RampSignal);
                     var rnd = new Random();

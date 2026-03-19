@@ -195,8 +195,44 @@ namespace Scada
             {
             }
         }
+        public string ReadParameterByName(string Name)
+        {
+            try
+            {
+                int ParameterType = -1;
+                string sParam = "";
+                var Connection = new Microsoft.Data.SqlClient.SqlConnection
+                {
+                    ConnectionString = sConnection
+                };
+                Connection.Open();
+                string sqlGetData = "select Value,Type from Parameters where Name = @Name";
+                SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
+                cmdGetData.Parameters.AddWithValue("@Name", Name);
+                cmdGetData.CommandText = sqlGetData;
+                SqlDataReader reader = cmdGetData.ExecuteReader();
 
-        public int NewParameter(string Name, int Type, string Value)
+                while (reader.Read())
+                {
+                    sParam = reader.GetString(0);
+                    ParameterType = reader.GetInt32(1);
+                }
+                cmdGetData.Dispose();
+                Connection.Close();
+                Connection = null;
+                return (sParam);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString(), ex);
+            }
+            finally
+            {
+            }
+        }
+
+
+        public int NewParameter(string Name, int Type, string Value, int Category)
         {
             try
             {
@@ -205,11 +241,12 @@ namespace Scada
                     ConnectionString = sConnection
                 };
                 Connection.Open();
-                string sqlInsertData = "insert into Parameters(Name,Value, Type ) values (@Name, @Value, @Type )";
+                string sqlInsertData = "insert into Parameters(Name,Value, Type, Category ) values (@Name, @Value, @Type ,@Category )";
                 SqlCommand cmdGetData = new SqlCommand(sqlInsertData, Connection);
                 cmdGetData.Parameters.AddWithValue("@Name", Name);
                 cmdGetData.Parameters.AddWithValue("@Type", Type);
                 cmdGetData.Parameters.AddWithValue("@Value", Value);
+                cmdGetData.Parameters.AddWithValue("@Category", Category);
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
                 Connection.Close();
@@ -256,7 +293,6 @@ namespace Scada
             {
             }
         }
-
 
 
         public int DeleteParameter(string Name)
@@ -4446,11 +4482,13 @@ namespace Scada
             }
         }
 
+        /*
         public void SetSystemColors(int ColorScheme)
         {
             switch (ColorScheme)
             {
                 case 0:
+                    var c = GetTagColorByName("System_Lt_BackgroundColor");
                     SetTagColorByTagName("System_BackgroundColor", "rgba(0,0,0,255)");
                     SetTagColorByTagName("System_PopupColor", "rgba(70,70,70,245)");
                     SetTagColorByTagName("System_PopupItemColor", "rgba(120,120,120,50)");
@@ -4484,5 +4522,6 @@ namespace Scada
 
             };
         }
+        */
     }
 }

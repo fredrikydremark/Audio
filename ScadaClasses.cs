@@ -369,7 +369,7 @@ namespace Scada
             public int TypeOfTag { get; set; }
         }
 
-        public class Colors
+        public class SystemColors
         {
             public SKColor uxBackGroundColor = new SKColor();
             public SKColor uxItemBackGroundColor = new SKColor();
@@ -425,14 +425,44 @@ namespace Scada
             public List<ItemValue> ?ItemValues { get; set; }
   
         }
-
-
-
-
-
-
-
-
-
     }
+
+ /*
+public static SKColor HexStringToColor(string hexColor)
+{
+    string hc = ExtractHexDigits(hexColor);
+    string r = hc.Substring(0, 2);
+    string g = hc.Substring(2, 2);
+    string b = hc.Substring(4, 2);
+    string a = hc.Substring(6, 2);
+    SKColor color;
+    try
+    {
+        byte ri = Byte.Parse(r, NumberStyles.HexNumber);
+        byte gi = Byte.Parse(g, NumberStyles.HexNumber);
+        byte bi = Byte.Parse(b, NumberStyles.HexNumber);
+        byte ai = Byte.Parse(a, NumberStyles.HexNumber);
+        color = new SKColor(ri, gi, bi, ai);
+    }
+    catch
+    {
+        color = SKColor.Empty;
+    }
+    return color;
+}
+
+public static string ExtractHexDigits(string input)
+{
+    // remove any characters that are not digits (like #)
+    var isHexDigit = new Regex("[abcdefABCDEF\\d]+", RegexOptions.Compiled);
+    string newnum = "";
+    foreach (char c in input)
+    {
+        if (isHexDigit.IsMatch(c.ToString()))
+            newnum += c.ToString();
+    }
+    return newnum;
+}
+*/
+
 }

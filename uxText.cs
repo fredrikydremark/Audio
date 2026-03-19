@@ -6,7 +6,7 @@ namespace Scada
 {
     public class ScadaText : SKCanvasView
     {
-        public ScadaText Init(double w, double h, ScadaText scb, ScadaClasses.Telegram Item, ScadaClasses.Colors Color)
+        public ScadaText Init(double w, double h, ScadaText scb, ScadaClasses.Telegram Item, ScadaClasses.SystemColors Color)
         {
             scb.AnchorX = 0;
             scb.AnchorY = 0;

@@ -29,8 +29,8 @@ namespace Scada
                 int Value = Convert.ToInt16(sBinaryValue.Substring((sBinaryValue.Length - 1) - Channel, 1));
 
                 string sqlUpdate = "UPDATE Tags SET Value = @Value FROM Tags " +
-                                   "JOIN Adam on Tags.TagID = Adam.TagID " +
-                                   "WHERE(Tags.TagID = Adam.TagID) AND ( Channel = @Channel AND Adress = @Adress )";
+                                   "JOIN AdamChannels on Tags.TagID = AdamChannels.TagID " +
+                                   "WHERE(Tags.TagID = AdamChannels.TagID) AND ( Channel = @Channel AND Adress = @Adress )";
 
 
                 try
@@ -72,10 +72,10 @@ namespace Scada
                 };
 
                 //string sqlGetData = "SELECT Channel,SetValue FROM Adam where adress = @Adress ORDER BY Adress ASC,Channel ASC";
-                string sqlGetData = "SELECT Channel, Tags.Value FROM Adam " +
-                                     "JOIN Tags on Tags.TagID = Adam.TagID " +
-                                     "Where ( Tags.TagID = Adam.TagID ) AND ( adress = @Adress) " +
-                                     "ORDER BY Adress ASC, Channel ASC ";
+                string sqlGetData = "SELECT Channel, Tags.Value FROM AdamChannels " +
+                                     "JOIN Tags on Tags.TagID = AdamChannels.TagID " +
+                                     "Where ( Tags.TagID = AdamChannels.TagID ) AND ( adress = @Adress) " +
+                                     "ORDER BY Adress ASC, Channel ASC";
 
 
                 myConnection.Open();
@@ -178,8 +178,6 @@ namespace Scada
                 {
                 }
 
-
-
                 Adress = 1;// Adress of the Analog 4017 
                 for (Channel = 0; Channel < 3; Channel++)
                 {
@@ -280,8 +278,8 @@ namespace Scada
                         if ((Value < 99999) && (Value > -99999))
                         {
                             string sqlUpdate = "UPDATE Tags SET Value = @Value, ValueTime = Getdate(),StatusQuality=0 FROM Tags " +
-                                               "JOIN Adam on Tags.TagID = Adam.TagID " +
-                                               "WHERE(Tags.TagID = Adam.TagID) AND ( Channel = @Channel AND Adress = @Adress)";
+                                               "JOIN AdamChannels on Tags.TagID = AdamChannels.TagID " +
+                                               "WHERE(Tags.TagID = AdamChannels.TagID) AND ( Channel = @Channel AND Adress = @Adress)";
 
                             try
                             {

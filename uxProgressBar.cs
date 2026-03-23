@@ -252,6 +252,7 @@ namespace Scada
                     FilterQuality = SKFilterQuality.High,
                     StrokeWidth = 0.4F
                 };
+
                 h = 12;
                 float MaxValue = 100F;
                 float l = (PV.Value / MaxValue) * w;
@@ -263,7 +264,7 @@ namespace Scada
                 {
                     IsAntialias = true,
                     Style = SKPaintStyle.StrokeAndFill,
-                    Color = new SKColor(50, 225, 50, 220),
+                    Color = new SKColor(3, 156, 35, 255),
                     BlendMode = SKBlendMode.Overlay,
                     FilterQuality = SKFilterQuality.High,
                     StrokeWidth = 1

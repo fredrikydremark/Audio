@@ -56,47 +56,6 @@ public partial class MainPage : ContentPage
         DataAccessLayer MyDataAccessLayer = new DataAccessLayer(ConnectionString);
         List<ScadaClasses.Telegram> ScadaItems = new List<ScadaClasses.Telegram>();
 
-        if (MyDataAccessLayer.ReadParameterByName("DARK") == "1")
-        {
-            ScadaColor.uxBackGroundColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkBackgroundColor"));
-            ScadaColor.uxItemBackGroundColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkItemBackgroundColor"));
-            ScadaColor.uxPanelColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkPanelColor"));
-            ScadaColor.uxItemColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkItemColor"));
-            ScadaColor.uxGradientStartColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkItemColor"));
-            ScadaColor.uxGradientEndColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkItemColor"));
-            ScadaColor.uxPopupColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkPopupColor"));
-            ScadaColor.uxPopupItemColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkPopupItemColor"));
-            ScadaColor.uxTextColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkTextColor"));
-            ScadaColor.uxLightColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkLightColor"));
-            ScadaColor.uxHoverColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkHoverColor"));
-            ScadaColor.uxTouchColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkTouchColor"));
-            ScadaColor.uxOffColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkOffColor"));
-            ScadaColor.uxLightColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkLightColor"));
-            ScadaColor.uxGridThinColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkGridThinColor"));
-            ScadaColor.uxGridFatColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkGridFatColor"));
-            ScadaColor.uxTransparentButtonColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkTransparentButtonColor"));
-        }
-        else
-        {
-            ScadaColor.uxBackGroundColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtBackgroundColor"));
-            ScadaColor.uxItemBackGroundColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtItemBackgroundColor"));
-            ScadaColor.uxPanelColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtPanelColor"));
-            ScadaColor.uxItemColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtItemColor"));
-            ScadaColor.uxGradientStartColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtItemColor"));
-            ScadaColor.uxGradientEndColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtItemColor"));
-            ScadaColor.uxPopupColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtPopupColor"));
-            ScadaColor.uxPopupItemColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtPopupItemColor"));
-            ScadaColor.uxTextColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtTextColor"));
-            ScadaColor.uxLightColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtLightColor"));
-            ScadaColor.uxHoverColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtHoverColor"));
-            ScadaColor.uxTouchColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtTouchColor"));
-            ScadaColor.uxOffColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtOffColor"));
-            ScadaColor.uxLightColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtLightColor"));
-            ScadaColor.uxGridThinColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtGridThinColor"));
-            ScadaColor.uxGridFatColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtGridFatColor"));
-            ScadaColor.uxTransparentButtonColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtTransparentButtonColor"));
-        }
-        Background = ScadaColor.uxBackGroundColor.ToMauiColor();
 
         var ListOfDigitalTagsToStore = MyDataAccessLayer.GetDigitalTagsToStore(-1);
         foreach (var Tag in ListOfDigitalTagsToStore)
@@ -141,6 +100,7 @@ public partial class MainPage : ContentPage
 
     void bckUpdate(object sender, EventArgs e)
     {
+        
         try
         {
             MainThread.BeginInvokeOnMainThread(() =>
@@ -464,8 +424,6 @@ public partial class MainPage : ContentPage
         gp.IndicatorColor = ScadaColor.uxPanelColor;
         gp.TextColor = ScadaColor.uxTextColor;
    
-
-
         double x = (Width / 2) - ((panelWith * Width)) / 2;
         double y = (Height / 2) - ((panelHeight * Height)) / 2;
         double w = (panelWith * Width);
@@ -498,7 +456,6 @@ public partial class MainPage : ContentPage
         AbsoluteLayout.SetLayoutBounds(s2, new Rect(x, y - 150, w, h));
         AbsoluteLayout.SetLayoutFlags(s2, AbsoluteLayoutFlags.None);
         SKCanvasPopupViews.Add(s2);
-
         /*
          var t1 = new ScadaText();
          t1.CornerRadius = 1;
@@ -566,6 +523,7 @@ public partial class MainPage : ContentPage
             }
             args.Handled = true;
         };
+
         //x = x + 30;
         AbsoluteLayout.SetLayoutBounds(btnPages, new Rect(x + gp.WidthRequest - btnPages.WidthRequest - (btnPages.WidthRequest / 4), y + btnPages.HeightRequest / 4, 25, 25));
         AbsoluteLayout.SetLayoutFlags(btnPages, AbsoluteLayoutFlags.None);
@@ -1039,8 +997,6 @@ public partial class MainPage : ContentPage
 
 
 
-
-
     private void ScadaDataSources()
     {
         double panelWith = 0.4;
@@ -1108,27 +1064,6 @@ public partial class MainPage : ContentPage
                 FontSize = 18.5F,
                 SvgBase64 = "",
             };
-            /*
-            var gridRow = new gridRow
-            {
-                Status = 0,
-                col1text = "",
-                col1width = 0F,
-                col2text = "",
-                col2width = 0F,
-                col3text = "",
-                col3width = 0F,
-                col4text = "",
-                col4width = 0F,
-                col5text = "",
-                col5width = 0F,
-                col6text = "",
-                col6width = 0F,
-                TagID = -1,
-                Row = r,
-                Id = myRow.Id
-            };
-            */
 
             myRowButton.ButtonRow = myRow;
             myRowButton.ButtonText = "";
@@ -1227,8 +1162,6 @@ public partial class MainPage : ContentPage
             r++;
         }
     }
-
-
 
 
 
@@ -1401,9 +1334,9 @@ public partial class MainPage : ContentPage
         SKCanvasViews.Add(popupAlarm);
         CreateCloseButton(x, y, w, h);
 
-
         DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);
-        var gridRows = MyDataAccessLayer.ReadParameters(sFilter,0,5);
+        var gridRows = MyDataAccessLayer.ReadParameters(sFilter,5,10,0,10);
+
         int r = 0;
          y = y + popupAlarm.CornerRadius;
         var TheColor = ScadaColor.uxItemColor;
@@ -1438,28 +1371,7 @@ public partial class MainPage : ContentPage
                 FontSize = 18.5F,
                 SvgBase64 = "",
             };
-            /*
-            var gridRow = new gridRow
-            {
-                Status = 0,
-                col1text = "",
-                col1width = 0F,
-                col2text = "",
-                col2width = 0F,
-                col3text = "",
-                col3width = 0F,
-                col4text = "",
-                col4width = 0F,
-                col5text = "",
-                col5width = 0F,
-                col6text = "",
-                col6width = 0F,
-                TagID = -1,
-                Row = r,
-                Id = myRow.Id
-            };
-            */
-       
+     
             myRowButton.ButtonRow = myRow;
             myRowButton.ButtonText = "";
 
@@ -1502,6 +1414,8 @@ public partial class MainPage : ContentPage
                             MyDataAccessLayer.UpdateParameterValue(myRowButton.ButtonRow.Id, tgRow.SV.Value.ToString());
                         }
                         tgRow.InvalidateSurface();
+                        ScadaClasses.Previouspage = -1;
+                        ScadaClasses.Refresh = true;
                         break;
                 }
                 args.Handled = true;
@@ -2937,20 +2851,65 @@ public partial class MainPage : ContentPage
         Window.MinimumWidth = 1280;
         Window.MinimumHeight = 600;
         Window.IsMaximizable = true;
+        
         DataAccessLayer MyDataAccessLayer = new DataAccessLayer(ConnectionString);
 
         if ((ScadaClasses.Previouspage != ScadaClasses.Currentpage) && (ScadaItems.Count > 0))
         {
+            if (MyDataAccessLayer.ReadParameterByName("Dark mode") == "1")
+            {
+                ScadaColor.uxBackGroundColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkBackgroundColor"));
+                ScadaColor.uxItemBackGroundColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkItemBackgroundColor"));
+                ScadaColor.uxPanelColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkPanelColor"));
+                ScadaColor.uxItemColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkItemColor"));
+                ScadaColor.uxGradientStartColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkItemColor"));
+                ScadaColor.uxGradientEndColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkItemColor"));
+                ScadaColor.uxPopupColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkPopupColor"));
+                ScadaColor.uxPopupItemColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkPopupItemColor"));
+                ScadaColor.uxTextColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkTextColor"));
+                ScadaColor.uxLightColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkLightColor"));
+                ScadaColor.uxHoverColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkHoverColor"));
+                ScadaColor.uxTouchColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkTouchColor"));
+                ScadaColor.uxOffColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkOffColor"));
+                ScadaColor.uxLightColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkLightColor"));
+                ScadaColor.uxGridThinColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkGridThinColor"));
+                ScadaColor.uxGridFatColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkGridFatColor"));
+                ScadaColor.uxTransparentButtonColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkTransparentButtonColor"));
+            }
+            else
+            {
+                ScadaColor.uxBackGroundColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtBackgroundColor"));
+                ScadaColor.uxItemBackGroundColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtItemBackgroundColor"));
+                ScadaColor.uxPanelColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtPanelColor"));
+                ScadaColor.uxItemColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtItemColor"));
+                ScadaColor.uxGradientStartColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtItemColor"));
+                ScadaColor.uxGradientEndColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtItemColor"));
+                ScadaColor.uxPopupColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtPopupColor"));
+                ScadaColor.uxPopupItemColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtPopupItemColor"));
+                ScadaColor.uxTextColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtTextColor"));
+                ScadaColor.uxLightColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtLightColor"));
+                ScadaColor.uxHoverColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtHoverColor"));
+                ScadaColor.uxTouchColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtTouchColor"));
+                ScadaColor.uxOffColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtOffColor"));
+                ScadaColor.uxLightColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtLightColor"));
+                ScadaColor.uxGridThinColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtGridThinColor"));
+                ScadaColor.uxGridFatColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtGridFatColor"));
+                ScadaColor.uxTransparentButtonColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemLtTransparentButtonColor"));
+            }
+            Background = ScadaColor.uxBackGroundColor.ToMauiColor();
+            //AppShell.SetBackgroundColor(this, Color.FromRgb(255, 0, 0));
+            //AppShell.SetTitleColor(this, Color.FromRgb(255, 0, 0));
             SKCanvasPopupViews.Clear();
             SKCanvasViews.Clear();
             //ContentViews.Clear();
+
             if (Designing == true)
             {
                 ScadaGrid grdSnap = new ScadaGrid();
                 grdSnap.ItemID = 0;
                 grdSnap.AnchorX = 0;
                 grdSnap.AnchorY = 0;
-               // grdSnap.CornerRadius = 0;
+                //grdSnap.CornerRadius = 0;
                 grdSnap.BarBackgroundColor = ScadaColor.uxPanelColor;
                 grdSnap.BackgroundColor = ScadaColor.uxPanelColor.ToMauiColor();
                 grdSnap.GridThinColor = ScadaColor.uxGridThinColor;
@@ -2958,17 +2917,15 @@ public partial class MainPage : ContentPage
                 grdSnap.WidthRequest = Window.Width;
                 grdSnap.HeightRequest = Window.Height;
                 //grdSnap.AlternativeTextColor = ScadaColor.uxPanelColor;
-               // grdSnap.TextColor = ScadaColor.uxTextColor;
+                //grdSnap.TextColor = ScadaColor.uxTextColor;
                 grdSnap.IsEnabled = true;
                 grdSnap.IsVisible = true;
                 AbsoluteLayout.SetLayoutBounds(grdSnap, new Rect(0, 0, Window.Width, Window.Height));            
                 AbsoluteLayout.SetLayoutFlags(grdSnap, AbsoluteLayoutFlags.None);
-
                 //AbsoluteLayout.SetLayoutBounds(grdSnap, new Rect(0, 0, Width, Height));
                 //AbsoluteLayout.SetLayoutFlags(grdSnap, AbsoluteLayoutFlags.None);
                 SKCanvasViews.Add(grdSnap);
             }
-
 
             foreach (var ScadaItem in ScadaItems)
                 switch (ScadaItem.ItemType)

@@ -444,11 +444,10 @@ namespace Scada
             GreenPaint.StrokeWidth = radius / 2.5F;
             BluePaint.StrokeWidth = radius / 2.5F;
 
-            var degrees1 = ( 25F / 100F ) * 360F;
-            var degrees2 = (25F / 100F) * 360F;
-            var degrees3 = (25F / 100F) * 360F;
-
-            //Draw Circle        
+            var degrees1 = (10F / 100F) * 360F;
+            var degrees2 = (20F / 100F) * 360F;
+            var degrees3 = (40F / 100F) * 360F;
+       
             canvas.Clear();
             canvas.DrawArc(new SKRect(0, 0, info.Height, info.Height), -90F, 360F, false, Backgroundpaint);           
             canvas.DrawArc(new SKRect(frame, frame, diam - frame, diam - frame), -90F, degrees1,false,RedPaint);

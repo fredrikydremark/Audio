@@ -106,13 +106,22 @@ public partial class MainPage : ContentPage
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 DataAccessLayer MyDataAccessLayer = new DataAccessLayer(ConnectionString);
-                if (MyDataAccessLayer.GetTagValueByName("System_EnableADAM") > 0.5)
+                if (MyDataAccessLayer.ReadParameterByName("Enable ADAM") == "1")
                 {
                     Adam AdamLayer = new Adam();
                     AdamLayer.ReadADAM();
                 }
+                if (MyDataAccessLayer.ReadParameterByName("Enable MQTT") == "1")
+                {
+           
+                }
+                if (MyDataAccessLayer.ReadParameterByName("Enable OpcUA") == "1")
+                {
+            
+                }
 
-                if (MyDataAccessLayer.GetTagValueByName("System_EnableSimulation") > 0.5)
+
+                if (MyDataAccessLayer.ReadParameterByName("Enable simulation") == "1")
                 {
                     float RampSignal = MyDataAccessLayer.GetTagValueByName("RampSignal");
                     if ((RampSignal > 75F) && (RampDirection > 0))
@@ -311,20 +320,20 @@ public partial class MainPage : ContentPage
         AbsoluteLayout.SetLayoutFlags(t1, AbsoluteLayoutFlags.None);
         SKCanvasPopupViews.Add(t1);
 
-        var btnPages = new ScadaButton();
-        btnPages.GradientStartColor = ScadaColor.uxItemColor;
-        btnPages.GradientEndColor = ScadaColor.uxItemColor;
-        btnPages.CornerRadius = 15;
-        btnPages.ItemID = 1;
-        btnPages.EnableTouchEvents = true;
-        btnPages.InputTransparent = false;
-        btnPages.HeightRequest = 25;
-        btnPages.WidthRequest = 25;
-        btnPages.SvgBase64 = MyDataAccessLayer.LoadLibItem("Closecross", 1);
-        btnPages.IndicatorType = 3;
-        btnPages.Margin = 0.15F;
-        btnPages.ButtonText = "";
-        btnPages.Touch += (sender, args) =>
+        var btnSettings = new ScadaButton();
+        btnSettings.GradientStartColor = ScadaColor.uxItemColor;
+        btnSettings.GradientEndColor = ScadaColor.uxItemColor;
+        btnSettings.CornerRadius = 15;
+        btnSettings.ItemID = 1;
+        btnSettings.EnableTouchEvents = true;
+        btnSettings.InputTransparent = false;
+        btnSettings.HeightRequest = 25;
+        btnSettings.WidthRequest = 25;
+        btnSettings.SvgBase64 = MyDataAccessLayer.LoadLibItem("CogWheel", 1);
+        btnSettings.IndicatorType = 3;
+        btnSettings.Margin = 0.15F;
+        btnSettings.ButtonText = "";
+        btnSettings.Touch += (sender, args) =>
         {
             switch (args.ActionType)
             {
@@ -338,22 +347,68 @@ public partial class MainPage : ContentPage
                     break;
 
                 case SKTouchAction.Moved:
-                    btnPages.GradientStartColor = ScadaColor.uxHoverColor;
-                    btnPages.GradientEndColor = ScadaColor.uxHoverColor;
-                    btnPages.IndicatorColor = ScadaColor.uxHoverColor;
+                    btnSettings.GradientStartColor = ScadaColor.uxHoverColor;
+                    btnSettings.GradientEndColor = ScadaColor.uxHoverColor;
+                    btnSettings.IndicatorColor = ScadaColor.uxHoverColor;
                     break;
 
                 case SKTouchAction.Exited:
-                    btnPages.GradientStartColor = ScadaColor.uxItemColor;
-                    btnPages.GradientEndColor = ScadaColor.uxItemColor;
-                    btnPages.IndicatorColor = ScadaColor.uxItemColor;
+                    btnSettings.GradientStartColor = ScadaColor.uxItemColor;
+                    btnSettings.GradientEndColor = ScadaColor.uxItemColor;
+                    btnSettings.IndicatorColor = ScadaColor.uxItemColor;
                     break;
             }
             args.Handled = true;
         };
-        AbsoluteLayout.SetLayoutBounds(btnPages, new Rect(x + gp.WidthRequest - btnPages.WidthRequest - (btnPages.WidthRequest / 4), y + btnPages.HeightRequest / 4, 25, 25));
-        AbsoluteLayout.SetLayoutFlags(btnPages, AbsoluteLayoutFlags.None);
-        SKCanvasPopupViews.Add(btnPages);
+        AbsoluteLayout.SetLayoutBounds(btnSettings, new Rect(x + btnSettings.WidthRequest/5, y + btnSettings.HeightRequest/5, 25, 25));
+        AbsoluteLayout.SetLayoutFlags(btnSettings, AbsoluteLayoutFlags.None);
+        SKCanvasPopupViews.Add(btnSettings);
+
+
+        var btnClose = new ScadaButton();
+        btnClose.GradientStartColor = ScadaColor.uxItemColor;
+        btnClose.GradientEndColor = ScadaColor.uxItemColor;
+        btnClose.CornerRadius = 15;
+        btnClose.ItemID = 1;
+        btnClose.EnableTouchEvents = true;
+        btnClose.InputTransparent = false;
+        btnClose.HeightRequest = 25;
+        btnClose.WidthRequest = 25;
+        btnClose.SvgBase64 = MyDataAccessLayer.LoadLibItem("Closecross", 1);
+        btnClose.IndicatorType = 3;
+        btnClose.Margin = 0.15F;
+        btnClose.ButtonText = "";
+        btnClose.Touch += (sender, args) =>
+        {
+            switch (args.ActionType)
+            {
+                case SKTouchAction.Released:
+                    ScadaClasses.Previouspage = -1;
+                    ScadaClasses.CurrentScadaPopup = -1;
+                    ScadaClasses.Refresh = true;
+                    break;
+
+                case SKTouchAction.Pressed:
+                    break;
+
+                case SKTouchAction.Moved:
+                    btnClose.GradientStartColor = ScadaColor.uxHoverColor;
+                    btnClose.GradientEndColor = ScadaColor.uxHoverColor;
+                    btnClose.IndicatorColor = ScadaColor.uxHoverColor;
+                    break;
+
+                case SKTouchAction.Exited:
+                    btnClose.GradientStartColor = ScadaColor.uxItemColor;
+                    btnClose.GradientEndColor = ScadaColor.uxItemColor;
+                    btnClose.IndicatorColor = ScadaColor.uxItemColor;
+                    break;
+            }
+            args.Handled = true;
+        };
+        AbsoluteLayout.SetLayoutBounds(btnClose, new Rect(x + gp.WidthRequest - btnClose.WidthRequest - (btnClose.WidthRequest / 4), y + btnClose.HeightRequest / 4, 25, 25));
+        AbsoluteLayout.SetLayoutFlags(btnClose, AbsoluteLayoutFlags.None);
+        SKCanvasPopupViews.Add(btnClose);
+
 
         var a1 = new ScadaButton();
         a1.CornerRadius = 10;
@@ -403,6 +458,7 @@ public partial class MainPage : ContentPage
         AbsoluteLayout.SetLayoutFlags(a1, AbsoluteLayoutFlags.None);
         SKCanvasPopupViews.Add(a1);
     }
+
 
 
     private void ScadaUpload()
@@ -3259,15 +3315,7 @@ public partial class MainPage : ContentPage
                         trh.HeightRequest = (Height / 100) * ScadaItem.Height;
                         trh.AlternativeTextColor = ScadaColor.uxTextColor;
                         trh.TextColor = ScadaColor.uxTextColor;
-                        /*
-                        try
-                        {
-                            trh.SV = float.Parse(ScadaItem.SV, CultureInfo.InvariantCulture);
-                        }
-                        catch
-                        {
-                        }
-                        */
+      
                         trh.IsEnabled = true;
                         trh.IsVisible = true;
                         trh.EnableTouchEvents = true;
@@ -3276,10 +3324,7 @@ public partial class MainPage : ContentPage
                         {
                             trh = (HistGraph)AttachDesignEvents(trh, ScadaItem);
                         }
-                        else
-                        {
-
-                        }
+        
                         AbsoluteLayout.SetLayoutBounds(trh, new Rect(
                                            (Width / 100) * ScadaItem.Left,
                                            (Height / 100) * ScadaItem.Top,
@@ -3732,7 +3777,7 @@ public partial class MainPage : ContentPage
                         sim.StyleId = ScadaItem.ItemID.ToString();
                         sim.AnchorX = 0;
                         sim.AnchorY = 0;
-                        sim.CornerRadius = 1;
+                        sim.CornerRadius = 10;
                         sim.BarBackgroundColor = ScadaColor.uxBackGroundColor;
                         sim.BackgroundColor = ScadaColor.uxBackGroundColor.ToMauiColor();
                         sim.GradientStartColor = ScadaColor.uxItemColor;
@@ -3782,7 +3827,7 @@ public partial class MainPage : ContentPage
                         controller.StyleId = ScadaItem.ItemID.ToString();
                         controller.AnchorX = 0;
                         controller.AnchorY = 0;
-                        controller.CornerRadius = 1;
+                        controller.CornerRadius = 10;
                         controller.BarBackgroundColor = ScadaColor.uxBackGroundColor;
                         controller.BackgroundColor = ScadaColor.uxBackGroundColor.ToMauiColor();
                         controller.GradientStartColor = ScadaColor.uxItemColor;

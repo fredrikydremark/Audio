@@ -279,6 +279,7 @@ namespace Scada
         public const int CategoryAdam = 101;
         public const int CategoryMQTT = 102;
         public const int CategoryOpcUA = 103;
+        public const int CategorySimulator = 103;
 
         /*
 
@@ -347,7 +348,6 @@ namespace Scada
         /*
         public List<ScadaClasses.LibItem> LibItems = new List<ScadaClasses.LibItem>();
 
-        
         public class ScadaControlTelegram
         {
             public int MessageType { get; set; }

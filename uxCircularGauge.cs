@@ -10,7 +10,6 @@ namespace Scada
         public int State;
         public float LastY;
 
-
         public CircularGauge Init(double w, double h, CircularGauge scb, ScadaClasses.Telegram Item, ScadaClasses.SystemColors Color)
         {
             scb.AnchorX = 0;
@@ -312,7 +311,7 @@ namespace Scada
             float radius = (info.Height / 2);
             float frame = radius / 3;
             float diam = radius * 2;
-            float aspect = (float)info.Width / (float)info.Height;
+            //float aspect = (float)info.Width / (float)info.Height;
 
             canvas.Clear();
             canvas.DrawArc(new SKRect(0, 0, info.Height, info.Height), -90, 360, false, Backgroundpaint);     
@@ -349,31 +348,31 @@ namespace Scada
                     w = w / 2;
                     canvas.RotateRadians( -v + 3.14F, radius + Xstop, radius + Ystop );
                     canvas.DrawText( scale.ToString(), radius + Xstop-w, radius + Ystop, TextPaint );
-                    canvas.RotateRadians( v + 3.14F, radius + Xstop, radius + Ystop );             
+                    canvas.RotateRadians( v + 3.1415F, radius + Xstop, radius + Ystop );             
                 }
             }
 
           
             float angle = SV.Value;
-            var Path2 = new SKPath { FillType = SKPathFillType.EvenOdd }; 
+            var Path = new SKPath { FillType = SKPathFillType.EvenOdd }; 
 
             v = (float)(ValueToAngle((double)(angle-5)));
             X = radius+(float)(Math.Sin((double)(v)) * (radius - (radius / 1.5)));
             Y = radius+(float)(Math.Cos((double)(v)) * (radius - (radius / 1.5)));
-            Path2.MoveTo(X, Y);
+            Path.MoveTo(X, Y);
 
             v = (float)(ValueToAngle((double)(angle)));
             X = radius+(float)(Math.Sin((double)(v)) * (radius - (radius / 2.0)));
             Y = radius+(float)(Math.Cos((double)(v)) * (radius - (radius / 2.0)));
-            Path2.LineTo(X, Y);
+            Path.LineTo(X, Y);
 
             v = (float)(ValueToAngle((double)(angle+5)));
             X = radius+(float)(Math.Sin((double)(v)) * (radius - (radius / 1.5)));
             Y = radius+(float)(Math.Cos((double)(v)) * (radius - (radius / 1.5)));
-            Path2.LineTo(X, Y);
+            Path.LineTo(X, Y);
             
-            Path2.Close();
-            canvas.DrawPath(Path2, pathStroke2);            
+            Path.Close();
+            canvas.DrawPath(Path, pathStroke2);            
         }
     }
 }

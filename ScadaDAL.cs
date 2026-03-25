@@ -3,7 +3,7 @@ using ExCSS;
 using Microsoft.Data.SqlClient;
 using System.Globalization;
 using static Scada.ScadaClasses;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+
 
 
 namespace Scada

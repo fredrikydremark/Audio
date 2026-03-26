@@ -252,6 +252,7 @@ namespace Scada
                     FilterQuality = SKFilterQuality.High,
                     StrokeWidth = 0.4F
                 };
+
                 h = 12;
                 float MaxValue = 100F;
                 float l = (PV.Value / MaxValue) * w;
@@ -263,20 +264,12 @@ namespace Scada
                 {
                     IsAntialias = true,
                     Style = SKPaintStyle.StrokeAndFill,
-                    Color = new SKColor(50, 225, 50, 220),
-                    StrokeWidth = 1
-                };
-                /*
-                var pathStroke2 = new SKPaint
-                {
-                    IsAntialias = true,
-                    Style = SKPaintStyle.StrokeAndFill,
-                    Color = new SKColor(240, 32, 32, 200),
+                    Color = new SKColor(3, 156, 35, 255),
                     BlendMode = SKBlendMode.Overlay,
                     FilterQuality = SKFilterQuality.High,
                     StrokeWidth = 1
                 };
-            */
+        
                 canvas.Clear();
                 canvas.DrawRoundRect(backgroundBar, background);
                 canvas.DrawRoundRect(progressBar, Barpaint);

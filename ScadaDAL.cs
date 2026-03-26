@@ -1,9 +1,9 @@
 ﻿
+using ExCSS;
 using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Hosting;
-using SkiaSharp.Views.Maui;
 using System.Globalization;
 using static Scada.ScadaClasses;
+
 
 
 namespace Scada
@@ -27,14 +27,11 @@ namespace Scada
                 cmdGetData.Parameters.AddWithValue("@Name", Name);
                 cmdGetData.CommandText = sqlGetData;
                 SqlDataReader reader = cmdGetData.ExecuteReader();
-
                 while (reader.Read())
                 {
                     sBase64 = reader.GetString(0);
                 }
-
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (sBase64);
@@ -65,7 +62,6 @@ namespace Scada
 
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (0);
@@ -95,7 +91,6 @@ namespace Scada
                 cmdGetData.Parameters.AddWithValue("@Name", Name);
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (0);
@@ -111,7 +106,7 @@ namespace Scada
         }
 
 
-        public List<gridRow> ReadParameters(string Filter, int StartRow, int EndRow)
+        public List<gridRow> ReadParameters(string Filter, int StartCatRange, int EndCatRange, int StartRow, int EndRow )
         {
             try
             {
@@ -122,10 +117,15 @@ namespace Scada
                 };
                 Connection.Open();
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
-                sqlGetData = "select ID,Name,Value,type FROM(SELECT *, ROW_NUMBER() OVER (ORDER BY Name) as row FROM [Parameters]) a WHERE (row > @StartRow and row <= @EndRow)";
+
+                sqlGetData = "SELECT ID, Name, Value, Type, Category FROM( SELECT *, ROW_NUMBER() OVER(ORDER BY Name) AS row " +
+                             "FROM( SELECT * FROM[Parameters] WHERE Category >= @StartCatRange AND Category <= @EndCatRange ) filtered ) numbered WHERE row >= @StartRow AND row <= @EndRow";
+
+                cmdGetData.Parameters.AddWithValue("@StartCatRange", StartCatRange);
+                cmdGetData.Parameters.AddWithValue("@EndCatRange", EndCatRange);
                 cmdGetData.Parameters.AddWithValue("@StartRow", StartRow);
                 cmdGetData.Parameters.AddWithValue("@EndRow", EndRow);
-               
+
                 cmdGetData.CommandText = sqlGetData;
                 SqlDataReader reader = cmdGetData.ExecuteReader();
 
@@ -133,28 +133,29 @@ namespace Scada
                 int row = 0;
                 while (reader.Read())
                 {
-                    gridRows.Add(new gridRow
-                    {
-                        Id = reader.GetInt32(0),
-                        col1text = reader.GetString(1),
-                        col1width = 100F,
-                        col2text = "",
-                        col2width = 10F,
-                        col3text = "",
-                        col3width = 10F,
-                        col4text = "",
-                        col4width = 10F,
-                        col5text = "",
-                        col5width = 10F,
-                        col6text = "",
-                        col6width = 10F,
-                        Status = -1,
-                        Row = row
-                    });
-                    row++;
+              
+                        gridRows.Add(new gridRow
+                        {
+                            Id = reader.GetInt32(0),
+                            col1text = reader.GetString(1),
+                            col1width = 100F,
+                            col2text = "",
+                            col2width = 10F,
+                            col3text = "",
+                            col3width = 10F,
+                            col4text = "",
+                            col4width = 10F,
+                            col5text = "",
+                            col5width = 10F,
+                            col6text = "",
+                            col6width = 10F,
+                            Status = -1,
+                            Row = row
+                        });
+                        row++;
+                   
                 }
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (gridRows);
@@ -203,8 +204,44 @@ namespace Scada
             {
             }
         }
+        public string ReadParameterByName(string Name)
+        {
+            try
+            {
+                int ParameterType = -1;
+                string sParam = "";
+                var Connection = new Microsoft.Data.SqlClient.SqlConnection
+                {
+                    ConnectionString = sConnection
+                };
+                Connection.Open();
+                string sqlGetData = "select Value,Type from Parameters where Name = @Name";
+                SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
+                cmdGetData.Parameters.AddWithValue("@Name", Name);
+                cmdGetData.CommandText = sqlGetData;
+                SqlDataReader reader = cmdGetData.ExecuteReader();
 
-        public int NewParameter(string Name, int Type, string Value)
+                while (reader.Read())
+                {
+                    sParam = reader.GetString(0);
+                    ParameterType = reader.GetInt32(1);
+                }
+                cmdGetData.Dispose();
+                Connection.Close();
+                Connection = null;
+                return (sParam);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString(), ex);
+            }
+            finally
+            {
+            }
+        }
+
+
+        public int NewParameter(string Name, int Type, string Value, int Category)
         {
             try
             {
@@ -213,11 +250,12 @@ namespace Scada
                     ConnectionString = sConnection
                 };
                 Connection.Open();
-                string sqlInsertData = "insert into Parameters(Name,Value, Type ) values (@Name, @Value, @Type )";
+                string sqlInsertData = "insert into Parameters(Name,Value, Type, Category ) values (@Name, @Value, @Type ,@Category )";
                 SqlCommand cmdGetData = new SqlCommand(sqlInsertData, Connection);
                 cmdGetData.Parameters.AddWithValue("@Name", Name);
                 cmdGetData.Parameters.AddWithValue("@Type", Type);
                 cmdGetData.Parameters.AddWithValue("@Value", Value);
+                cmdGetData.Parameters.AddWithValue("@Category", Category);
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
                 Connection.Close();
@@ -251,7 +289,6 @@ namespace Scada
                 
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (0);
@@ -265,7 +302,6 @@ namespace Scada
             {
             }
         }
-
 
 
         public int DeleteParameter(string Name)
@@ -315,7 +351,6 @@ namespace Scada
                 SqlDataReader reader = cmdGetData.ExecuteReader();
 
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (0);
@@ -370,7 +405,6 @@ namespace Scada
                     });
                 }
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (myTags);
@@ -421,7 +455,6 @@ namespace Scada
                     });
                 }
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (myTags);
@@ -435,6 +468,104 @@ namespace Scada
             }
         }
 
+        public List<gridRow> GetDataSources()
+        {
+            try
+            {
+                var Connection = new Microsoft.Data.SqlClient.SqlConnection
+                {
+                    ConnectionString = sConnection
+                };
+                Connection.Open();
+                string sqlGetData = "select Value,Category from Parameters where Name ='Name' order by Name";
+
+                SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
+                cmdGetData.CommandText = sqlGetData;
+                SqlDataReader reader = cmdGetData.ExecuteReader();
+                var myDataSources = new List<gridRow>();
+                int nRow = 0;
+                while (reader.Read())
+                {
+                    myDataSources.Add(new gridRow
+                    {
+                        col1text = "Datasource",
+                        col1width = 300,
+                        col2text = reader.GetString(0),
+                        col2width = 400,
+                        col3text = "",
+                        col4text = "",
+                        col5text = "",
+                        col6text = "",
+                        DataType = 1,
+                        Id = reader.GetInt32(1),
+                        Row = nRow
+                    });
+                    nRow++;
+                }
+                cmdGetData.Dispose();
+                Connection.Close();
+                Connection = null;
+                return (myDataSources);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString(), ex);
+            }
+            finally
+            {
+            }
+        }
+
+
+        public List<gridRow> GetParams(int Category)
+        {
+            try
+            {
+                var Connection = new Microsoft.Data.SqlClient.SqlConnection
+                {
+                    ConnectionString = sConnection
+                };
+                Connection.Open();
+                string sqlGetData = "select Name,Value,ID from Parameters where Category =@Category";
+
+                SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
+                cmdGetData.CommandText = sqlGetData;
+                cmdGetData.Parameters.AddWithValue("@Category", Category);
+                SqlDataReader reader = cmdGetData.ExecuteReader();
+                var myTagParams = new List<gridRow>();
+                int nRow = 0;
+                while (reader.Read())
+                {
+                    myTagParams.Add(new gridRow
+                    {
+                        col1text = reader.GetString(0),
+                        col1width = 300,
+                        col2text = reader.GetString(1),
+                        col2width = 400,
+                        col3text = "",
+                        col4text = "",
+                        col5text = "",
+                        col6text = "",
+                        DataType = 1,
+                        Id = reader.GetInt32(2),
+                        Row = nRow
+                    });
+                    nRow++;
+                }
+
+                cmdGetData.Dispose();
+                Connection.Close();
+                Connection = null;
+                return (myTagParams);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString(), ex);
+            }
+            finally
+            {
+            }
+        }
 
 
 
@@ -447,8 +578,7 @@ namespace Scada
                     ConnectionString = sConnection
                 };
                 Connection.Open();
-                string sqlGetData = "select tagname,description,HL,LL,Color,Unit,StoreIntervalSec,alarmenable,TypeOfTag from tags where TagID =@TagID";
-
+                string sqlGetData = "select tagname,description,HL,LL,Color,Unit,StoreIntervalSec,alarmenable,TypeOfTag,driver from tags where TagID =@TagID";
 
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
                 cmdGetData.CommandText = sqlGetData;
@@ -457,7 +587,7 @@ namespace Scada
 
                 var myTagParams = new List<gridRow>();
                 string tagname = "", description = "", HL = "", LL = "", Color = "", Unit = "", TypeOfTag = "";
-                string AlarmEnable = "0", StoreIntervalSec = "0";
+                string AlarmEnable = "0", StoreIntervalSec = "0", Driver = "0"; 
 
                 while (reader.Read())
                 {
@@ -470,6 +600,7 @@ namespace Scada
                     StoreIntervalSec = reader.GetInt32(6).ToString();
                     AlarmEnable = reader.GetInt32(7).ToString();
                     TypeOfTag = reader.GetInt32(8).ToString();
+                    Driver = reader.GetInt32(9).ToString();
                 }
 
                 myTagParams.Add(new gridRow
@@ -541,6 +672,7 @@ namespace Scada
                     DataType = 0,
                     Row = 4
                 });
+
                 myTagParams.Add(new gridRow
                 {
                     col1text = "Unit",
@@ -554,6 +686,7 @@ namespace Scada
                     DataType = 0,
                     Row = 5
                 });
+
                 myTagParams.Add(new gridRow
                 {
                     col1text = "StoreInterval Sec",
@@ -581,6 +714,7 @@ namespace Scada
                     DataType = 0,
                     Row = 7
                 });
+
                 myTagParams.Add(new gridRow
                 {
                     col1text = "Type of tag",
@@ -594,9 +728,21 @@ namespace Scada
                     DataType = 0,
                     Row = 8
                 });
+                myTagParams.Add(new gridRow
+                {
+                    col1text = "Driver",
+                    col1width = 300,
+                    col2text = Driver.ToString(),
+                    col2width = 400,
+                    col3text = "",
+                    col4text = "",
+                    col5text = "",
+                    col6text = "",
+                    DataType = 0,
+                    Row = 9
+                });
 
-                cmdGetData.Dispose();
-                cmdGetData = null;
+                cmdGetData.Dispose();        
                 Connection.Close();
                 Connection = null;
                 return (myTagParams);
@@ -611,8 +757,6 @@ namespace Scada
         }
 
 
-
-
         public List<gridRow> LoadTags()
         {
             try
@@ -622,18 +766,12 @@ namespace Scada
                     ConnectionString = sConnection
                 };
                 Connection.Open();
-                string sqlGetData = "select tags.tagID,tags.driver,tags.tagname,tags.Description,tags.Value,tags.HL,tags.LL,tags.Color,Adam.adress,Adam.channel,OpcUA.endpoint,mqtt.adress from tags " +
-                                     "left join Adam on Adam.tagID = tags.tagID " +
-                                     "left join OpcUA on OpcUA.tagID = tags.tagID " +
-                                     "left join MQTT on MQTT.tagID = tags.tagID " +
-                                     "WHERE Driver <> 0 ";
+                string sqlGetData = "select tagID,driver,tagname,description,value,HL,LL,Unit,Color from tags " +                                
+                                    "WHERE Driver <> 0 ";
 
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
-
-
                 cmdGetData.CommandText = sqlGetData;
                 SqlDataReader reader = cmdGetData.ExecuteReader();
-
                 var gridRows = new List<gridRow>();
                 int r = 0;
                 while (reader.Read())
@@ -656,34 +794,33 @@ namespace Scada
 
                     string sLL = reader.GetDouble(5).ToString("0.0");
                     string sHL = reader.GetDouble(6).ToString("0.0");
-                    string sColor = reader.GetString(7);
-                    sColor = "";
-                    string sColumn = "";
+                    string sUnit = reader.GetString(7);
+                    string sColor = reader.GetString(8);
 
                     gridRows.Add(new gridRow
                     {
                         Status = 0,
-                        col1text = TagName,
-                        col1width = 250F,
-                        col2text = TagDesc,
-                        col2width = 250F,
-                        col3text = sPV,
+                        col1text = TagDesc,
+                        col1width = 340F,
+                        col2text = sPV + sUnit,
+                        col2width = 100F,
+                        col3text = "",
                         col3width = 50F,
-                        col4text = sLL,
+                        col4text = "",
                         col4width = 50F,
-                        col5text = sHL,
+                        col5text = "",
                         col5width = 50F,
                         col6text = "",
                         col6width = 50F,
                         TagID = TagID,
                         Row = r,
+                        Color = sColor,
                         Id = 0
                     });
                     r++;
 
                 }
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (gridRows);
@@ -799,7 +936,6 @@ namespace Scada
 
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (0);
@@ -842,7 +978,6 @@ namespace Scada
                     });
                 }
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (Rows);
@@ -887,7 +1022,6 @@ namespace Scada
                 cmdGetData.Parameters.AddWithValue("@Radius", oTelegram.Radius);
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (0);
@@ -1005,7 +1139,6 @@ namespace Scada
                 {
                     ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog = scada; Integrated Security=true; TrustServerCertificate=true"
                 };
-                double ItemWidth = 10;
                 string sqlGetData = "select Width,Height from ItemSizes where ItemType =@ItemType and nSize =@Size";
                 Connection.Open();
                 var cmdGetData = new Microsoft.Data.SqlClient.SqlCommand(sqlGetData, Connection);
@@ -1073,7 +1206,6 @@ namespace Scada
 
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (0);
@@ -1108,7 +1240,6 @@ namespace Scada
 
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (0);
@@ -1141,7 +1272,6 @@ namespace Scada
 
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (0);
@@ -1173,7 +1303,6 @@ namespace Scada
                 cmdGetData.Parameters.AddWithValue("@TagID", TagID);
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (0);
@@ -1204,7 +1333,6 @@ namespace Scada
                 cmdGetData.Parameters.AddWithValue("@TagID", TagID);
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (0);
@@ -1234,7 +1362,6 @@ namespace Scada
                 cmdGetData.Parameters.AddWithValue("@TagID", TagID);
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (0);
@@ -1266,7 +1393,6 @@ namespace Scada
                 cmdGetData.Parameters.AddWithValue("@TagID", TagID);
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (0);
@@ -1297,7 +1423,6 @@ namespace Scada
                 cmdGetData.Parameters.AddWithValue("@TagID", TagID);
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (0);
@@ -1328,7 +1453,6 @@ namespace Scada
                 cmdGetData.Parameters.AddWithValue("@TagID", TagID);
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (0);
@@ -1360,7 +1484,6 @@ namespace Scada
                 cmdGetData.Parameters.AddWithValue("@TagID", TagID);
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (0);
@@ -1391,7 +1514,6 @@ namespace Scada
                 cmdGetData.Parameters.AddWithValue("@TagID", TagID);
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (0);
@@ -1421,7 +1543,6 @@ namespace Scada
                 cmdGetData.Parameters.AddWithValue("@TagID", TagID);
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (0);
@@ -1454,7 +1575,6 @@ namespace Scada
 
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (0);
@@ -1487,7 +1607,6 @@ namespace Scada
                 cmdGetData.Parameters.AddWithValue("@TagID", TagID);
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (0);
@@ -1535,7 +1654,6 @@ namespace Scada
                 }
                 reader.Close();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (v);
@@ -1574,7 +1692,6 @@ namespace Scada
 
                 reader.Close();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (v);
@@ -1609,7 +1726,7 @@ namespace Scada
 
                                 "Totals = Max(Value) " +
                                 "FROM ChannelData " +
-                                "WHERE ( tagID = @sTag ) AND (time > DateADD(second, -360, Getdate()) AND (time < DateADD(mi, 0, Getdate() )))" +                        // time < Getdate()
+                                "WHERE ( tagID = @sTag ) AND (time > DateADD(second, -360, Getdate()) AND (time < DateADD(mi, 0, Getdate() )))" +     // time < Getdate()
                                 "GROUP BY " +
                                   "DATEPART(YEAR, [time]), " +
                                   "DATEPART(MONTH, [time]), " +
@@ -1696,7 +1813,6 @@ namespace Scada
                 TempValues[TempValues.Count - 1].Y = TempValues[TempValues.Count - 2].Y;
                 reader.Close();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 dValue BeyondValue = GetBeyondValue(MyTag);
@@ -1714,8 +1830,6 @@ namespace Scada
                     TempValues[0].Y = BeyondValue.v.ToString("0.0");
                     TempValues[TempValues.Count - 1].Y = LatestValue.v.ToString("0.0");
                 }
-
-
                 return (TempValues);
             }
             catch (Exception ex)
@@ -1846,7 +1960,6 @@ namespace Scada
 
                 reader.Close();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
 
@@ -1981,7 +2094,6 @@ namespace Scada
 
                 reader.Close();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (TempValues);
@@ -2075,7 +2187,6 @@ namespace Scada
 
                 reader.Close();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (TempValues);
@@ -2175,7 +2286,6 @@ namespace Scada
 
                 reader.Close();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (TempValues);
@@ -2260,7 +2370,6 @@ namespace Scada
 
                 reader.Close();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (TempValues);
@@ -2331,7 +2440,6 @@ namespace Scada
 
                 reader.Close();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
 
@@ -2375,7 +2483,6 @@ namespace Scada
 
                 reader.Close();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
 
                 Connection = null;
@@ -2435,7 +2542,6 @@ namespace Scada
                 }
                 reader.Close();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (GraphItems);
@@ -2477,7 +2583,6 @@ namespace Scada
                 }
                 reader.Close();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (sItems);
@@ -2508,7 +2613,6 @@ namespace Scada
                 cmdGetData.ExecuteNonQuery();
 
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
 
                 Connection = null;
@@ -2551,7 +2655,6 @@ namespace Scada
                 cmdGetData.Parameters.AddWithValue("@Minute", myChartsettiing.iMinute);
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (0);
@@ -2567,7 +2670,6 @@ namespace Scada
         }
 
     
-
 
         public List<gridRow> ReadTags(string Filter, int TypeOfTag, int StartRow, int EndRow)
         {
@@ -2614,7 +2716,6 @@ namespace Scada
                     idx++;
                 }
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (gridRows);
@@ -2751,11 +2852,11 @@ namespace Scada
                     }
                     if (oTempTele.ItemType == ScadaClasses.uxTagsGrid)
                     {
-                        oTempTele.gridRows = LoadTags();
+                        //oTempTele.gridRows = LoadTags();
                     }
                     if (oTempTele.ItemType == ScadaClasses.uxParameters)
                     {
-                        oTempTele.gridRows = ReadParameters("",1,5);
+                       // oTempTele.gridRows = ReadParameters("",1,5);
                     }
 
                     if (oTempTele.ItemType == ScadaClasses.uxHistoryChart)
@@ -2798,11 +2899,9 @@ namespace Scada
                         }
                     }
                     Items.Add(oTempTele);
-                    oTempTele = null;
                 }
                 reader.Close();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (Items);
@@ -2831,7 +2930,6 @@ namespace Scada
                 cmdGetData.Parameters.AddWithValue("@ItemID", ItemID);
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (0);
@@ -2862,7 +2960,6 @@ namespace Scada
                 cmdGetData.Parameters.AddWithValue("@TagID", TagID);
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (0);
@@ -2985,9 +3082,7 @@ namespace Scada
                     });
                     r++;
                 }
-
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (gridRows);
@@ -3017,7 +3112,6 @@ namespace Scada
                 cmdGetData.Parameters.AddWithValue("@ID", oTelegram.TagID);
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (1);
@@ -3047,7 +3141,6 @@ namespace Scada
                 cmdGetData.Parameters.AddWithValue("@TagID", TagID);
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (1);
@@ -3080,7 +3173,6 @@ namespace Scada
                 cmdGetData.Parameters.AddWithValue("@ID", oTelegram.TagID);
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
 
                 Connection = null;
@@ -3141,7 +3233,6 @@ namespace Scada
                 }
 
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (gridRows);
@@ -3196,9 +3287,7 @@ namespace Scada
                         Id = 0
                     });
                 }
-
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (gridRows);
@@ -3274,7 +3363,6 @@ namespace Scada
 
                 }
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (ItemValues);
@@ -3329,7 +3417,6 @@ namespace Scada
                     });
                 }
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (gridRows);
@@ -3384,7 +3471,6 @@ namespace Scada
                     idx++;
                 }
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (gridRows);
@@ -3421,10 +3507,8 @@ namespace Scada
                 cmdGetData.Parameters.AddWithValue("@TypeOfTag", myTag.TypeOfTag);
                 cmdGetData.Parameters.AddWithValue("@AlarmEnable", myTag.AlarmEnable);
                 cmdGetData.Parameters.AddWithValue("@StoreIntervalSec", myTag.StoreIntervalSec);
-
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (GetLatestTagID());
@@ -3455,7 +3539,6 @@ namespace Scada
 
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (0);
@@ -3491,7 +3574,6 @@ namespace Scada
                 cmdGetData.Parameters.AddWithValue("@UxDescription", UxDescription);
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (0);
@@ -3639,7 +3721,6 @@ namespace Scada
                 cmdGetData.Parameters.AddWithValue("@ItemID", oTelegram.ItemID);
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (GetLatestItemID());
@@ -3673,7 +3754,6 @@ namespace Scada
 
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (0);
@@ -3903,7 +3983,6 @@ namespace Scada
                 cmdGetData.Parameters.AddWithValue("@Radius", oTelegram.Radius);
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
-                cmdGetData = null;
                 Connection.Close();
                 Connection = null;
                 return (0);
@@ -4412,11 +4491,13 @@ namespace Scada
             }
         }
 
+        /*
         public void SetSystemColors(int ColorScheme)
         {
             switch (ColorScheme)
             {
                 case 0:
+                    var c = GetTagColorByName("System_Lt_BackgroundColor");
                     SetTagColorByTagName("System_BackgroundColor", "rgba(0,0,0,255)");
                     SetTagColorByTagName("System_PopupColor", "rgba(70,70,70,245)");
                     SetTagColorByTagName("System_PopupItemColor", "rgba(120,120,120,50)");
@@ -4450,5 +4531,6 @@ namespace Scada
 
             };
         }
+        */
     }
 }

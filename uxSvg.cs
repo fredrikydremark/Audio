@@ -7,10 +7,7 @@ using System.Text;
 namespace Scada
 {
     public class ScadaSvg : SKCanvasView
-    {
-
-
-        public ScadaSvg Init(double w, double h, ScadaSvg scb, ScadaClasses.Telegram Item, ScadaClasses.Colors Color)
+    {   public ScadaSvg Init(double w, double h, ScadaSvg scb, ScadaClasses.Telegram Item, ScadaClasses.SystemColors Color)
         {
             scb.AnchorX = 0;
             scb.AnchorY = 0;
@@ -21,23 +18,18 @@ namespace Scada
             scb.GradientEndColor = Color.uxGradientEndColor;
             scb.WidthRequest = w * Item.Width;
             scb.HeightRequest = h  * Item.Height;
-
             scb.ItemID = Item.ItemID;
-            scb.StyleId = Item.ItemID.ToString();
-          
+            scb.StyleId = Item.ItemID.ToString();       
             DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);
- 
             scb.SvgBase64 = MyDataAccessLayer.LoadLibItem(Item.Action, 1);
-
             scb.IsEnabled = true;
             scb.IsVisible = true;
             scb.EnableTouchEvents = true;
-            scb.InputTransparent = false;
-        
+            scb.InputTransparent = false;    
             return (scb);
         }
 
-        public static BindableProperty ItemIDProperty = BindableProperty.Create(nameof(ItemID), typeof(int),
+       public static BindableProperty ItemIDProperty = BindableProperty.Create(nameof(ItemID), typeof(int),
        typeof(ScadaSvg), 0, BindingMode.OneWay,
            validateValue: (_, value) => value != null,
        propertyChanged: OnPropertyChangedInvalidate);
@@ -121,11 +113,9 @@ namespace Scada
             set => SetValue(sProperty, value);
         }
 
-
         private static void OnPropertyChangedInvalidate(BindableObject bindable, object oldvalue, object newvalue)
         {
             var control = (ScadaSvg)bindable;
-
             if (oldvalue != newvalue)
                 control.InvalidateSurface();
         }
@@ -142,18 +132,21 @@ namespace Scada
                 string decodedString = Encoding.UTF8.GetString(data);
                 SKSvg svg = new SKSvg();
                 var picture = svg.FromSvg(decodedString);
-                var dimensions = new SKSizeI
-                (
-                     (int)Math.Ceiling(info.Width * 1.0),
-                     (int)Math.Ceiling(info.Height * 1.0)
-                );
+                if (picture != null)
+                {
+                    var dimensions = new SKSizeI
+                    (
+                         (int)Math.Ceiling(info.Width * 1.0),
+                         (int)Math.Ceiling(info.Height * 1.0)
+                    );
 
-                float ScaleX = info.Width / picture.CullRect.Width;
-                float ScaleY = info.Height / picture.CullRect.Height;
-                SKMatrix matrix = SKMatrix.CreateScale(ScaleX, ScaleY);
-                SKImage image = SKImage.FromPicture(picture, dimensions, matrix);
-                canvas.Clear();
-                canvas.DrawImage(image, new SKPoint(0, 0));
+                    float ScaleX = info.Width / picture.CullRect.Width;
+                    float ScaleY = info.Height / picture.CullRect.Height;
+                    SKMatrix matrix = SKMatrix.CreateScale(ScaleX, ScaleY);
+                    SKImage image = SKImage.FromPicture(picture, dimensions, matrix);
+                    canvas.Clear();
+                    canvas.DrawImage(image, new SKPoint(0, 0));
+                }
             }
             catch
             {

@@ -183,7 +183,7 @@ namespace Scada
             var canvas = e.Surface.Canvas;
             float MaxValue = 100;
         
-            var backgroundBar = new SKRoundRect(new SKRect(0, 0, info.Width, info.Height), 5, 5);
+            var backgroundBar = new SKRoundRect(new SKRect(0, 0, info.Width, info.Height), CornerRadius, CornerRadius);
             var Background = new SKPaint { Color = GradientStartColor, IsAntialias = true };
 
             if (PV.Value > MaxValue)

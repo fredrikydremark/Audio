@@ -37,8 +37,8 @@ namespace Scada
             private double outMin;
 
             //Threading and Timing
-            private double computeHz = 1.0f;
-            private Thread runThread;
+           // private double computeHz = 1.0f;
+            //private Thread runThread;
 
             #endregion
 
@@ -86,11 +86,12 @@ namespace Scada
                 set { outMax = value; }
             }
 
+        /*
             public bool PIDOK
             {
                 get { return runThread != null; }
             }
-
+          */
             #endregion
 
             #region Construction / Deconstruction

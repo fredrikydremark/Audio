@@ -16,7 +16,7 @@ namespace Scada
         float localBtnFaceIntensity = 255f;
 
       
-        public DonutChart Init(double w, double h, DonutChart scb, ScadaClasses.Telegram Item, ScadaClasses.Colors Color)
+        public DonutChart Init(double w, double h, DonutChart scb, ScadaClasses.Telegram Item, ScadaClasses.SystemColors Color)
         {
             scb.AnchorX = 0;
             scb.AnchorY = 0;
@@ -364,9 +364,6 @@ namespace Scada
 
 
 
-
-
-
         private SKPoint PointFromDegrees(float degrees, int radius, SKRect rect, int padding = 0)
         {
             const int offset = 90;
@@ -374,15 +371,6 @@ namespace Scada
             var y = (float)(rect.MidY + (radius + padding) * Math.Sin((degrees - offset) * (Math.PI / 180)));
             return new SKPoint(x, y);
         }
-
-        SKPaint Backgroundpaint = new SKPaint
-        {
-            IsAntialias = true,
-            Style = SKPaintStyle.StrokeAndFill,
-            Color = new SKColor(60, 60, 60, 220),
-            StrokeWidth = 0,
-            FilterQuality = SKFilterQuality.High
-        };
 
         SKPaint OffPaint = new SKPaint
         {
@@ -423,14 +411,21 @@ namespace Scada
             FilterQuality = SKFilterQuality.High
         };
 
-
-
         protected override void OnPaintSurface(SKPaintSurfaceEventArgs e)
         {
             var info = e.Info;
             var canvas = e.Surface.Canvas;          
-            float MaxValue = 100;         
-    
+            float MaxValue = 100;
+
+            SKPaint Backgroundpaint = new SKPaint
+            {
+                IsAntialias = true,
+                Style = SKPaintStyle.StrokeAndFill,
+                Color = GradientStartColor,
+                StrokeWidth = 0,
+                FilterQuality = SKFilterQuality.High
+            };
+
             if (PV.Value > MaxValue ) 
             {
                PV.Value = (float)(MaxValue);
@@ -449,20 +444,15 @@ namespace Scada
             GreenPaint.StrokeWidth = radius / 2.5F;
             BluePaint.StrokeWidth = radius / 2.5F;
 
-            var degrees1 = ( 25F / 100F ) * 360F;
-            var degrees2 = (25F / 100F) * 360F;
-            var degrees3 = (25F / 100F) * 360F;
-
-            //Draw Circle        
+            var degrees1 = (10F / 100F) * 360F;
+            var degrees2 = (20F / 100F) * 360F;
+            var degrees3 = (40F / 100F) * 360F;
+       
             canvas.Clear();
-            canvas.DrawArc(new SKRect(0, 0, info.Height, info.Height), -90, 360, false, Backgroundpaint);
-           
-            canvas.DrawArc(new SKRect(frame, frame, diam - frame, diam - frame), -90, degrees1,false,RedPaint);
-
-            canvas.DrawArc(new SKRect(frame, frame, diam - frame, diam - frame), -90 + degrees1,degrees2,false,GreenPaint);
-          
-            canvas.DrawArc(new SKRect(frame, frame, diam - frame, diam - frame), -90 + degrees1+degrees2,degrees3,false,BluePaint);
-
+            canvas.DrawArc(new SKRect(0, 0, info.Height, info.Height), -90F, 360F, false, Backgroundpaint);           
+            canvas.DrawArc(new SKRect(frame, frame, diam - frame, diam - frame), -90F, degrees1,false,RedPaint);
+            canvas.DrawArc(new SKRect(frame, frame, diam - frame, diam - frame), -90F + degrees1,degrees2,false,GreenPaint);          
+            canvas.DrawArc(new SKRect(frame, frame, diam - frame, diam - frame), -90F + degrees1+degrees2,degrees3,false,BluePaint);
         }
     }
 }

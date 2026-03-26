@@ -11,7 +11,7 @@ namespace Scada
         public int State;
         public float LastY;
 
-        public ScadaBarGraph Init(double w, double h, ScadaBarGraph scb, ScadaClasses.Telegram Item, ScadaClasses.Colors Color)
+        public ScadaBarGraph Init(double w, double h, ScadaBarGraph scb, ScadaClasses.Telegram Item, ScadaClasses.SystemColors Color)
         {
             scb.AnchorX = 0;
             scb.AnchorY = 0;

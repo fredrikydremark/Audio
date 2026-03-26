@@ -435,7 +435,7 @@ namespace Scada
             {
                 if (bFaceFade == true)
                 {
-                    if (localBtnFaceIntensity > GradientStartColor.Blue-20)  
+                    if (localBtnFaceIntensity > GradientStartColor.Blue)  
                     {
                         localBtnFaceIntensity = localBtnFaceIntensity - Step;
                         if (IsLoaded == true)
@@ -443,7 +443,7 @@ namespace Scada
                             InvalidateSurface();
                         }
                     }
-                    if (localBtnFaceIntensity < GradientStartColor.Blue-20)  
+                    if (localBtnFaceIntensity < GradientStartColor.Blue)  
                     {
                         localBtnFaceIntensity = localBtnFaceIntensity + Step;
                         if (IsLoaded == true)
@@ -454,7 +454,7 @@ namespace Scada
                 }
                 if (bFaceFade == false)
                 {
-                    if (localBtnFaceIntensity < GradientStartColor.Blue) 
+                    if (localBtnFaceIntensity < GradientStartColor.Blue+30) 
                     {
                         localBtnFaceIntensity = localBtnFaceIntensity + Step;                      
                         if (IsLoaded == true)

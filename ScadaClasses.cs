@@ -209,7 +209,9 @@ namespace Scada
         public const int uxAutomotivePower = 19;
         public const int uxAutomotiveSpeed = 20;
         
+        // Extra
         public const int uxProgressBar = 21;
+        public const int uxArrow = 22;
         public const int uxLine = 23;
         public const int uxText = 24;
         public const int uxDonutChart = 25;

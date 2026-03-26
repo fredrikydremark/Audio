@@ -2012,91 +2012,7 @@ public partial class MainPage : ContentPage
         SKCanvasPopupViews.Add(btnParam);
 
 
-
-        /*
-        var ToggleDarkMode = new Toggle();
-        ToggleDarkMode.CornerRadius = 1;
-        ToggleDarkMode.BarBackgroundColor = uxPanelColor;
-        ToggleDarkMode.BackgroundColor = uxPanelColor.ToMauiColor();
-        ToggleDarkMode.GradientStartColor = uxPanelColor;
-        ToggleDarkMode.GradientEndColor = ScadaColor.uxPanelColor;
-        ToggleDarkMode.TextColor = ScadaColor.uxTextColor;
-        ToggleDarkMode.WidthRequest = 50;
-        ToggleDarkMode.HeightRequest = 22;
-        ToggleDarkMode.FontSize = 18;
-        ToggleDarkMode.PV = new ItemValue();
-        ToggleDarkMode.SV = new ItemValue();
-        ToggleDarkMode.IsEnabled = true;
-        ToggleDarkMode.IsVisible = true;
-        ToggleDarkMode.EnableTouchEvents = true;
-        ToggleDarkMode.InputTransparent = false;
-        if (ScadaColor.uxDarkMode == true)
-        {
-            ToggleDarkMode.PV.Value = 1;
-        }
-        else
-        {
-            ToggleDarkMode.PV.Value = 0;
-        }
-
-        ToggleDarkMode.Touch += (sender, args) =>
-        {
-            switch (args.ActionType)
-            {
-                case SKTouchAction.Pressed:
-                    if (ScadaColor.uxDarkMode == false)
-                    {
-                        MyDataAccessLayer.SetTagColorByTagName("System_BackgroundColor", "rgba(0,0,0,255)");
-                        MyDataAccessLayer.SetTagColorByTagName("System_PopupColor", "rgba(70,70,70,245)");
-                        MyDataAccessLayer.SetTagColorByTagName("System_PopupItemColor", "rgba(120,120,120,50)");
-                        MyDataAccessLayer.SetTagColorByTagName("System_ItemColor", "rgba(50,50,50,240)");
-                        MyDataAccessLayer.SetTagColorByTagName("System_ItemBackgroundColor", "rgba(40,40,40,240)");
-                        MyDataAccessLayer.SetTagColorByTagName("System_PanelColor", "rgba(30,30,30,150)");
-                        MyDataAccessLayer.SetTagColorByTagName("System_TextColor", "rgba(250,250,250,220)");
-                        MyDataAccessLayer.SetTagColorByTagName("System_HoverColor", "rgba(125,125,125,235)");
-                        MyDataAccessLayer.SetTagColorByTagName("System_TouchColor", "rgba(128,128,128,235)");
-                        MyDataAccessLayer.SetTagColorByTagName("System_OffColor", "rgba(118,118,118,235)");
-                        MyDataAccessLayer.SetTagColorByTagName("System_LightColor", "rgba(52,52,52,240)");
-                        MyDataAccessLayer.SetTagColorByTagName("System_GridThinColor", "rgba(40,40,40,200)");
-                        MyDataAccessLayer.SetTagColorByTagName("System_GridFatColor", "rgba(45,45,45,200)");
-
-                        uxDarkMode = true;
-                        ToggleDarkMode.PV.Value = 1;
-                    }
-                    else
-                    {
-                        MyDataAccessLayer.SetTagColorByTagName("System_BackgroundColor", "rgba(225,225,225,255)");
-                        MyDataAccessLayer.SetTagColorByTagName("System_PopupColor", "rgba(170,170,170,245)");
-                        MyDataAccessLayer.SetTagColorByTagName("System_PopupItemColor", "rgba(135,135,135,50)");
-                        MyDataAccessLayer.SetTagColorByTagName("System_ItemColor", "rgba(180,180,180,255)");
-                        MyDataAccessLayer.SetTagColorByTagName("System_ItemBackgroundColor", "rgba(200,200,200,255)");
-                        MyDataAccessLayer.SetTagColorByTagName("System_PanelColor", "rgba(230,230,230,150)");
-                        MyDataAccessLayer.SetTagColorByTagName("System_TextColor", "rgba(0,0,0,250)");
-                        MyDataAccessLayer.SetTagColorByTagName("System_HoverColor", "rgba(210,210,210,245)");
-                        MyDataAccessLayer.SetTagColorByTagName("System_TouchColor", "rgba(128,128,128,255)");
-                        MyDataAccessLayer.SetTagColorByTagName("System_OffColor", "rgba(128,128,128,235)");
-                        MyDataAccessLayer.SetTagColorByTagName("System_LightColor", "rgba(170,170,170,255)");
-                        MyDataAccessLayer.SetTagColorByTagName("System_GridThinColor", "rgba(210,210,210,200)");
-                        MyDataAccessLayer.SetTagColorByTagName("System_GridFatColor", "rgba(205,205,205,200)");
-
-                        uxDarkMode = false;
-                        ToggleDarkMode.PV.Value = 0;
-                    }
-                    Previouspage = -1;
-                    //Update(this, null);
-                    break;
-            }
-            args.Handled = true;
-        };
-        ToggleDarkMode.InvalidateSurface();
-        AbsoluteLayout.SetLayoutBounds(ToggleDarkMode, new Rect(x + 350, y + 245, 50, 22));
-        AbsoluteLayout.SetLayoutFlags(ToggleDarkMode, AbsoluteLayoutFlags.None);
-        SKCanvasViews.Add(ToggleDarkMode);
-        */
-
-
         pnlVertPos = pnlVertPos + pnlVertSpacing;
-
         var pnlTags = new ScadaButton();
         pnlTags.CornerRadius = 10;
         pnlTags.IndicatorType = 1;
@@ -2987,14 +2903,16 @@ public partial class MainPage : ContentPage
                 switch (ScadaItem.ItemType)
                 {
                     case ScadaClasses.uxPanel:
-                        ScadaButton SKPanel = new ScadaButton();
+                        ScadaPanel SKPanel = new ScadaPanel();
                         SKPanel.Init(wScale, hScale, SKPanel, ScadaItem, ScadaColor);                   
                         if (Designing == true)
                         {
-                            SKPanel = (ScadaButton)AttachDesignEvents(SKPanel, ScadaItem);
+                            SKPanel = (ScadaPanel)AttachDesignEvents(SKPanel, ScadaItem);
                         }
-                        SKPanel.EnableFaceFade();
-                        SKPanel.FadeUp();
+                        SKPanel.GradientStartColor = ScadaColor.uxPanelColor;
+                        SKPanel.GradientEndColor = ScadaColor.uxPanelColor;
+                   
+                        SKPanel.EnableTouchEvents = false;
                         AbsoluteLayout.SetLayoutBounds(SKPanel, new Rect(wScale * ScadaItem.Left, hScale * ScadaItem.Top, wScale * ScadaItem.Width, hScale * ScadaItem.Height));
                         AbsoluteLayout.SetLayoutFlags(SKPanel, AbsoluteLayoutFlags.None);
                         SKCanvasViews.Add(SKPanel);

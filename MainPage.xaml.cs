@@ -2760,7 +2760,6 @@ public partial class MainPage : ContentPage
         SKCanvasViews.Add(myFwdButton);
     }
 
-
     public void CreateRwdButton(double x, double y, double w, double h)
     {
         DataAccessLayer MyDataAccessLayer = new DataAccessLayer(ConnectionString);
@@ -2806,7 +2805,6 @@ public partial class MainPage : ContentPage
             }
             args.Handled = true;
         };
-
         AbsoluteLayout.SetLayoutBounds(myRwdButton, new Rect(x + 5, y + h - 35, 30, 30));
         AbsoluteLayout.SetLayoutFlags(myRwdButton, AbsoluteLayoutFlags.None);
         SKCanvasViews.Add(myRwdButton);
@@ -2909,8 +2907,8 @@ public partial class MainPage : ContentPage
                         {
                             SKPanel = (ScadaPanel)AttachDesignEvents(SKPanel, ScadaItem);
                         }
-                        SKPanel.GradientStartColor = ScadaColor.uxPanelColor;
-                        SKPanel.GradientEndColor = ScadaColor.uxPanelColor;
+                        //SKPanel.GradientStartColor = ScadaColor.uxPanelColor;
+                        //SKPanel.GradientEndColor = ScadaColor.uxPanelColor;
                    
                         SKPanel.EnableTouchEvents = false;
                         AbsoluteLayout.SetLayoutBounds(SKPanel, new Rect(wScale * ScadaItem.Left, hScale * ScadaItem.Top, wScale * ScadaItem.Width, hScale * ScadaItem.Height));

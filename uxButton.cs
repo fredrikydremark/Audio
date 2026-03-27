@@ -46,7 +46,7 @@ namespace Scada
         bool bFaceFade = true;
         bool bIndicatorFade = true;
         float localBtnIndicatorIntensity = 70f;
-        float localBtnFaceIntensity = 0f;
+        float localBtnFaceIntensity = 70f;
         bool FaceFadeEnabled = false;
 
         public ScadaButton Init(double wScale, double hScale, ScadaButton scb, ScadaClasses.Telegram Item, ScadaClasses.SystemColors Color)

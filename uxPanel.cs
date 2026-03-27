@@ -23,8 +23,8 @@ namespace Scada
             scb.CornerRadius = 10;
             scb.BarBackgroundColor = Color.uxBackGroundColor;
             scb.BackgroundColor = Color.uxPanelColor.ToMauiColor();
-            scb.GradientStartColor = Color.uxItemColor;
-            scb.GradientEndColor = Color.uxItemColor;
+            scb.GradientStartColor = Color.uxPanelColor;
+            scb.GradientEndColor = Color.uxPanelColor;
            
             scb.WidthRequest = wScale * Item.Width;
             scb.HeightRequest = hScale * Item.Height;
@@ -35,8 +35,8 @@ namespace Scada
             scb.FontSize = 18.5F;
             //scb.EnableFaceFade();
    
-            DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);
-            var ItemValuesBtn = MyDataAccessLayer.ReadItemValues(scb.ItemID);
+            //DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);
+            //var ItemValuesBtn = MyDataAccessLayer.ReadItemValues(scb.ItemID);
          
             scb.IsEnabled = true;
             scb.IsVisible = true;
@@ -237,7 +237,6 @@ namespace Scada
 
 
 
-  
 
         protected override void OnPaintSurface(SKPaintSurfaceEventArgs e)
         {
@@ -246,11 +245,11 @@ namespace Scada
             float w = info.Width;
             float h = info.Height;
 
-            var progressBar = new SKRoundRect(new SKRect(0, 0, w, h), CornerRadius, CornerRadius);
+            var backgroundPanel = new SKRoundRect(new SKRect(0, 0, w, h), CornerRadius, CornerRadius);
 
             SKColor GrStart = GradientStartColor;
             SKColor GrEnd = GradientEndColor;
-
+            /*
             if (FaceFadeEnabled == true)
             {
                 GrStart = GrStart.WithRed((byte)localBtnFaceIntensity);
@@ -261,12 +260,26 @@ namespace Scada
                 GrEnd = GrEnd.WithGreen((byte)localBtnFaceIntensity);
                 GrEnd = GrEnd.WithBlue((byte)localBtnFaceIntensity);
             }
+            */
 
-            using (var facePaint = new SKPaint() { IsAntialias = true, FilterQuality = SKFilterQuality.High, BlendMode = SKBlendMode.Overlay })
+            var panelPaint = new SKPaint
+            {
+                IsAntialias = true,
+                Style = SKPaintStyle.StrokeAndFill,
+                Color = GradientStartColor,
+                BlendMode = SKBlendMode.Overlay,
+                FilterQuality = SKFilterQuality.High,
+                StrokeWidth = 1
+            };
+            canvas.Clear();
+            canvas.DrawRoundRect(backgroundPanel, panelPaint);
+
+
+            /*
+            using (var panelPaint = new SKPaint() { IsAntialias = true, FilterQuality = SKFilterQuality.High, BlendMode = SKBlendMode.Overlay })
             {
                 var Rectangle = new SKRect(0, 0, w, h);
-
-                    facePaint.Shader = SKShader.CreateLinearGradient(
+                    panelPaint.Shader = SKShader.CreateLinearGradient(
                     new SKPoint(Rectangle.Left, Rectangle.Top),
                     new SKPoint(Rectangle.Right, Rectangle.Bottom),
                     new[]
@@ -276,10 +289,9 @@ namespace Scada
                     },
                     new float[] { 0, 1 },
                     SKShaderTileMode.Decal);
-
-                    canvas.DrawRoundRect(progressBar, facePaint);
-                       
+                    canvas.DrawRoundRect(backgroundPanel, panelPaint);                       
             }
+            */
 
         }
     }

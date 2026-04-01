@@ -339,7 +339,9 @@ public partial class MainPage : ContentPage
             {
                 case SKTouchAction.Released:
                     ScadaClasses.Previouspage = -1;
-                    ScadaClasses.CurrentScadaPopup = -1;
+                    ScadaClasses.CurrentScadaPopup = ScadaClasses.uxEditParameterText;
+                    edtInputText.Text = ConnectionString;//myRowButton.ButtonRow.col2text;
+                  
                     ScadaClasses.Refresh = true;
                     break;
 
@@ -765,6 +767,7 @@ public partial class MainPage : ContentPage
                 {
                     case SKTouchAction.Released:
                         ScadaClasses.Previouspage = -1;
+                        ScadaClasses.PreviousScadaPopup = ScadaClasses.CurrentScadaPopup;
                         ScadaClasses.CurrentScadaPopup = ScadaClasses.uxEditParameterText;
                         edtInputText.Text = myRowButton.ButtonRow.col2text;
                         ScadaClasses.CurrentID = myRowButton.ButtonRow.Id;
@@ -4714,7 +4717,7 @@ public partial class MainPage : ContentPage
                                     MyDataAccessLayer.UpdateParameterValue(ScadaClasses.CurrentID, edtInputText.Text);
                                    
                                     ScadaClasses.Previouspage = -1;
-                                    ScadaClasses.CurrentScadaPopup = ScadaClasses.uxDataSourcesSettings;
+                                    ScadaClasses.CurrentScadaPopup = ScadaClasses.PreviousScadaPopup;
                                     ScadaClasses.Refresh = true;
                                     break;
 

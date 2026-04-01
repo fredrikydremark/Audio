@@ -11,8 +11,6 @@ namespace Scada
     public class ScadaPanel : SKCanvasView
     {
         bool bFaceFade = true;
-        bool bIndicatorFade = true;
-        float localBtnIndicatorIntensity = 70f;
         float localBtnFaceIntensity = 0f;
         bool FaceFadeEnabled = false;
 
@@ -24,8 +22,7 @@ namespace Scada
             scb.BarBackgroundColor = Color.uxBackGroundColor;
             scb.BackgroundColor = Color.uxPanelColor.ToMauiColor();
             scb.GradientStartColor = Color.uxPanelColor;
-            scb.GradientEndColor = Color.uxPanelColor;
-           
+            scb.GradientEndColor = Color.uxPanelColor;          
             scb.WidthRequest = wScale * Item.Width;
             scb.HeightRequest = hScale * Item.Height;
           
@@ -33,19 +30,12 @@ namespace Scada
             scb.ItemID = Item.ItemID;
             scb.StyleId = Item.ItemID.ToString();
             scb.FontSize = 18.5F;
-            //scb.EnableFaceFade();
-   
-            //DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);
-            //var ItemValuesBtn = MyDataAccessLayer.ReadItemValues(scb.ItemID);
-         
             scb.IsEnabled = true;
             scb.IsVisible = true;
             scb.EnableTouchEvents = false;
-            scb.InputTransparent = false;
-            //scb.Start();                           
+            scb.InputTransparent = false;                                   
             return (scb);
         }
-
 
 
         public static BindableProperty ItemIDProperty = BindableProperty.Create(nameof(ItemID), typeof(int),
@@ -92,10 +82,6 @@ namespace Scada
             set => SetValue(ButtonFaceIntensityProperty, value);
         }
 
-
- 
-
-
         public static BindableProperty FontSizeProperty = BindableProperty.Create(nameof(FontSize), typeof(float),
             typeof(ScadaPanel), 12f, BindingMode.OneWay,
             validateValue: (_, value) => value != null && (float)value >= 0,
@@ -139,10 +125,6 @@ namespace Scada
         }
 
   
-
-
-     
-
         public static BindableProperty TextColorProperty = BindableProperty.Create(nameof(TextColor), typeof(SKColor),
             typeof(ScadaPanel), SKColors.Blue, BindingMode.OneWay,
             validateValue: (_, value) => value != null, propertyChanged: OnPropertyChangedInvalidate);
@@ -154,7 +136,6 @@ namespace Scada
         }
 
       
-
         public static BindableProperty SvgBase64Property = BindableProperty.Create(nameof(SvgBase64), typeof(string),
         typeof(ScadaPanel), "", BindingMode.OneWay,
         validateValue: (_, value) => value != null, propertyChanged: OnPropertyChangedInvalidate);
@@ -176,7 +157,6 @@ namespace Scada
                 }
             }
         }
-
 
 
         public void FadeDown()
@@ -230,14 +210,6 @@ namespace Scada
         }
 
 
-
-    
-
-    
-
-
-
-
         protected override void OnPaintSurface(SKPaintSurfaceEventArgs e)
         {
             var info = e.Info;
@@ -246,21 +218,6 @@ namespace Scada
             float h = info.Height;
 
             var backgroundPanel = new SKRoundRect(new SKRect(0, 0, w, h), CornerRadius, CornerRadius);
-
-            SKColor GrStart = GradientStartColor;
-            SKColor GrEnd = GradientEndColor;
-            /*
-            if (FaceFadeEnabled == true)
-            {
-                GrStart = GrStart.WithRed((byte)localBtnFaceIntensity);
-                GrStart = GrStart.WithGreen((byte)localBtnFaceIntensity);
-                GrStart = GrStart.WithBlue((byte)localBtnFaceIntensity);
-
-                GrEnd = GrEnd.WithRed((byte)localBtnFaceIntensity);
-                GrEnd = GrEnd.WithGreen((byte)localBtnFaceIntensity);
-                GrEnd = GrEnd.WithBlue((byte)localBtnFaceIntensity);
-            }
-            */
 
             var panelPaint = new SKPaint
             {

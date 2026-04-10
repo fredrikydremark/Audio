@@ -5466,7 +5466,98 @@ public partial class MainPage : ContentPage
                     break;
              }
 
-           
+            //Alarm bell
+            var btnAlarmbell = new ScadaButton();
+            btnAlarmbell.GradientStartColor = ScadaColor.uxItemColor;
+            btnAlarmbell.GradientEndColor = ScadaColor.uxItemColor;
+            btnAlarmbell.CornerRadius = 15;
+            btnAlarmbell.ItemID = 1;
+            btnAlarmbell.EnableTouchEvents = true;
+            btnAlarmbell.InputTransparent = false;
+            btnAlarmbell.HeightRequest = 25;
+            btnAlarmbell.WidthRequest = 25;
+            btnAlarmbell.SvgBase64 = MyDataAccessLayer.LoadLibItem("Alarmbell", 1);
+            btnAlarmbell.IndicatorType = 3;
+            btnAlarmbell.Margin = 0.15F;
+            btnAlarmbell.ButtonText = "";
+            btnAlarmbell.Touch += (sender, args) =>
+            {
+                switch (args.ActionType)
+                {
+                    case SKTouchAction.Released:
+                        ScadaClasses.Previouspage = -1;
+                        ScadaClasses.CurrentScadaPopup = ScadaClasses.uxAlarmGrid;                        
+                        ScadaClasses.Refresh = true;
+                        break;
+
+                    case SKTouchAction.Pressed:
+                        break;
+
+                    case SKTouchAction.Moved:
+                        btnAlarmbell.GradientStartColor = ScadaColor.uxHoverColor;
+                        btnAlarmbell.GradientEndColor = ScadaColor.uxHoverColor;
+                        btnAlarmbell.IndicatorColor = ScadaColor.uxHoverColor;
+                        break;
+
+                    case SKTouchAction.Exited:
+                        btnAlarmbell.GradientStartColor = ScadaColor.uxItemColor;
+                        btnAlarmbell.GradientEndColor = ScadaColor.uxItemColor;
+                        btnAlarmbell.IndicatorColor = ScadaColor.uxItemColor;
+                        break;
+                }
+                args.Handled = true;
+            };
+            AbsoluteLayout.SetLayoutBounds(btnAlarmbell, new Rect(20 + btnAlarmbell.WidthRequest / 5, 20 + btnAlarmbell.HeightRequest / 5, 25, 25));
+            AbsoluteLayout.SetLayoutFlags(btnAlarmbell, AbsoluteLayoutFlags.None);
+            SKCanvasPopupViews.Add(btnAlarmbell);
+
+            //Settings cogwheel
+            var btnSettings = new ScadaButton();
+            btnSettings.GradientStartColor = ScadaColor.uxItemColor;
+            btnSettings.GradientEndColor = ScadaColor.uxItemColor;
+            btnSettings.CornerRadius = 15;
+            btnSettings.ItemID = 1;
+            btnSettings.EnableTouchEvents = true;
+            btnSettings.InputTransparent = false;
+            btnSettings.HeightRequest = 25;
+            btnSettings.WidthRequest = 25;
+            btnSettings.SvgBase64 = MyDataAccessLayer.LoadLibItem("CogWheel", 1);
+            btnSettings.IndicatorType = 3;
+            btnSettings.Margin = 0.15F;
+            btnSettings.ButtonText = "";
+            btnSettings.Touch += (sender, args) =>
+            {
+                switch (args.ActionType)
+                {
+                    case SKTouchAction.Released:
+                        ScadaClasses.Previouspage = -1;
+                        ScadaClasses.CurrentScadaPopup = ScadaClasses.uxParameters;                       
+                        ScadaClasses.Refresh = true;
+                        break;
+
+                    case SKTouchAction.Pressed:
+                        break;
+
+                    case SKTouchAction.Moved:
+                        btnSettings.GradientStartColor = ScadaColor.uxHoverColor;
+                        btnSettings.GradientEndColor = ScadaColor.uxHoverColor;
+                        btnSettings.IndicatorColor = ScadaColor.uxHoverColor;
+                        break;
+
+                    case SKTouchAction.Exited:
+                        btnSettings.GradientStartColor = ScadaColor.uxItemColor;
+                        btnSettings.GradientEndColor = ScadaColor.uxItemColor;
+                        btnSettings.IndicatorColor = ScadaColor.uxItemColor;
+                        break;
+                }
+                args.Handled = true;
+            };
+            AbsoluteLayout.SetLayoutBounds(btnSettings, new Rect(20 + btnSettings.WidthRequest / 5, Height - 50 + btnSettings.HeightRequest / 5, 25, 25));
+            AbsoluteLayout.SetLayoutFlags(btnSettings, AbsoluteLayoutFlags.None);
+            SKCanvasPopupViews.Add(btnSettings);
+
+
+
             absoluteLayout.Clear();
             foreach (SKCanvasView SKItem in SKCanvasViews)
             {
@@ -5801,8 +5892,7 @@ public partial class MainPage : ContentPage
 
 
 
-       
-
+      
             if (uxItem is ScadaButton)
             {
                 var dItem = uxItem as ScadaButton;

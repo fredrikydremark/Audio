@@ -513,11 +513,6 @@ namespace Scada
             return ScadaItems;
         }
 
-        public class A
-        {
-            public string X { get; set; }
-            public string Y { get; set; }
-           
-        }          
+      
     }
 }

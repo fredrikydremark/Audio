@@ -248,7 +248,7 @@ namespace Scada
             double stop = PI / 4;
             double range = 100;
 
-            double r = start - (v * ((2 * 3.14) - (PI / 2)) / range);
+            double r = start - (v * ((2 * 3.1415) - (PI / 2)) / range);
             return r;
         }
 
@@ -346,7 +346,7 @@ namespace Scada
                     TickPaint.MeasureText(scale.ToString(), ref bounds);
                     var w = bounds.Width;
                     w = w / 2;
-                    canvas.RotateRadians( -v + 3.14F, radius + Xstop, radius + Ystop );
+                    canvas.RotateRadians( -v + 3.1415F, radius + Xstop, radius + Ystop );
                     canvas.DrawText( scale.ToString(), radius + Xstop-w, radius + Ystop, TextPaint );
                     canvas.RotateRadians( v + 3.1415F, radius + Xstop, radius + Ystop );             
                 }

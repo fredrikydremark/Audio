@@ -59,19 +59,20 @@ public partial class MainPage : ContentPage
         //ConnectionString = Preferences.Default.Get("ConnectionString", ".\\SQLExpress");
 
         //ConnectionString = "Server=tcp:scada.database.windows.net,1433;Initial Catalog = scada; Encrypt=True;TrustServerCertificate=False;Connection Timeout = 30; Authentication=Active Directory Default";
-        ConnectionString = "Server = tcp:scada.database.windows.net,1433;Initial Catalog = scada; Persist Security Info = False; User ID = fredrik655_hotmail.com#EXT#@fredrik655hotmail.onmicrosoft.com; MultipleActiveResultSets = False; Encrypt = True; TrustServerCertificate = False; Authentication = Active Directory Integrated";
+        //ConnectionString = "Server = tcp:scada.database.windows.net,1433;Initial Catalog = scada; Persist Security Info = False; User ID = fredrik655_hotmail.com#EXT#@fredrik655hotmail.onmicrosoft.com; MultipleActiveResultSets = False; Encrypt = True; TrustServerCertificate = False; Authentication = Active Directory Integrated";
 
         //Azure SQL Autentication
         //ConnectionString = "Server = tcp:scada.database.windows.net,1433; Initial Catalog = scada; Persist Security Info = False; User ID = freydr; Password =Admin123>; MultipleActiveResultSets = False; Encrypt = True; TrustServerCertificate = False; Connection Timeout = 30";
 
         //SQL
+        
         /*
         ConnectionString = "Server =tcp:scada.database.windows.net,1433;" +
                            "Database=AdventureWorksLT;User ID=freydr;" +
                            "Password=Admin123>;Encrypt=True;" +
                            "TrustServerCertificate=False;Connection Timeout=30;";
         */
-
+        ConnectionString = "Server = tcp:scada.database.windows.net,1433; Initial Catalog = scada; Persist Security Info = False; User ID = operator1; Password = KopparGruvanSmalter137081>; MultipleActiveResultSets = False; Encrypt = True; TrustServerCertificate = False; Connection Timeout = 30";
 
         DataAccessLayer MyDataAccessLayer = new DataAccessLayer(ConnectionString);
         List<ScadaClasses.Telegram> ScadaItems = new List<ScadaClasses.Telegram>();

@@ -19,8 +19,9 @@ public partial class MainPage : ContentPage
     public System.Timers.Timer uxtimer = new System.Timers.Timer();
 
     //private static WebSocket client;
-    public static string ConnectionString = "Data Source = PC-5CG5125C24; Initial Catalog = SCADA; Integrated Security = true; TrustServerCertificate=true";
- 
+    //public static string ConnectionString = "Data Source = PC-5CG5125C24; Initial Catalog = SCADA; Integrated Security = true; TrustServerCertificate=true";
+    //public static string ConnectionString = "Server=tcp:scada.database.windows.net,1433;Initial Catalog = scada; Encrypt=True;TrustServerCertificate=False;Connection Timeout = 30; Authentication=Active Directory Default";
+    public static string ConnectionString = "";
     ScadaPopups MyPopups = new ScadaPopups();
     Editor edtSvgEditor = new Editor { Placeholder = "Paste your SVG text", Text = "Paste your SVG text" };
     Editor edtSvgName = new Editor { Placeholder = "SvgName", Text = "SvgName" };
@@ -51,8 +52,27 @@ public partial class MainPage : ContentPage
     {
         InitializeComponent();
 
-        Preferences.Default.Set("ConnectionString", "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true");
-        ConnectionString = Preferences.Default.Get("ConnectionString", ".\\SQLExpress");
+        //Local SQL
+        //Preferences.Default.Set("ConnectionString", "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true");
+
+        //Local SQLExpress
+        //ConnectionString = Preferences.Default.Get("ConnectionString", ".\\SQLExpress");
+
+        //ConnectionString = "Server=tcp:scada.database.windows.net,1433;Initial Catalog = scada; Encrypt=True;TrustServerCertificate=False;Connection Timeout = 30; Authentication=Active Directory Default";
+        ConnectionString = "Server = tcp:scada.database.windows.net,1433;Initial Catalog = scada; Persist Security Info = False; User ID = fredrik655_hotmail.com#EXT#@fredrik655hotmail.onmicrosoft.com; MultipleActiveResultSets = False; Encrypt = True; TrustServerCertificate = False; Authentication = Active Directory Integrated";
+
+        //Azure SQL Autentication
+        //ConnectionString = "Server = tcp:scada.database.windows.net,1433; Initial Catalog = scada; Persist Security Info = False; User ID = freydr; Password =Admin123>; MultipleActiveResultSets = False; Encrypt = True; TrustServerCertificate = False; Connection Timeout = 30";
+
+        //SQL
+        /*
+        ConnectionString = "Server =tcp:scada.database.windows.net,1433;" +
+                           "Database=AdventureWorksLT;User ID=freydr;" +
+                           "Password=Admin123>;Encrypt=True;" +
+                           "TrustServerCertificate=False;Connection Timeout=30;";
+        */
+
+
         DataAccessLayer MyDataAccessLayer = new DataAccessLayer(ConnectionString);
         List<ScadaClasses.Telegram> ScadaItems = new List<ScadaClasses.Telegram>();
 
@@ -106,6 +126,7 @@ public partial class MainPage : ContentPage
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 DataAccessLayer MyDataAccessLayer = new DataAccessLayer(ConnectionString);
+                /*
                 if (MyDataAccessLayer.ReadParameterByName("Enable ADAM") == "1")
                 {
                     Adam AdamLayer = new Adam();
@@ -119,8 +140,9 @@ public partial class MainPage : ContentPage
                 {
             
                 }
+                */
 
-
+                /*
                 if (MyDataAccessLayer.ReadParameterByName("Enable simulation") == "1")
                 {
                     float RampSignal = MyDataAccessLayer.GetTagValueByName("RampSignal");
@@ -158,6 +180,7 @@ public partial class MainPage : ContentPage
                 {
                     MyDataAccessLayer.StoreTagValue(Tag.TagID, Tag.Value);
                 }
+                */
                 ScadaClasses.Refresh = true;
                 bcktimer.Interval = 5000;
             });

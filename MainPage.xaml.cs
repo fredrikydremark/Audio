@@ -19,7 +19,11 @@ public partial class MainPage : ContentPage
     public System.Timers.Timer uxtimer = new System.Timers.Timer();
 
     //private static WebSocket client;
-    public static string ConnectionString = "Data Source = .\\SQLExpress;; Initial Catalog = SCADA; Integrated Security = true; TrustServerCertificate=true";
+    //
+
+    public static string ConnectionString = "Server=tcp:scada.database.windows.net,1433;Initial Catalog=Scada;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=Active Directory Default";
+
+    //public static string ConnectionString = "Data Source = .\\SQLExpress;; Initial Catalog = SCADA; Integrated Security = true; TrustServerCertificate=true";
  
     ScadaPopups MyPopups = new ScadaPopups();
     Editor edtSvgEditor = new Editor { Placeholder = "Paste your SVG text", Text = "Paste your SVG text" };
@@ -51,8 +55,8 @@ public partial class MainPage : ContentPage
     {
         InitializeComponent();
 
-        Preferences.Default.Set("ConnectionString", "Data Source=.\\SQLExpress; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true");
-        ConnectionString = Preferences.Default.Get("ConnectionString", ".\\SQLExpress");
+        //Preferences.Default.Set("ConnectionString", "Data Source=.\\SQLExpress; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true");
+        //ConnectionString = Preferences.Default.Get("ConnectionString", ".\\SQLExpress");
         DataAccessLayer MyDataAccessLayer = new DataAccessLayer(ConnectionString);
         List<ScadaClasses.Telegram> ScadaItems = new List<ScadaClasses.Telegram>();
 
@@ -63,7 +67,7 @@ public partial class MainPage : ContentPage
             MyDataAccessLayer.StoreTagValue(Tag.TagID, Tag.Value);
         }
 
-        if (MyDataAccessLayer.GetTagValueByName("System_EnableADAM") > 0.5)
+        if (MyDataAccessLayer.ReadParameterByName("Enable ADAM") == "1")
         {
             MyDataAccessLayer.SetTagStatus(1, 1);
         }

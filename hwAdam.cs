@@ -14,13 +14,15 @@ namespace Scada
         static string myPortName = "COM4";
         static int baudRate = 9600;
 
-        SerialPort sp = new SerialPort(myPortName, baudRate);
+        static SerialPort sp = new SerialPort(myPortName, baudRate);
     
         int StoreDigital(string sBinaryValue, int Adress)
         {
             var myConnection = new Microsoft.Data.SqlClient.SqlConnection
             {
-                ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
+                ConnectionString = "Data Source = .\\SQLExpress;; Initial Catalog = SCADA; Integrated Security = true; TrustServerCertificate=true"
+                //ConnectionString = "Data Source=localhost\\SQLEXPRESS; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
+                //ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
             };
 
 
@@ -67,8 +69,10 @@ namespace Scada
             try
             {
                 var myConnection = new Microsoft.Data.SqlClient.SqlConnection
-                {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
+                {               
+                   ConnectionString = "Data Source = .\\SQLExpress;; Initial Catalog = SCADA; Integrated Security = true; TrustServerCertificate=true"
+                   // ConnectionString = "Data Source=localhost\\SQLEXPRESS; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
+                  //ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
                 };
 
                 //string sqlGetData = "SELECT Channel,SetValue FROM Adam where adress = @Adress ORDER BY Adress ASC,Channel ASC";
@@ -116,8 +120,10 @@ namespace Scada
         {
             Double Value = 9999999;
             var myConnection = new Microsoft.Data.SqlClient.SqlConnection
-            {
-                ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
+            {            
+                ConnectionString = "Data Source = .\\SQLExpress;; Initial Catalog = SCADA; Integrated Security = true; TrustServerCertificate=true"
+                //ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
+                //ConnectionString = "Data Source=localhost\\SQLEXPRESS; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
             };
 
             string sBinary, s, DigitalOutput;
@@ -308,7 +314,7 @@ namespace Scada
             {
                 try
                 {
-                    //string[] portNames = SerialPort.GetPortNames();
+                    string[] portNames = SerialPort.GetPortNames();
                     sp.DiscardNull = false;
                     sp.Encoding = Encoding.UTF8;
                     sp.ReadTimeout = 100;
@@ -316,9 +322,12 @@ namespace Scada
                     sp.NewLine = "\r";
                     sp.DtrEnable = true;
                     sp.Open();
+
                 }
                 catch
-                { }
+                { 
+                
+                }
             }
             //timer1.Enabled = true;
         }

@@ -58,21 +58,70 @@ public partial class MainPage : ContentPage
         //Local SQLExpress
         //ConnectionString = Preferences.Default.Get("ConnectionString", ".\\SQLExpress");
 
-        //ConnectionString = "Server=tcp:scada.database.windows.net,1433;Initial Catalog = scada; Encrypt=True;TrustServerCertificate=False;Connection Timeout = 30; Authentication=Active Directory Default";
-        //ConnectionString = "Server = tcp:scada.database.windows.net,1433;Initial Catalog = scada; Persist Security Info = False; User ID = fredrik655_hotmail.com#EXT#@fredrik655hotmail.onmicrosoft.com; MultipleActiveResultSets = False; Encrypt = True; TrustServerCertificate = False; Authentication = Active Directory Integrated";
+        //ConnectionString = "Server=tcp:scada.database.windows.net,1433;Initial Catalog=scada; Encrypt=True;TrustServerCertificate=False;Connection Timeout = 30; Authentication=Active Directory Default";
+        //ConnectionString = "Server = tcp:scada.database.windows.net,1433;Initial Catalog = scada; Persist Security Info = False; User ID =freydr; MultipleActiveResultSets = False; Encrypt = True; TrustServerCertificate = False; Authentication = Active Directory Integrated";
 
         //Azure SQL Autentication
         //ConnectionString = "Server = tcp:scada.database.windows.net,1433; Initial Catalog = scada; Persist Security Info = False; User ID = freydr; Password =Admin123>; MultipleActiveResultSets = False; Encrypt = True; TrustServerCertificate = False; Connection Timeout = 30";
 
         //SQL
-        
+        //ConnectionString = "Data Source =PC-5CG5125C24; Initial Catalog = SCADA; Integrated Security = true; TrustServerCertificate = true";
         /*
         ConnectionString = "Server =tcp:scada.database.windows.net,1433;" +
                            "Database=AdventureWorksLT;User ID=freydr;" +
                            "Password=Admin123>;Encrypt=True;" +
                            "TrustServerCertificate=False;Connection Timeout=30;";
         */
-        ConnectionString = "Server = tcp:scada.database.windows.net,1433; Initial Catalog = scada; Persist Security Info = False; User ID = operator1; Password = KopparGruvanSmalter137081>; MultipleActiveResultSets = False; Encrypt = True; TrustServerCertificate = False; Connection Timeout = 30";
+        //ConnectionString = "Server = tcp:scada.database.windows.net,1433; Initial Catalog = scada; Persist Security Info = False; User ID = operator1; Password = KopparGruvanSmalter137081>; MultipleActiveResultSets = False; Encrypt = True; TrustServerCertificate = False; Connection Timeout = 30";
+
+        
+
+        /*ConnectionString =  "Server=tcp:scada.database.windows.net,1433;" +
+                            "Initial Catalog=scada;" +
+                            "Encrypt=True;" +
+                            "TrustServerCertificate=False;" +
+                            "Connection Timeout=30;" +
+                            "Authentication=SharedTokenCacheCredential;" +
+                            "User ID=fredrik655@hotmail.com;"
+        */
+        /*
+        ConnectionString = "Server=tcp:scada.database.windows.net,1433;" +
+                            "Initial Catalog=scada;" +
+                            "Encrypt=True;" +
+                            "TrustServerCertificate=False;" +
+                            "Connection Timeout=30;" +
+                            "Authentication=Active Directory Integrated;" +
+                            "User ID=fredrik655@hotmail.com;";
+        */
+        
+        ConnectionString =  "Server=tcp:scada.database.windows.net,1433;" +
+                            "Initial Catalog=scada;" +
+                            "Encrypt=True;" +
+                            "TrustServerCertificate=False;" +
+                            "Connection Timeout=30;" +
+                            "Authentication=Active Directory Interactive;" +
+                            "User ID=fredrik655@hotmail.com;";
+        
+        /* ConnectionString = "Server=scada.database.windows.net;" +
+                              "Authentication=Active Directory Password; Encrypt=True; Database=scada;" +
+                              "User Id=fredrik655@hotmail.com; Password=MQTTBroker0407>";
+        */
+        /*
+        ConnectionString = @"Server=scada.database.windows.net;"+
+                                   "Authentication=Active Directory Managed Identity; Encrypt=True;" +
+                                   "Database=scada";
+         */
+        // Use your own server, database, user ID, and password.
+       
+        /*
+          ConnectionString =  "Server=scada.database.windows.net;" +
+                            "Authentication=Active Directory Password; Encrypt=True; Database=scada;"+
+                            "User Id=fredrik655@hotmail.com; Password=MQTTBroker0407>";
+        */
+        //Active Directory Default
+
+
+
 
         DataAccessLayer MyDataAccessLayer = new DataAccessLayer(ConnectionString);
         List<ScadaClasses.Telegram> ScadaItems = new List<ScadaClasses.Telegram>();
@@ -798,10 +847,10 @@ public partial class MainPage : ContentPage
                         ScadaClasses.Refresh = true;
                         break;
                     /*
-                           var TagParams = MyDataAccessLayer.GetTagParams(ScadaClasses.CurrentTag);
-                                    edtInputText.Text = TagParams[myRowButton.ButtonRow.Row].col2text;
-                                    ScadaClasses.CurrentRow = myRowButton.ButtonRow.Row;
-                     */
+                        var TagParams = MyDataAccessLayer.GetTagParams(ScadaClasses.CurrentTag);
+                            edtInputText.Text = TagParams[myRowButton.ButtonRow.Row].col2text;
+                            ScadaClasses.CurrentRow = myRowButton.ButtonRow.Row;
+                    */
 
 
                     case SKTouchAction.Entered:

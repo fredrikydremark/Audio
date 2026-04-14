@@ -9,7 +9,7 @@ namespace Scada
 {
     public class DataAccessLayer(string s)
     {
-        private string sConnection = s; //"Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true";
+        private string sConnection = s; 
 
         public string LoadLibItem(string Name, int TypeInLib)
         {

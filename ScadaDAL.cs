@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.Data.SqlClient;
 using System.Globalization;
+using System.Reflection.PortableExecutable;
 using static Scada.ScadaClasses;
 
 
@@ -1749,14 +1750,14 @@ namespace Scada
                 var hm = new DateTime(src.Year, src.Month, src.Day, src.Hour, src.Minute, 0);
 
                 var TempValues = new List<ScadaClasses.Value>();
-                var DiagramScale = new List<MyValue>();
+                var DiagramScale = new List<ChartValue>();
 
                 var Scale = new DateTime(src.Year, src.Month, src.Day, src.Hour, src.Minute, src.Second);
                 var EndScale = Scale.AddSeconds(-360);
 
                 while (Scale > EndScale)
                 {
-                    var v = new MyValue();
+                    var v = new ChartValue();
                     v.Hour = Scale.Hour;
                     v.Minute = Scale.Minute;
                     v.Second = Scale.Second;
@@ -1774,7 +1775,7 @@ namespace Scada
                     Minute = reader.GetInt32(1);
                     Second = reader.GetInt32(2);
 
-                    foreach (MyValue v in DiagramScale)
+                    foreach (ChartValue v in DiagramScale)
                     {
                         if (v.Minute == Minute)
                         {
@@ -1793,7 +1794,7 @@ namespace Scada
                     i++;
                 }
                 string sTimeText;
-                foreach (MyValue v in DiagramScale)
+                foreach (ChartValue v in DiagramScale)
                 {
                     sTimeText = "";
                     if (v.Second == 0)
@@ -1883,7 +1884,7 @@ namespace Scada
 
                 var TempValues = new List<ScadaClasses.Value>();
 
-                var DiagramScale = new List<MyValue>();
+                var DiagramScale = new List<ChartValue>();
 
                 int Hour = src.Hour;
                 int EndHour = Hour - 2;
@@ -1896,7 +1897,7 @@ namespace Scada
                     {
                         while (Minute > 0)
                         {
-                            var v = new MyValue();
+                            var v = new ChartValue();
                             v.Minute = Minute;
                             v.Hour = Hour;
                             v.sValue = "0";
@@ -1908,7 +1909,7 @@ namespace Scada
                     {
                         while (Minute > src.Minute)
                         {
-                            var v = new MyValue();
+                            var v = new ChartValue();
                             v.Minute = Minute;
                             v.Hour = Hour;
                             v.sValue = "0";
@@ -1916,7 +1917,7 @@ namespace Scada
                             Minute--;
                         }
                     }
-                    var v2 = new MyValue();
+                    var v2 = new ChartValue();
                     v2.Minute = Minute;
                     v2.Hour = Hour;
                     v2.sValue = "0";
@@ -1933,7 +1934,7 @@ namespace Scada
                     Hour = reader.GetInt32(0);
                     Minute = reader.GetInt32(1);
 
-                    foreach (MyValue v in DiagramScale)
+                    foreach (ChartValue v in DiagramScale)
                     {
                         if (v.Hour == Hour)
                         {
@@ -1946,7 +1947,7 @@ namespace Scada
                 }
 
                 string sTimeText;
-                foreach (MyValue v in DiagramScale)
+                foreach (ChartValue v in DiagramScale)
                 {
                     sTimeText = "";
                     if ((v.Minute % 30) == 0)
@@ -2016,7 +2017,7 @@ namespace Scada
                 cmdGetData.Parameters.AddWithValue("@sYear", myChartSetting.iYear.ToString());
                 SqlDataReader reader = cmdGetData.ExecuteReader();
 
-                var DiagramScale = new List<MyValue>();
+                var DiagramScale = new List<ChartValue>();
                 var TempValues = new List<ScadaClasses.Value>();
 
                 int iHour = 0, iMinute = 0;
@@ -2025,7 +2026,7 @@ namespace Scada
 
                 foreach (string s in sHourScale)
                 {
-                    var v = new MyValue();
+                    var v = new ChartValue();
                     v.Minute = iMinute;
                     v.Hour = myChartSetting.iHour;
                     v.sTime = s;
@@ -2039,7 +2040,7 @@ namespace Scada
                     iHour = reader.GetInt32(0);
                     iMinute = reader.GetInt32(1);
 
-                    foreach (MyValue v in DiagramScale)
+                    foreach (ChartValue v in DiagramScale)
                     {
                         if (v.Minute == iMinute)
                         {
@@ -2052,7 +2053,7 @@ namespace Scada
 
 
                 string sTimeText;
-                foreach (MyValue v in DiagramScale)
+                foreach (ChartValue v in DiagramScale)
                 {
                     sTimeText = "";
                     if ((v.Minute % 15) == 0)
@@ -2267,21 +2268,192 @@ namespace Scada
                 cmdGetData.Parameters.AddWithValue("@sWeek", myChartSetting.iWeek);
                 cmdGetData.Parameters.AddWithValue("@sTag", MyTag.TagID);
 
-
+                /*
                 int iWeekDay;
                 var TempValues = new List<ScadaClasses.Value>();
                 var sWeekScale = new[] { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
+                var sMonday = new[] { "Mon", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "" };
+
                 foreach (string s in sWeekScale)
                 {
                     TempValues.Add(new ScadaClasses.Value { X = s, Y = "0", Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag, Max = 100F, Min = 0F, TimeSpan = tsWeek });
                 }
-
+                int i = 0;
                 SqlDataReader reader = cmdGetData.ExecuteReader();
                 while (reader.Read())
                 {
                     iWeekDay = reader.GetInt32(2);
                     TempValues[iWeekDay - 1].Y = reader.GetDouble(4).ToString("000.00");
+                    i++;
                 }
+                */
+
+
+
+                var TempValues = new List<ScadaClasses.Value>();
+                var DiagramScale = new List<ChartValue>();
+
+                var Scale = new DateTime(myChartSetting.iYear, myChartSetting.iMonth, myChartSetting.iDay, 0, 0, 0);
+                var EndScale = Scale.AddDays(-7);
+                int w = 8;
+                while (Scale > EndScale)
+                {
+                    var v = new ChartValue();
+                    v.DayOfWeek = w;
+                    v.Hour = Scale.Hour;
+                    v.Minute = Scale.Minute;
+                    v.Second = Scale.Second;
+                    v.sValue = "";
+                    DiagramScale.Add(v);
+                    Scale = Scale.AddHours(-1);
+                    if (v.Hour == 0) 
+                    {
+                        w = w - 1;
+                    }
+                }
+                int i = 0;
+
+                DiagramScale.Reverse();
+
+
+                int DayOfWeek;
+                int Hour;
+                SqlDataReader reader = cmdGetData.ExecuteReader();
+                while (reader.Read())
+                {
+                    DayOfWeek = reader.GetInt32(2);
+                    Hour = reader.GetInt32(3);
+
+                    foreach (ChartValue v in DiagramScale)
+                    {
+                        if (v.DayOfWeek == DayOfWeek)
+                        {
+                            if (v.Hour == Hour)
+                            {
+                                v.sValue = reader.GetDouble(4).ToString("000.00");
+                            }
+                       
+                        }
+                    }
+                    i++;
+                }
+
+                string sTimeText;
+                foreach (ChartValue v in DiagramScale)
+                {
+                    sTimeText = "";
+                    if (v.Hour  == 0)
+                    {
+                        if (v.DayOfWeek == 1)
+                        {
+                            sTimeText = v.Hour.ToString("Mon");
+                        }
+                        if (v.DayOfWeek == 2)
+                        {
+                            sTimeText = v.Hour.ToString("Tis");
+                        }
+                        if (v.DayOfWeek == 3)
+                        {
+                            sTimeText = v.Hour.ToString("Ons");
+                        }
+                        if (v.DayOfWeek == 4)
+                        {
+                            sTimeText = v.Hour.ToString("Tor");
+                        }
+                        if (v.DayOfWeek == 5)
+                        {
+                            sTimeText = v.Hour.ToString("Fre");
+                        }
+                        if(v.DayOfWeek == 6)
+                        {
+                            sTimeText = v.Hour.ToString("Sat");
+                        }
+                        if(v.DayOfWeek == 7)
+                        {
+                            sTimeText = v.Hour.ToString("Sun");
+                        }
+                    }
+
+
+                    TempValues.Add(new ScadaClasses.Value { X = sTimeText, Y = v.sValue, Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag, Max = 100F, Min = 0F, TimeSpan = tsWeek });
+                }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                /*
+                var DiagramScale = new List<ChartValue>();         
+                int iHour = 0, iMinute = 0;
+                var sHourScale = new[] { "00", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "15", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "30", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "45", "", "", "", "", "", "", "", "", "", "", "", "", "", "" };
+                foreach (string s in sHourScale)
+                {
+                    var v = new ChartValue();
+                    v.Minute = iMinute;
+                    v.Hour = myChartSetting.iHour;
+                    v.sTime = s;
+                    v.sValue = "0";
+                    DiagramScale.Add(v);
+                    iMinute++;
+                }
+
+                while (reader.Read())
+                {
+                    iHour = reader.GetInt32(0);
+                    iMinute = reader.GetInt32(1);
+
+                    foreach (ChartValue v in DiagramScale)
+                    {
+                        if (v.Minute == iMinute)
+                        {
+                            v.Hour = iHour;
+                            v.sValue = reader.GetDouble(2).ToString("000.00");
+
+                        }
+                    }
+                }
+
+
+                string sTimeText;
+                foreach (ChartValue v in DiagramScale)
+                {
+                    sTimeText = "";
+                    if ((v.Minute % 15) == 0)
+                    {
+                        sTimeText = v.Hour.ToString("00") + ":" + v.Minute.ToString("00");
+                    }
+                    TempValues.Add(new ScadaClasses.Value { X = sTimeText, Y = v.sValue, Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag, Max = 100F, Min = 0F, TimeSpan = tsHour });
+                }
+
+                */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
                 reader.Close();
                 cmdGetData.Dispose();

@@ -65,16 +65,17 @@ public partial class MainPage : ContentPage
         //ConnectionString = "Server = tcp:scada.database.windows.net,1433; Initial Catalog = scada; Persist Security Info = False; User ID = freydr; Password =Admin123>; MultipleActiveResultSets = False; Encrypt = True; TrustServerCertificate = False; Connection Timeout = 30";
 
         //SQL
-        //ConnectionString = "Data Source =PC-5CG5125C24; Initial Catalog = SCADA; Integrated Security = true; TrustServerCertificate = true";
-        /*
+        ConnectionString = "Data Source =PC-5CG5125C24; Initial Catalog = SCADA; Integrated Security = true; TrustServerCertificate = true";
+
+       /*
         ConnectionString = "Server =tcp:scada.database.windows.net,1433;" +
-                           "Database=AdventureWorksLT;User ID=freydr;" +
+                           "Database=Scada;User ID=freydr;" +
                            "Password=Admin123>;Encrypt=True;" +
                            "TrustServerCertificate=False;Connection Timeout=30;";
         */
         //ConnectionString = "Server = tcp:scada.database.windows.net,1433; Initial Catalog = scada; Persist Security Info = False; User ID = operator1; Password = KopparGruvanSmalter137081>; MultipleActiveResultSets = False; Encrypt = True; TrustServerCertificate = False; Connection Timeout = 30";
 
-        
+
 
         /*ConnectionString =  "Server=tcp:scada.database.windows.net,1433;" +
                             "Initial Catalog=scada;" +
@@ -93,7 +94,8 @@ public partial class MainPage : ContentPage
                             "Authentication=Active Directory Integrated;" +
                             "User ID=fredrik655@hotmail.com;";
         */
-        
+
+        /*Ok 2026-04-20
         ConnectionString =  "Server=tcp:scada.database.windows.net,1433;" +
                             "Initial Catalog=scada;" +
                             "Encrypt=True;" +
@@ -101,7 +103,11 @@ public partial class MainPage : ContentPage
                             "Connection Timeout=30;" +
                             "Authentication=Active Directory Interactive;" +
                             "User ID=fredrik655@hotmail.com;";
-        
+       */
+
+
+
+
         /* ConnectionString = "Server=scada.database.windows.net;" +
                               "Authentication=Active Directory Password; Encrypt=True; Database=scada;" +
                               "User Id=fredrik655@hotmail.com; Password=MQTTBroker0407>";
@@ -112,7 +118,7 @@ public partial class MainPage : ContentPage
                                    "Database=scada";
          */
         // Use your own server, database, user ID, and password.
-       
+
         /*
           ConnectionString =  "Server=scada.database.windows.net;" +
                             "Authentication=Active Directory Password; Encrypt=True; Database=scada;"+
@@ -1129,7 +1135,7 @@ public partial class MainPage : ContentPage
 
 
 
-    private void ScadaDataSources()
+    private void ScadaTagsSources()
     {
         double panelWith = 0.4;
         double panelHeight = 0.55;
@@ -2431,6 +2437,34 @@ public partial class MainPage : ContentPage
         return Math.Round((value / n)) * n;
     }
 
+    public  DateTime FirstDateOfWeekISO8601(int year, int weekOfYear)
+    {
+        DateTime jan1 = new DateTime(year, 1, 1);
+        int daysOffset = DayOfWeek.Thursday - jan1.DayOfWeek;
+
+        // Use first Thursday in January to get first week of the year as
+        // it will never be in Week 52/53
+        DateTime firstThursday = jan1.AddDays(daysOffset);
+        var cal = CultureInfo.CurrentCulture.Calendar;
+        int firstWeek = cal.GetWeekOfYear(firstThursday, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+
+        var weekNum = weekOfYear;
+        // As we're adding days to a date in Week 1,
+        // we need to subtract 1 in order to get the right date for week #1
+        if (firstWeek == 1)
+        {
+            weekNum -= 1;
+        }
+
+        // Using the first Thursday as starting week ensures that we are starting in the right year
+        // then we add number of weeks multiplied with days
+        var result = firstThursday.AddDays(weekNum * 7);
+
+        // Subtract 3 days from Thursday to get Monday, which is the first weekday in ISO8601
+        return result.AddDays(-3);
+    }
+
+
     public int ChartSetTimeScaleStep(int ItemID, int Direction)
     {
         DataAccessLayer MyDataAccessLayer = new DataAccessLayer(ConnectionString);
@@ -2470,14 +2504,38 @@ public partial class MainPage : ContentPage
             case 4:
                 {
                     DateTime myTime = new DateTime(myChartSettings.iYear, myChartSettings.iMonth, myChartSettings.iDay, myChartSettings.iHour, 0, 0);
-                    Direction = Direction * 7;
-                    DateTime OneWeek = myTime.AddDays(Direction);
-                    myChartSettings.iYear = OneWeek.Year;
-                    myChartSettings.iMonth = OneWeek.Month;
-                    myChartSettings.iDay = OneWeek.Day;
                     myChartSettings.iHour = 0;
                     myChartSettings.iMinute = 0;
-                }
+
+                    if (Direction > 0)
+                    {
+                        if (myChartSettings.iWeek < 52)
+                        {
+                            myChartSettings.iWeek = myChartSettings.iWeek + 1;
+                        }
+                        else
+                        {
+                            myChartSettings.iWeek = 1;
+                            myChartSettings.iYear = myChartSettings.iYear + 1;
+                        }
+                    }
+
+                    if (Direction < 0)
+                    {
+                        if (myChartSettings.iWeek > 1)
+                        {
+                            myChartSettings.iWeek = myChartSettings.iWeek - 1;
+                        }
+                        else
+                        {
+                            myChartSettings.iWeek = 52;
+                            myChartSettings.iYear = myChartSettings.iYear - 1;
+                        }
+                    }
+              
+                    FirstDateOfWeekISO8601(myChartSettings.iYear ,myChartSettings.iWeek);
+
+                    }
                 break;
 
             case 5:
@@ -3226,7 +3284,7 @@ public partial class MainPage : ContentPage
                         break;
 
                     case ScadaClasses.uxDataSources:
-                        ScadaDataSources();     
+                        ScadaTagsSources();     
                         break;
 
                     case ScadaClasses.uxDataSourcesSettings:
@@ -5988,25 +6046,18 @@ public partial class MainPage : ContentPage
                         case 1:
                             dItem.ButtonText = "Latest 5 minutes";
                             break;
-
                         case 2:
                             dItem.ButtonText = myDT.ToString("hh:mm  dd", CultureInfo.InvariantCulture) + " " + myDT.ToString("MMMM", CultureInfo.InvariantCulture) + " " + myDT.ToString("yyyy", CultureInfo.InvariantCulture);
                             break;
-
                         case 3:
                             dItem.ButtonText = myDT.ToString("dd", CultureInfo.InvariantCulture) + " " + myDT.ToString("MMMM", CultureInfo.InvariantCulture) + " " + myDT.ToString("yyyy", CultureInfo.InvariantCulture);
                             break;
-
                         case 4:
-                            Calendar cal = new CultureInfo("sv-se").Calendar;
-                            int week = cal.GetWeekOfYear(myDT, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
-                            dItem.ButtonText = "Week " + myDT.ToString(week.ToString("00"), CultureInfo.InvariantCulture) + " " + myDT.ToString("yyyy", CultureInfo.InvariantCulture);
+                            dItem.ButtonText = "Week " + ChartSetting.iWeek.ToString("00") + " " + myDT.ToString("yyyy", CultureInfo.InvariantCulture); 
                             break;
-
                         case 5:
                             dItem.ButtonText = myDT.ToString("MMMM", CultureInfo.InvariantCulture) + " " + myDT.ToString("yyyy", CultureInfo.InvariantCulture);
                             break;
-
                         case 6:
                             dItem.ButtonText = "Year " + myDT.ToString("yyyy", CultureInfo.InvariantCulture);
                             break;

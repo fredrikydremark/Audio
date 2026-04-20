@@ -2059,7 +2059,7 @@ namespace Scada
                     {
                         sTimeText = v.Hour.ToString("00") + ":" + v.Minute.ToString("00");
                     }
-                    TempValues.Add(new ScadaClasses.Value { X = sTimeText, Y = v.sValue, Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag });
+                    TempValues.Add(new ScadaClasses.Value { X = sTimeText, Y = v.sValue, Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag,Max=100F,Min=0F,TimeSpan=tsHour });
                 }
 
                 /*
@@ -2174,7 +2174,7 @@ namespace Scada
                 var sDayScale = new[] { "00:00", "", "", "03:00", "", "", "06:00", "", "", "09:00", "", "", "12:00", "", "", "15:00", "", "", "18:00", "", "", "21:00", "", "" };
                 foreach (string s in sDayScale)
                 {
-                    TempValues.Add(new ScadaClasses.Value { X = s, Y = "0", Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag });
+                    TempValues.Add(new ScadaClasses.Value { X = s, Y = "0", Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag, Max = 100F, Min = 0F, TimeSpan = tsDay });
                 }
 
                 int iHour;
@@ -2273,7 +2273,7 @@ namespace Scada
                 var sWeekScale = new[] { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
                 foreach (string s in sWeekScale)
                 {
-                    TempValues.Add(new ScadaClasses.Value { X = s, Y = "0", Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag });
+                    TempValues.Add(new ScadaClasses.Value { X = s, Y = "0", Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag, Max = 100F, Min = 0F, TimeSpan = tsWeek });
                 }
 
                 SqlDataReader reader = cmdGetData.ExecuteReader();
@@ -2338,10 +2338,10 @@ namespace Scada
                 var TempValues = new List<ScadaClasses.Value>();
                 int daysInMonth = DateTime.DaysInMonth(myChartSetting.iYear, myChartSetting.iMonth);
 
-                var sMonthScale = new[] { "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31" };
+                var sMonthScale = new[] { "01", "", "", "", "", "", "", "08", "", "", "", "", "", "", "15", "", "", "", "", "", "", "22", "", "", "", "", "", "", "29", "", "" };
                 foreach (string s in sMonthScale)
                 {
-                    TempValues.Add(new ScadaClasses.Value { X = s, Y = "0", Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag });
+                    TempValues.Add(new ScadaClasses.Value { X = s, Y = "0", Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag, Max = 100F, Min = 0F, TimeSpan = tsMonth });
                 }
 
                 /*
@@ -2428,12 +2428,12 @@ namespace Scada
                     {
                         oldMonth++;
                         sMonth = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(oldMonth);
-                        TempValues.Add(new ScadaClasses.Value { X = sMonth, Y = "0", Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag });
+                        TempValues.Add(new ScadaClasses.Value { X = sMonth, Y = "0", Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag, Max = 100F, Min = 0F, TimeSpan = tsYear });
                     }
 
                     sMonth = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(iMonth); ;
                     sValue = reader.GetDouble(1).ToString("000.00");
-                    TempValues.Add(new ScadaClasses.Value { X = sMonth, Y = sValue, Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag });
+                    TempValues.Add(new ScadaClasses.Value { X = sMonth, Y = sValue, Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag, Max = 100F, Min = 0F, TimeSpan = tsYear });
                     oldMonth = iMonth;
                 }
 
@@ -2605,7 +2605,7 @@ namespace Scada
                 {
                     ConnectionString = sConnection
                 };
-                string sqlGetData = "insert into ChartSettings Values( 1,2025,1,1,1,0,0, @ItemID ) ";
+                string sqlGetData = "insert into ChartSettings Values( 1,2026,1,1,1,0,0, @ItemID ) ";
                 Connection.Open();
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
                 cmdGetData.Parameters.AddWithValue("@ItemID", ItemID);
@@ -2639,6 +2639,7 @@ namespace Scada
                                     "Span = @Span, " +
                                     "Year = @Year, " +
                                     "Month = @Month, " +
+                                    "Week = @Week, " +
                                     "Day = @Day, " +
                                     "Hour = @Hour, " +
                                     "Minute = @Minute " +
@@ -2649,6 +2650,7 @@ namespace Scada
                 cmdGetData.Parameters.AddWithValue("@Span", myChartsettiing.iSpan);
                 cmdGetData.Parameters.AddWithValue("@Year", myChartsettiing.iYear);
                 cmdGetData.Parameters.AddWithValue("@Month", myChartsettiing.iMonth);
+                cmdGetData.Parameters.AddWithValue("@Week", myChartsettiing.iWeek);
                 cmdGetData.Parameters.AddWithValue("@Day", myChartsettiing.iDay);
                 cmdGetData.Parameters.AddWithValue("@Hour", myChartsettiing.iHour);
                 cmdGetData.Parameters.AddWithValue("@Minute", myChartsettiing.iMinute);
@@ -2759,29 +2761,6 @@ namespace Scada
                     oTempTele.Top = reader.GetDouble(3);
                     oTempTele.Width = reader.GetDouble(4);
                     oTempTele.Height = reader.GetDouble(5);
-
-                    /*
-                    int StatusQuality = 1;
-                    if (reader.IsDBNull(18) == false)
-                    {
-                        StatusQuality = reader.GetInt32(18);
-                    }
-
-                    if (reader.IsDBNull(6) == false)
-                    {
-                        if ( StatusQuality == 0 ) {                          
-                            oTempTele.PV = reader.GetDouble(6).ToString("0.0").Replace(",", ".");
-                        }
-                        else 
-                        {
-                            oTempTele.PV = "-.-";
-                        }
-                    }
-                    else
-                    {
-                        oTempTele.PV = "--.-";
-                    }
-                    */
                     oTempTele.ItemValues = ReadItemValues(oTempTele.ItemID);
 
                     if (reader.IsDBNull(7) == false)

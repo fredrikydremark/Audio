@@ -284,6 +284,13 @@ namespace Scada
         public const int CategoryOpcUA = 103;
         public const int CategorySimulator = 103;
 
+
+        public const int tsNow = 0;
+        public const int tsHour = 1;
+        public const int tsDay = 2;
+        public const int tsWeek = 3;
+        public const int tsMonth = 4;
+        public const int tsYear = 5;
         /*
 
         public class Param
@@ -348,21 +355,6 @@ namespace Scada
 
         }
 
-        /*
-        public List<ScadaClasses.LibItem> LibItems = new List<ScadaClasses.LibItem>();
-
-        public class ScadaControlTelegram
-        {
-            public int MessageType { get; set; }
-            public int ItemID { get; set; }
-            public int TagID { get; set; }
-            public string TagName { get; set; }
-            public int Page { get; set; }
-            public int ItemType { get; set; }
-            public string Action { get; set; }
-            public double SV { get; set; }
-        }
-        */
 
         public class Value
         {
@@ -370,6 +362,9 @@ namespace Scada
             public string Y { get; set; }
             public string Color { get; set; }
             public int TypeOfTag { get; set; }
+            public double Max { get; set; }
+            public double Min { get; set; }
+            public int TimeSpan { get; set; }
         }
 
         public class SystemColors

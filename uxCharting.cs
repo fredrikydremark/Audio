@@ -197,7 +197,6 @@ Begin
   End;
 
 
-
   ScaleMarkStartXp := XpStart;
   ScaleMarkStopXp  := XpStart - ScaleMarkLength;
 
@@ -214,9 +213,7 @@ Begin
               ScaleMarkStopXp  := XpStopp - ScaleMarkLength;
               TabDirection := -1;
             end;
-
   end;
-
 
   YValue:=MinValue;
   YValue:=YValue+Scale;
@@ -230,7 +227,7 @@ Line[2].X := ScaleMarkStopXp;
 Line[2].Y := Yp;
 
 if TheAxis = Left then
-      HorizontalHelpLine(MemBitmap, XpStart, XpStopp, Yp);
+  HorizontalHelpLine(MemBitmap, XpStart, XpStopp, Yp);
 
 str(YValue: 5:0, S);
 
@@ -416,7 +413,6 @@ end;
                     );
                 }
             }
-
             return result.Select(y => new ValuePoint(y)).ToList();
         }
 
@@ -511,7 +507,7 @@ end;
                         FilterQuality = SKFilterQuality.High,
                         StrokeCap = SKStrokeCap.Round
                     };
-
+                    /* Interpolation Enable
                     var InterpolateValues = new List<ValuePoint>();
                     double OldValue=0;
                     foreach (var Value in LocalValues)
@@ -536,6 +532,7 @@ end;
                         LocalValues[idx].Y =  v.Y.ToString("##.#");
                         idx--;
                     }
+                    */
 
                     int Count = LocalValues.Count;
                     string sv = "0";

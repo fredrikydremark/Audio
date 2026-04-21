@@ -1,9 +1,7 @@
 ﻿
 using Microsoft.Data.SqlClient;
 using System.Globalization;
-using System.Reflection.PortableExecutable;
 using static Scada.ScadaClasses;
-
 
 
 namespace Scada
@@ -2288,8 +2286,6 @@ namespace Scada
                 }
                 */
 
-
-
                 var TempValues = new List<ScadaClasses.Value>();
                 var DiagramScale = new List<ChartValue>();
 
@@ -2312,9 +2308,7 @@ namespace Scada
                     }
                 }
                 int i = 0;
-
                 DiagramScale.Reverse();
-
 
                 int DayOfWeek;
                 int Hour;
@@ -2373,24 +2367,8 @@ namespace Scada
                             sTimeText = v.Hour.ToString("Sun");
                         }
                     }
-
-
                     TempValues.Add(new ScadaClasses.Value { X = sTimeText, Y = v.sValue, Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag, Max = 100F, Min = 0F, TimeSpan = tsWeek });
                 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
                 /*

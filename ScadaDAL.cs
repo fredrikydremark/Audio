@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.Data.SqlClient;
 using System.Globalization;
+using System.Text;
 using static Scada.ScadaClasses;
 
 
@@ -103,6 +104,125 @@ namespace Scada
             }
         }
 
+
+        public int StoreDigital(string sBinaryValue, int Adress)
+        {
+            var myConnection = new Microsoft.Data.SqlClient.SqlConnection
+            {
+                ConnectionString = sConnection
+            };
+
+
+            for (int Channel = 0; Channel < 6; Channel++)
+            {
+                int Value = Convert.ToInt16(sBinaryValue.Substring((sBinaryValue.Length - 1) - Channel, 1));
+
+                string sqlUpdate = "UPDATE Tags SET Value = @Value FROM Tags " +
+                                   "JOIN AdamChannels on Tags.TagID = AdamChannels.TagID " +
+                                   "WHERE(Tags.TagID = AdamChannels.TagID) AND ( Channel = @Channel AND Adress = @Adress )";
+
+
+                try
+                {
+                    myConnection.Open();
+                    SqlCommand cmdIns = new SqlCommand(sqlUpdate, myConnection);
+                    cmdIns.Parameters.AddWithValue("@Channel", Channel);
+                    cmdIns.Parameters.AddWithValue("@Adress", Adress);
+                    cmdIns.Parameters.AddWithValue("@Value", Value);
+                    cmdIns.ExecuteNonQuery();
+                    cmdIns.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    return (-1);
+                    throw new Exception(ex.ToString(), ex);
+                }
+                finally
+                {
+                    myConnection.Close();
+                }
+            }
+            return (0);
+        }
+
+        public string GetDigitalOutputs(int Adress)
+        {
+            string DigOutput = "-------";
+            try
+            {
+                var myConnection = new Microsoft.Data.SqlClient.SqlConnection
+                {
+                    ConnectionString = sConnection
+                };
+                string sqlGetData = "SELECT Channel, Tags.Value FROM AdamChannels " +
+                                     "JOIN Tags on Tags.TagID = AdamChannels.TagID " +
+                                     "Where ( Tags.TagID = AdamChannels.TagID ) AND ( adress = @Adress) " +
+                                     "ORDER BY Adress ASC, Channel ASC";
+
+                myConnection.Open();
+                SqlCommand cmdGetData = new SqlCommand(sqlGetData, myConnection);
+                cmdGetData.Parameters.AddWithValue("@Adress", Adress);
+                SqlDataReader reader = cmdGetData.ExecuteReader();                  
+                StringBuilder sDigital = new StringBuilder(DigOutput);
+
+                while (reader.Read())
+                {
+                    int Channel = reader.GetInt32(0);
+                    double SV = reader.GetDouble(1);
+                    if (SV > 0.2)
+                        sDigital[Channel] = '1';
+                    else
+                        sDigital[Channel] = '0';
+
+                }
+                DigOutput = sDigital.ToString();
+                reader.Close();
+                cmdGetData.Dispose();
+                myConnection.Close();
+                myConnection.Dispose();
+                myConnection = null;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString(), ex);
+            }
+            finally
+            {
+            }
+            return (DigOutput);
+        }
+
+
+        public bool StoreAnalog(int Channel, int Adress, double Value)
+        {
+            var myConnection = new Microsoft.Data.SqlClient.SqlConnection
+            {
+                ConnectionString = sConnection
+            };
+            string sqlUpdate = "UPDATE Tags SET Value = @Value, ValueTime = Getdate(),StatusQuality=0 FROM Tags " +
+                               "JOIN AdamChannels on Tags.TagID = AdamChannels.TagID " +
+                               "WHERE(Tags.TagID = AdamChannels.TagID) AND ( Channel = @Channel AND Adress = @Adress)";
+
+            try
+            {
+                myConnection.Open();
+                SqlCommand cmdIns = new SqlCommand(sqlUpdate, myConnection);
+                cmdIns.Parameters.AddWithValue("@Channel", Channel);
+                cmdIns.Parameters.AddWithValue("@Adress", Adress);
+                cmdIns.Parameters.AddWithValue("@Value", Value);
+                cmdIns.ExecuteNonQuery();
+                cmdIns.Dispose();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString(), ex);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+            return (true);
+        }
 
         public List<gridRow> ReadParameters(string Filter, int StartCatRange, int EndCatRange, int StartRow, int EndRow )
         {

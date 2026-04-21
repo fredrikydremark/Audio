@@ -13,17 +13,15 @@ namespace Scada
     {     
         static string myPortName = "COM4";
         static int baudRate = 9600;
-
-        SerialPort sp = new SerialPort(myPortName, baudRate);
+        static SerialPort sp = new SerialPort(myPortName, baudRate);
     
+        /*
         int StoreDigital(string sBinaryValue, int Adress)
         {
             var myConnection = new Microsoft.Data.SqlClient.SqlConnection
             {
                 ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
             };
-
-
             for (int Channel = 0; Channel < 6; Channel++)
             {
                 int Value = Convert.ToInt16(sBinaryValue.Substring((sBinaryValue.Length - 1) - Channel, 1));
@@ -31,7 +29,6 @@ namespace Scada
                 string sqlUpdate = "UPDATE Tags SET Value = @Value FROM Tags " +
                                    "JOIN AdamChannels on Tags.TagID = AdamChannels.TagID " +
                                    "WHERE(Tags.TagID = AdamChannels.TagID) AND ( Channel = @Channel AND Adress = @Adress )";
-
 
                 try
                 {
@@ -55,8 +52,9 @@ namespace Scada
             }
             return (0);
         }
+        */
 
-
+        /*
         private string GetDigitalOutputs(int Adress)
         {
             string DigOutput;
@@ -110,15 +108,13 @@ namespace Scada
             }
             return (DigOutput);
         }
-
+        */
 
         public void ReadADAM()
         {
             Double Value = 9999999;
-            var myConnection = new Microsoft.Data.SqlClient.SqlConnection
-            {
-                ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
-            };
+    
+            DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);
 
             string sBinary, s, DigitalOutput;
             short Channel, Adress;
@@ -129,10 +125,9 @@ namespace Scada
             Adress = 1;
             if (sp.IsOpen == true)
             {
-
                 //Write Digital outputs
                 Adress = 2;
-                DigitalOutput = GetDigitalOutputs(Adress);
+                DigitalOutput = MyDataAccessLayer.GetDigitalOutputs(Adress);
                 for (Channel = 0; Channel < 7; Channel++)
                 {
                     if (DigitalOutput[Channel] != '-')
@@ -150,7 +145,6 @@ namespace Scada
                     }
                 }
 
-
                 try
                 {
                     Adress = 2;
@@ -166,7 +160,7 @@ namespace Scada
                     try
                     {
                         sBinary = Convert.ToString(Convert.ToInt32(message, 16), 2);
-                        StoreDigital(sBinary, Adress);
+                        MyDataAccessLayer.StoreDigital(sBinary, Adress);
                     }
                     catch (Exception ex)
                     {
@@ -277,6 +271,8 @@ namespace Scada
 
                         if ((Value < 99999) && (Value > -99999))
                         {
+                            MyDataAccessLayer.StoreAnalog(Channel, Adress,Value);
+                            /*
                             string sqlUpdate = "UPDATE Tags SET Value = @Value, ValueTime = Getdate(),StatusQuality=0 FROM Tags " +
                                                "JOIN AdamChannels on Tags.TagID = AdamChannels.TagID " +
                                                "WHERE(Tags.TagID = AdamChannels.TagID) AND ( Channel = @Channel AND Adress = @Adress)";
@@ -299,6 +295,7 @@ namespace Scada
                             {
                                 myConnection.Close();
                             }
+                            */
                         }
                     }
                 }

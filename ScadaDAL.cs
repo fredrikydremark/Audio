@@ -75,7 +75,6 @@ namespace Scada
             }
         }
 
-
         public int DeleteLibItem(string Name)
         {
             try
@@ -104,14 +103,12 @@ namespace Scada
             }
         }
 
-
         public int StoreDigital(string sBinaryValue, int Adress)
         {
             var myConnection = new Microsoft.Data.SqlClient.SqlConnection
             {
                 ConnectionString = sConnection
             };
-
 
             for (int Channel = 0; Channel < 6; Channel++)
             {

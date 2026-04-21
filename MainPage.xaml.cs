@@ -175,17 +175,16 @@ public partial class MainPage : ContentPage
 
 
     void bckUpdate(object sender, EventArgs e)
-    {
-        
+    {        
         try
         {
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 DataAccessLayer MyDataAccessLayer = new DataAccessLayer(ConnectionString);
-                /*
+                
                 if (MyDataAccessLayer.ReadParameterByName("Enable ADAM") == "1")
                 {
-                    Adam AdamLayer = new Adam();
+                    Adam AdamLayer = new Adam(MyDataAccessLayer.ReadParameterByName("PortName"), MyDataAccessLayer.ReadParameterByName("Baudrate"));
                     AdamLayer.ReadADAM();
                 }
                 if (MyDataAccessLayer.ReadParameterByName("Enable MQTT") == "1")
@@ -196,7 +195,7 @@ public partial class MainPage : ContentPage
                 {
             
                 }
-                */
+                
 
                 /*
                 if (MyDataAccessLayer.ReadParameterByName("Enable simulation") == "1")
@@ -224,7 +223,7 @@ public partial class MainPage : ContentPage
                     var d1 = (rnd1.NextDouble() * 15F);
                     MyDataAccessLayer.SetTagValueByName("RandomSignal", RampSignal + (float)(d1));
                 }
-
+                */
                 var ListOfAnalogTagsToStore = MyDataAccessLayer.GetAnalogTagsToStore();
                 foreach (var Tag in ListOfAnalogTagsToStore)
                 {
@@ -236,7 +235,7 @@ public partial class MainPage : ContentPage
                 {
                     MyDataAccessLayer.StoreTagValue(Tag.TagID, Tag.Value);
                 }
-                */
+                
                 ScadaClasses.Refresh = true;
                 bcktimer.Interval = 5000;
             });
@@ -3452,8 +3451,8 @@ public partial class MainPage : ContentPage
                                     break;
 
                                 case SKTouchAction.Exited:
-                                    myTimeScaleButton.GradientStartColor = ScadaColor.uxTransparentButtonColor;
-                                    myTimeScaleButton.GradientEndColor = ScadaColor.uxTransparentButtonColor;
+                                    myTimeScaleButton.GradientStartColor = ScadaColor.uxPopupItemColor;
+                                    myTimeScaleButton.GradientEndColor = ScadaColor.uxPopupItemColor;
                                     break;
 
                             }

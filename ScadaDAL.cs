@@ -121,7 +121,6 @@ namespace Scada
                                    "JOIN AdamChannels on Tags.TagID = AdamChannels.TagID " +
                                    "WHERE(Tags.TagID = AdamChannels.TagID) AND ( Channel = @Channel AND Adress = @Adress )";
 
-
                 try
                 {
                     myConnection.Open();
@@ -179,8 +178,6 @@ namespace Scada
                 reader.Close();
                 cmdGetData.Dispose();
                 myConnection.Close();
-                myConnection.Dispose();
-                myConnection = null;
             }
             catch (Exception ex)
             {
@@ -191,6 +188,85 @@ namespace Scada
             }
             return (DigOutput);
         }
+
+        public double GetAnalogChannel_k(int Adress,int Channel)
+        {
+            double k = 1;
+            try
+            {
+                var myConnection = new Microsoft.Data.SqlClient.SqlConnection
+                {
+                    ConnectionString = sConnection
+                };
+                string sqlGetData = "select k FROM AdamChannels " +
+                                     "Where ( Channel= @Channel ) AND ( adress = @Adress )";
+                                    
+                myConnection.Open();
+                SqlCommand cmdGetData = new SqlCommand(sqlGetData, myConnection);
+                cmdGetData.Parameters.AddWithValue("@Adress", Adress);
+                SqlDataReader reader = cmdGetData.ExecuteReader();
+               
+
+                while (reader.Read())
+                {          
+                   k = reader.GetDouble(0);
+                }
+               
+                reader.Close();
+                cmdGetData.Dispose();
+                myConnection.Close();
+ 
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString(), ex);
+            }
+            finally
+            {
+            }
+            return (k);
+        }
+
+        public double GetAnalogChannel_m(int Adress, int Channel)
+        {
+            double m = 1;
+            try
+            {
+                var myConnection = new Microsoft.Data.SqlClient.SqlConnection
+                {
+                    ConnectionString = sConnection
+                };
+                string sqlGetData = "select m FROM AdamChannels " +
+                                     "Where ( Channel= @Channel ) AND ( adress = @Adress )";
+
+                myConnection.Open();
+                SqlCommand cmdGetData = new SqlCommand(sqlGetData, myConnection);
+                cmdGetData.Parameters.AddWithValue("@Adress", Adress);
+                SqlDataReader reader = cmdGetData.ExecuteReader();
+
+
+                while (reader.Read())
+                {
+                    m = reader.GetDouble(0);
+                }
+
+                reader.Close();
+                cmdGetData.Dispose();
+                myConnection.Close();
+                myConnection.Dispose();
+                myConnection = null;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString(), ex);
+            }
+            finally
+            {
+            }
+            return (m);
+        }
+
+
 
 
         public bool StoreAnalog(int Channel, int Adress, double Value)

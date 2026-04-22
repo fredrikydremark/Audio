@@ -3084,7 +3084,12 @@ namespace Scada
                     ConnectionString = sConnection
                 };
 
-                string sqlGetData = "SELECT itemID,itemtype,posLeft,posTop,posWidth,posHeight,Value,HL,LL,page,nextpage,unit,Action,text,items.tagID,tags.tagName,tags.Color,radius,tags.StatusQuality FROM Items LEFT JOIN Tags on tags.tagID = Items.tagID WHERE ( Page = @Page )  ORDER BY itemtype asc";
+                string sqlGetData = "SELECT itemID,itemtype,posLeft,posTop,posWidth,posHeight,Value,HL,LL,page," +
+                                    "nextpage,unit,Action,text,items.tagID,tags.tagName,tags.Color,radius,tags.StatusQuality " +
+                                    "FROM Items " +
+                                    "LEFT JOIN Tags on tags.tagID = Items.tagID " +
+                                    "WHERE ( Page = @Page ) " +
+                                    "ORDER BY itemtype asc";
                 Connection.Open();
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
                 cmdGetData.Parameters.AddWithValue("@Page", Page);

@@ -291,34 +291,37 @@ namespace Scada
         public const int tsWeek = 3;
         public const int tsMonth = 4;
         public const int tsYear = 5;
-        /*
 
+        public const int infoNormal = 0;
+        public const int infoStartup = 1;
+
+        /*
         public class Param
         {
             public string Data { get; set; }
             public int TypeOfData { get; set; }
-
         }
         */
+
         /*
-    public class PopupRow
-    {
-       public int ItemID { get; set; }
-       public int TagID { get; set; }
-       public int Left { get; set; }
-       public int Top { get; set; }
-       public int Width { get; set; }
-       public int Height { get; set; }
-       public int ItemType { get; set; }
-       public string InputType { get; set; }
-       public string GridAction { get; set; }
-       public string Action { get; set; }
-       public string Text { get; set; }
-       public string Destination { get; set; }
-       public string DestinationType { get; set; }
-       public string Value { get; set; }
-    }
-    */
+        public class PopupRow
+        {
+            public int ItemID { get; set; }
+            public int TagID { get; set; }
+            public int Left { get; set; }
+            public int Top { get; set; }
+            public int Width { get; set; }
+            public int Height { get; set; }
+            public int ItemType { get; set; }
+            public string InputType { get; set; }
+            public string GridAction { get; set; }
+            public string Action { get; set; }
+            public string Text { get; set; }
+            public string Destination { get; set; }
+            public string DestinationType { get; set; }
+            public string Value { get; set; }
+        }
+        */
 
         public class Tag
         {

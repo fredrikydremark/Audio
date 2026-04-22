@@ -323,8 +323,7 @@ namespace Scada
                 var gridRows = new List<gridRow>();
                 int row = 0;
                 while (reader.Read())
-                {
-              
+                {           
                         gridRows.Add(new gridRow
                         {
                             Id = reader.GetInt32(0),
@@ -341,6 +340,7 @@ namespace Scada
                             col6text = "",
                             col6width = 10F,
                             Status = -1,
+                            DataType= reader.GetInt32(3),
                             Row = row
                         });
                         row++;

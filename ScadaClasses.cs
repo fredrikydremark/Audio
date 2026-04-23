@@ -284,34 +284,44 @@ namespace Scada
         public const int CategoryOpcUA = 103;
         public const int CategorySimulator = 103;
 
-        /*
 
+        public const int tsNow = 0;
+        public const int tsHour = 1;
+        public const int tsDay = 2;
+        public const int tsWeek = 3;
+        public const int tsMonth = 4;
+        public const int tsYear = 5;
+
+        public const int infoNormal = 0;
+        public const int infoStartup = 1;
+
+        /*
         public class Param
         {
             public string Data { get; set; }
             public int TypeOfData { get; set; }
-
         }
         */
+
         /*
-    public class PopupRow
-    {
-       public int ItemID { get; set; }
-       public int TagID { get; set; }
-       public int Left { get; set; }
-       public int Top { get; set; }
-       public int Width { get; set; }
-       public int Height { get; set; }
-       public int ItemType { get; set; }
-       public string InputType { get; set; }
-       public string GridAction { get; set; }
-       public string Action { get; set; }
-       public string Text { get; set; }
-       public string Destination { get; set; }
-       public string DestinationType { get; set; }
-       public string Value { get; set; }
-    }
-    */
+        public class PopupRow
+        {
+            public int ItemID { get; set; }
+            public int TagID { get; set; }
+            public int Left { get; set; }
+            public int Top { get; set; }
+            public int Width { get; set; }
+            public int Height { get; set; }
+            public int ItemType { get; set; }
+            public string InputType { get; set; }
+            public string GridAction { get; set; }
+            public string Action { get; set; }
+            public string Text { get; set; }
+            public string Destination { get; set; }
+            public string DestinationType { get; set; }
+            public string Value { get; set; }
+        }
+        */
 
         public class Tag
         {
@@ -348,21 +358,6 @@ namespace Scada
 
         }
 
-        /*
-        public List<ScadaClasses.LibItem> LibItems = new List<ScadaClasses.LibItem>();
-
-        public class ScadaControlTelegram
-        {
-            public int MessageType { get; set; }
-            public int ItemID { get; set; }
-            public int TagID { get; set; }
-            public string TagName { get; set; }
-            public int Page { get; set; }
-            public int ItemType { get; set; }
-            public string Action { get; set; }
-            public double SV { get; set; }
-        }
-        */
 
         public class Value
         {
@@ -370,6 +365,9 @@ namespace Scada
             public string Y { get; set; }
             public string Color { get; set; }
             public int TypeOfTag { get; set; }
+            public double Max { get; set; }
+            public double Min { get; set; }
+            public int TimeSpan { get; set; }
         }
 
         public class SystemColors

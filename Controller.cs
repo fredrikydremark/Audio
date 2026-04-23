@@ -4,7 +4,6 @@ using SkiaSharp;
 using SkiaSharp.Views.Maui;
 using SkiaSharp.Views.Maui.Controls;
 
-
 namespace Scada
 {
     public class Controller : SKCanvasView

@@ -58,7 +58,7 @@ namespace Scada
             scb.BackgroundColor = Color.uxPanelColor.ToMauiColor();
             scb.GradientStartColor = Color.uxItemColor;
             scb.GradientEndColor = Color.uxItemColor;
-            scb.IndicatorColor = Color.uxOffColor;//Status
+            scb.IndicatorColor = Color.uxOffColor;
             scb.IndicatorType = 1;
             scb.ButtonFaceIntensity = 0;
             scb.IndicatorIntensity = 0;

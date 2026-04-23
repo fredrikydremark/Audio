@@ -1,65 +1,48 @@
 ﻿using Microsoft.Data.SqlClient;
-using SkiaSharp;
-using SkiaSharp.Views.Maui;
-using SkiaSharp.Views.Maui.Controls;
-using System;
-using System.Collections.Generic;
 using System.IO.Ports;
 using System.Text;
+using static Scada.ScadaClasses;
 
 namespace Scada
 {
     public class Adam
-    {     
+    {
         static string myPortName = "COM4";
         static int baudRate = 9600;
-
         static SerialPort sp = new SerialPort(myPortName, baudRate);
     
-        int StoreDigital(string sBinaryValue, int Adress)
+        public Adam(string portName, string baud)
         {
-            var myConnection = new Microsoft.Data.SqlClient.SqlConnection
+            myPortName = portName;
+            if (int.TryParse(baud, out int iBaud))
             {
-                ConnectionString = "Data Source = .\\SQLExpress;; Initial Catalog = SCADA; Integrated Security = true; TrustServerCertificate=true"
-                //ConnectionString = "Data Source=localhost\\SQLEXPRESS; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
-                //ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
+                ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
             };
 
+            sp.Parity = Parity.None;
+            sp.DataBits = 8;
+            sp.StopBits = StopBits.One;
+            sp.Handshake = Handshake.None;
+            sp.ReadTimeout = 500;
+            sp.WriteTimeout = 500;
 
-            for (int Channel = 0; Channel < 6; Channel++)
+            try
             {
-                int Value = Convert.ToInt16(sBinaryValue.Substring((sBinaryValue.Length - 1) - Channel, 1));
-
-                string sqlUpdate = "UPDATE Tags SET Value = @Value FROM Tags " +
-                                   "JOIN AdamChannels on Tags.TagID = AdamChannels.TagID " +
-                                   "WHERE(Tags.TagID = AdamChannels.TagID) AND ( Channel = @Channel AND Adress = @Adress )";
-
-
-                try
-                {
-                    myConnection.Open();
-                    SqlCommand cmdIns = new SqlCommand(sqlUpdate, myConnection);
-                    cmdIns.Parameters.AddWithValue("@Channel", Channel);
-                    cmdIns.Parameters.AddWithValue("@Adress", Adress);
-                    cmdIns.Parameters.AddWithValue("@Value", Value);
-                    cmdIns.ExecuteNonQuery();
-                    cmdIns.Dispose();
-                }
-                catch (Exception ex)
-                {
-                    return (-1);
-                    throw new Exception(ex.ToString(), ex);
-                }
-                finally
-                {
-                    myConnection.Close();
-                }
+              if (!sp.IsOpen)
+                sp.Open();
             }
-            return (0);
+            catch (UnauthorizedAccessException ex)
+            {
+              
+            }
+            catch (IOException ex)
+            {
+               
+            }
         }
 
 
-        private string GetDigitalOutputs(int Adress)
+        ~Adam()
         {
             string DigOutput;
             int Channel;
@@ -69,10 +52,8 @@ namespace Scada
             try
             {
                 var myConnection = new Microsoft.Data.SqlClient.SqlConnection
-                {               
-                   ConnectionString = "Data Source = .\\SQLExpress;; Initial Catalog = SCADA; Integrated Security = true; TrustServerCertificate=true"
-                   // ConnectionString = "Data Source=localhost\\SQLEXPRESS; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
-                  //ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
+                {
+                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
                 };
 
                 //string sqlGetData = "SELECT Channel,SetValue FROM Adam where adress = @Adress ORDER BY Adress ASC,Channel ASC";
@@ -120,10 +101,8 @@ namespace Scada
         {
             Double Value = 9999999;
             var myConnection = new Microsoft.Data.SqlClient.SqlConnection
-            {            
-                ConnectionString = "Data Source = .\\SQLExpress;; Initial Catalog = SCADA; Integrated Security = true; TrustServerCertificate=true"
-                //ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
-                //ConnectionString = "Data Source=localhost\\SQLEXPRESS; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
+            {
+                ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true"
             };
 
             string sBinary, s, DigitalOutput;
@@ -135,10 +114,9 @@ namespace Scada
             Adress = 1;
             if (sp.IsOpen == true)
             {
-
                 //Write Digital outputs
                 Adress = 2;
-                DigitalOutput = GetDigitalOutputs(Adress);
+                DigitalOutput = MyDataAccessLayer.GetDigitalOutputs(Adress);
                 for (Channel = 0; Channel < 7; Channel++)
                 {
                     if (DigitalOutput[Channel] != '-')
@@ -156,7 +134,6 @@ namespace Scada
                     }
                 }
 
-
                 try
                 {
                     Adress = 2;
@@ -172,7 +149,7 @@ namespace Scada
                     try
                     {
                         sBinary = Convert.ToString(Convert.ToInt32(message, 16), 2);
-                        StoreDigital(sBinary, Adress);
+                        MyDataAccessLayer.StoreDigital(sBinary, Adress);
                     }
                     catch (Exception ex)
                     {
@@ -187,7 +164,6 @@ namespace Scada
                 Adress = 1;// Adress of the Analog 4017 
                 for (Channel = 0; Channel < 3; Channel++)
                 {
-
                     Value = 9999999;
                     s = String.Concat("#0", Adress.ToString(), Channel.ToString());
                     message = "";
@@ -202,113 +178,23 @@ namespace Scada
                     catch (TimeoutException)
                     {
                         message = "--.-";
-
                     }
 
                     if (Double.TryParse(message, out Value))
                     {
-                        switch (Channel)
+                        k = MyDataAccessLayer.GetAnalogChannel_k(Adress, Channel);
+                        m = MyDataAccessLayer.GetAnalogChannel_m(Adress, Channel);
+                        Value = Value * k + m;
+
+                        double MaxRange = 10000F;
+                        double MinRange = -10000F;
+
+                        if ((Value < MaxRange) && (Value > MinRange))
                         {
-                            case 0:
-                                try
-                                {
-                                    k = 15;
-                                    m = -50;
-                                    Value = (Convert.ToDouble(message) * k) + m;
-
-                                }
-                                catch
-                                {
-                                }
-
-                                break;
-
-                            case 1:
-                                try
-                                {
-                                    k = -1.8;
-                                    m = 10;
-                                    Value = (Convert.ToDouble(message) * k) + m;
-                                }
-                                catch
-                                {
-                                }
-
-                                break;
-                            case 2:
-                                try
-                                {
-                                    k = 1;
-                                    m = 0;
-                                    Value = (Convert.ToDouble(message) * k) + m;
-                                    Value = 0;
-                                }
-                                catch
-                                {
-                                }
-                                break;
-
-                            case 3:
-                                try
-                                {
-                                    Value = 0;
-                                }
-                                catch
-                                {
-                                }
-                                break;
-                            case 4:
-                                try
-                                {
-
-                                }
-                                catch
-                                {
-
-                                }
-                                break;
-                            case 5:
-                                try
-                                {
-                                    //Value = (Convert.ToDouble(message) * Convert.ToDouble(Value6_k)) + Convert.ToDouble(Value6_m);
-                                }
-                                catch
-                                {
-
-                                }
-
-                                break;
-                        }
-                        message = "> " + message + "\r\n";
-
-                        if ((Value < 99999) && (Value > -99999))
-                        {
-                            string sqlUpdate = "UPDATE Tags SET Value = @Value, ValueTime = Getdate(),StatusQuality=0 FROM Tags " +
-                                               "JOIN AdamChannels on Tags.TagID = AdamChannels.TagID " +
-                                               "WHERE(Tags.TagID = AdamChannels.TagID) AND ( Channel = @Channel AND Adress = @Adress)";
-
-                            try
-                            {
-                                myConnection.Open();
-                                SqlCommand cmdIns = new SqlCommand(sqlUpdate, myConnection);
-                                cmdIns.Parameters.AddWithValue("@Channel", Channel);
-                                cmdIns.Parameters.AddWithValue("@Adress", Adress);
-                                cmdIns.Parameters.AddWithValue("@Value", Value);
-                                cmdIns.ExecuteNonQuery();
-                                cmdIns.Dispose();
-                            }
-                            catch (Exception ex)
-                            {
-                                throw new Exception(ex.ToString(), ex);
-                            }
-                            finally
-                            {
-                                myConnection.Close();
-                            }
+                            MyDataAccessLayer.StoreAnalog(Channel,Adress,Value);
                         }
                     }
                 }
-
             }
             else
             {
@@ -325,11 +211,8 @@ namespace Scada
 
                 }
                 catch
-                { 
-                
-                }
+                { }
             }
-            //timer1.Enabled = true;
         }
     }
 }

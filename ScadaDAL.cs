@@ -2,8 +2,8 @@
 using ExCSS;
 using Microsoft.Data.SqlClient;
 using System.Globalization;
+using System.Text;
 using static Scada.ScadaClasses;
-
 
 
 namespace Scada
@@ -76,7 +76,6 @@ namespace Scada
             }
         }
 
-
         public int DeleteLibItem(string Name)
         {
             try
@@ -105,6 +104,199 @@ namespace Scada
             }
         }
 
+        public int StoreDigital(string sBinaryValue, int Adress)
+        {
+            var myConnection = new Microsoft.Data.SqlClient.SqlConnection
+            {
+                ConnectionString = sConnection
+            };
+
+            for (int Channel = 0; Channel < 6; Channel++)
+            {
+                int Value = Convert.ToInt16(sBinaryValue.Substring((sBinaryValue.Length - 1) - Channel, 1));
+
+                string sqlUpdate = "UPDATE Tags SET Value = @Value FROM Tags " +
+                                   "JOIN AdamChannels on Tags.TagID = AdamChannels.TagID " +
+                                   "WHERE(Tags.TagID = AdamChannels.TagID) AND ( Channel = @Channel AND Adress = @Adress )";
+
+                try
+                {
+                    myConnection.Open();
+                    SqlCommand cmdIns = new SqlCommand(sqlUpdate, myConnection);
+                    cmdIns.Parameters.AddWithValue("@Channel", Channel);
+                    cmdIns.Parameters.AddWithValue("@Adress", Adress);
+                    cmdIns.Parameters.AddWithValue("@Value", Value);
+                    cmdIns.ExecuteNonQuery();
+                    cmdIns.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    return (-1);
+                    throw new Exception(ex.ToString(), ex);
+                }
+                finally
+                {
+                    myConnection.Close();
+                }
+            }
+            return (0);
+        }
+
+        public string GetDigitalOutputs(int Adress)
+        {
+            string DigOutput = "-------";
+            try
+            {
+                var myConnection = new Microsoft.Data.SqlClient.SqlConnection
+                {
+                    ConnectionString = sConnection
+                };
+                string sqlGetData = "SELECT Channel, Tags.Value FROM AdamChannels " +
+                                     "JOIN Tags on Tags.TagID = AdamChannels.TagID " +
+                                     "Where ( Tags.TagID = AdamChannels.TagID ) AND ( adress = @Adress) " +
+                                     "ORDER BY Adress ASC, Channel ASC";
+
+                myConnection.Open();
+                SqlCommand cmdGetData = new SqlCommand(sqlGetData, myConnection);
+                cmdGetData.Parameters.AddWithValue("@Adress", Adress);
+                SqlDataReader reader = cmdGetData.ExecuteReader();                  
+                StringBuilder sDigital = new StringBuilder(DigOutput);
+
+                while (reader.Read())
+                {
+                    int Channel = reader.GetInt32(0);
+                    double SV = reader.GetDouble(1);
+                    if (SV > 0.2)
+                        sDigital[Channel] = '1';
+                    else
+                        sDigital[Channel] = '0';
+
+                }
+                DigOutput = sDigital.ToString();
+                reader.Close();
+                cmdGetData.Dispose();
+                myConnection.Close();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString(), ex);
+            }
+            finally
+            {
+            }
+            return (DigOutput);
+        }
+
+        public double GetAnalogChannel_k(int Adress,int Channel)
+        {
+            double k = 1;
+            try
+            {
+                var myConnection = new Microsoft.Data.SqlClient.SqlConnection
+                {
+                    ConnectionString = sConnection
+                };
+                string sqlGetData = "select k FROM AdamChannels " +
+                                     "Where ( Channel= @Channel ) AND ( adress = @Adress )";
+                                    
+                myConnection.Open();
+                SqlCommand cmdGetData = new SqlCommand(sqlGetData, myConnection);
+                cmdGetData.Parameters.AddWithValue("@Adress", Adress);
+                SqlDataReader reader = cmdGetData.ExecuteReader();
+               
+
+                while (reader.Read())
+                {          
+                   k = reader.GetDouble(0);
+                }
+               
+                reader.Close();
+                cmdGetData.Dispose();
+                myConnection.Close();
+ 
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString(), ex);
+            }
+            finally
+            {
+            }
+            return (k);
+        }
+
+        public double GetAnalogChannel_m(int Adress, int Channel)
+        {
+            double m = 1;
+            try
+            {
+                var myConnection = new Microsoft.Data.SqlClient.SqlConnection
+                {
+                    ConnectionString = sConnection
+                };
+                string sqlGetData = "select m FROM AdamChannels " +
+                                     "Where ( Channel= @Channel ) AND ( adress = @Adress )";
+
+                myConnection.Open();
+                SqlCommand cmdGetData = new SqlCommand(sqlGetData, myConnection);
+                cmdGetData.Parameters.AddWithValue("@Adress", Adress);
+                SqlDataReader reader = cmdGetData.ExecuteReader();
+
+
+                while (reader.Read())
+                {
+                    m = reader.GetDouble(0);
+                }
+
+                reader.Close();
+                cmdGetData.Dispose();
+                myConnection.Close();
+                myConnection.Dispose();
+                myConnection = null;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString(), ex);
+            }
+            finally
+            {
+            }
+            return (m);
+        }
+
+
+
+
+        public bool StoreAnalog(int Channel, int Adress, double Value)
+        {
+            var myConnection = new Microsoft.Data.SqlClient.SqlConnection
+            {
+                ConnectionString = sConnection
+            };
+            string sqlUpdate = "UPDATE Tags SET Value = @Value, ValueTime = Getdate(),StatusQuality=0 FROM Tags " +
+                               "JOIN AdamChannels on Tags.TagID = AdamChannels.TagID " +
+                               "WHERE(Tags.TagID = AdamChannels.TagID) AND ( Channel = @Channel AND Adress = @Adress)";
+
+            try
+            {
+                myConnection.Open();
+                SqlCommand cmdIns = new SqlCommand(sqlUpdate, myConnection);
+                cmdIns.Parameters.AddWithValue("@Channel", Channel);
+                cmdIns.Parameters.AddWithValue("@Adress", Adress);
+                cmdIns.Parameters.AddWithValue("@Value", Value);
+                cmdIns.ExecuteNonQuery();
+                cmdIns.Dispose();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString(), ex);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+            return (true);
+        }
 
         public List<gridRow> ReadParameters(string Filter, int StartCatRange, int EndCatRange, int StartRow, int EndRow )
         {
@@ -132,8 +324,7 @@ namespace Scada
                 var gridRows = new List<gridRow>();
                 int row = 0;
                 while (reader.Read())
-                {
-              
+                {           
                         gridRows.Add(new gridRow
                         {
                             Id = reader.GetInt32(0),
@@ -150,6 +341,7 @@ namespace Scada
                             col6text = "",
                             col6width = 10F,
                             Status = -1,
+                            DataType= reader.GetInt32(3),
                             Row = row
                         });
                         row++;
@@ -1750,14 +1942,14 @@ namespace Scada
                 var hm = new DateTime(src.Year, src.Month, src.Day, src.Hour, src.Minute, 0);
 
                 var TempValues = new List<ScadaClasses.Value>();
-                var DiagramScale = new List<MyValue>();
+                var DiagramScale = new List<ChartValue>();
 
                 var Scale = new DateTime(src.Year, src.Month, src.Day, src.Hour, src.Minute, src.Second);
                 var EndScale = Scale.AddSeconds(-360);
 
                 while (Scale > EndScale)
                 {
-                    var v = new MyValue();
+                    var v = new ChartValue();
                     v.Hour = Scale.Hour;
                     v.Minute = Scale.Minute;
                     v.Second = Scale.Second;
@@ -1775,7 +1967,7 @@ namespace Scada
                     Minute = reader.GetInt32(1);
                     Second = reader.GetInt32(2);
 
-                    foreach (MyValue v in DiagramScale)
+                    foreach (ChartValue v in DiagramScale)
                     {
                         if (v.Minute == Minute)
                         {
@@ -1794,7 +1986,7 @@ namespace Scada
                     i++;
                 }
                 string sTimeText;
-                foreach (MyValue v in DiagramScale)
+                foreach (ChartValue v in DiagramScale)
                 {
                     sTimeText = "";
                     if (v.Second == 0)
@@ -1884,7 +2076,7 @@ namespace Scada
 
                 var TempValues = new List<ScadaClasses.Value>();
 
-                var DiagramScale = new List<MyValue>();
+                var DiagramScale = new List<ChartValue>();
 
                 int Hour = src.Hour;
                 int EndHour = Hour - 2;
@@ -1897,7 +2089,7 @@ namespace Scada
                     {
                         while (Minute > 0)
                         {
-                            var v = new MyValue();
+                            var v = new ChartValue();
                             v.Minute = Minute;
                             v.Hour = Hour;
                             v.sValue = "0";
@@ -1909,7 +2101,7 @@ namespace Scada
                     {
                         while (Minute > src.Minute)
                         {
-                            var v = new MyValue();
+                            var v = new ChartValue();
                             v.Minute = Minute;
                             v.Hour = Hour;
                             v.sValue = "0";
@@ -1917,7 +2109,7 @@ namespace Scada
                             Minute--;
                         }
                     }
-                    var v2 = new MyValue();
+                    var v2 = new ChartValue();
                     v2.Minute = Minute;
                     v2.Hour = Hour;
                     v2.sValue = "0";
@@ -1934,7 +2126,7 @@ namespace Scada
                     Hour = reader.GetInt32(0);
                     Minute = reader.GetInt32(1);
 
-                    foreach (MyValue v in DiagramScale)
+                    foreach (ChartValue v in DiagramScale)
                     {
                         if (v.Hour == Hour)
                         {
@@ -1947,7 +2139,7 @@ namespace Scada
                 }
 
                 string sTimeText;
-                foreach (MyValue v in DiagramScale)
+                foreach (ChartValue v in DiagramScale)
                 {
                     sTimeText = "";
                     if ((v.Minute % 30) == 0)
@@ -2017,7 +2209,7 @@ namespace Scada
                 cmdGetData.Parameters.AddWithValue("@sYear", myChartSetting.iYear.ToString());
                 SqlDataReader reader = cmdGetData.ExecuteReader();
 
-                var DiagramScale = new List<MyValue>();
+                var DiagramScale = new List<ChartValue>();
                 var TempValues = new List<ScadaClasses.Value>();
 
                 int iHour = 0, iMinute = 0;
@@ -2026,7 +2218,7 @@ namespace Scada
 
                 foreach (string s in sHourScale)
                 {
-                    var v = new MyValue();
+                    var v = new ChartValue();
                     v.Minute = iMinute;
                     v.Hour = myChartSetting.iHour;
                     v.sTime = s;
@@ -2040,7 +2232,7 @@ namespace Scada
                     iHour = reader.GetInt32(0);
                     iMinute = reader.GetInt32(1);
 
-                    foreach (MyValue v in DiagramScale)
+                    foreach (ChartValue v in DiagramScale)
                     {
                         if (v.Minute == iMinute)
                         {
@@ -2053,14 +2245,14 @@ namespace Scada
 
 
                 string sTimeText;
-                foreach (MyValue v in DiagramScale)
+                foreach (ChartValue v in DiagramScale)
                 {
                     sTimeText = "";
                     if ((v.Minute % 15) == 0)
                     {
                         sTimeText = v.Hour.ToString("00") + ":" + v.Minute.ToString("00");
                     }
-                    TempValues.Add(new ScadaClasses.Value { X = sTimeText, Y = v.sValue, Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag });
+                    TempValues.Add(new ScadaClasses.Value { X = sTimeText, Y = v.sValue, Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag,Max=100F,Min=0F,TimeSpan=tsHour });
                 }
 
                 /*
@@ -2175,7 +2367,7 @@ namespace Scada
                 var sDayScale = new[] { "00:00", "", "", "03:00", "", "", "06:00", "", "", "09:00", "", "", "12:00", "", "", "15:00", "", "", "18:00", "", "", "21:00", "", "" };
                 foreach (string s in sDayScale)
                 {
-                    TempValues.Add(new ScadaClasses.Value { X = s, Y = "0", Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag });
+                    TempValues.Add(new ScadaClasses.Value { X = s, Y = "0", Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag, Max = 100F, Min = 0F, TimeSpan = tsDay });
                 }
 
                 int iHour;
@@ -2268,21 +2460,172 @@ namespace Scada
                 cmdGetData.Parameters.AddWithValue("@sWeek", myChartSetting.iWeek);
                 cmdGetData.Parameters.AddWithValue("@sTag", MyTag.TagID);
 
-
+                /*
                 int iWeekDay;
                 var TempValues = new List<ScadaClasses.Value>();
                 var sWeekScale = new[] { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
+                var sMonday = new[] { "Mon", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "" };
+
                 foreach (string s in sWeekScale)
                 {
-                    TempValues.Add(new ScadaClasses.Value { X = s, Y = "0", Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag });
+                    TempValues.Add(new ScadaClasses.Value { X = s, Y = "0", Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag, Max = 100F, Min = 0F, TimeSpan = tsWeek });
                 }
-
+                int i = 0;
                 SqlDataReader reader = cmdGetData.ExecuteReader();
                 while (reader.Read())
                 {
                     iWeekDay = reader.GetInt32(2);
                     TempValues[iWeekDay - 1].Y = reader.GetDouble(4).ToString("000.00");
+                    i++;
                 }
+                */
+
+                var TempValues = new List<ScadaClasses.Value>();
+                var DiagramScale = new List<ChartValue>();
+
+                var Scale = new DateTime(myChartSetting.iYear, myChartSetting.iMonth, myChartSetting.iDay, 0, 0, 0);
+                var EndScale = Scale.AddDays(-7);
+                int w = 8;
+                while (Scale > EndScale)
+                {
+                    var v = new ChartValue();
+                    v.DayOfWeek = w;
+                    v.Hour = Scale.Hour;
+                    v.Minute = Scale.Minute;
+                    v.Second = Scale.Second;
+                    v.sValue = "";
+                    DiagramScale.Add(v);
+                    Scale = Scale.AddHours(-1);
+                    if (v.Hour == 0) 
+                    {
+                        w = w - 1;
+                    }
+                }
+                int i = 0;
+                DiagramScale.Reverse();
+
+                int DayOfWeek;
+                int Hour;
+                SqlDataReader reader = cmdGetData.ExecuteReader();
+                while (reader.Read())
+                {
+                    DayOfWeek = reader.GetInt32(2);
+                    Hour = reader.GetInt32(3);
+
+                    foreach (ChartValue v in DiagramScale)
+                    {
+                        if (v.DayOfWeek == DayOfWeek)
+                        {
+                            if (v.Hour == Hour)
+                            {
+                                v.sValue = reader.GetDouble(4).ToString("000.00");
+                            }
+                       
+                        }
+                    }
+                    i++;
+                }
+
+                string sTimeText;
+                foreach (ChartValue v in DiagramScale)
+                {
+                    sTimeText = "";
+                    if (v.Hour  == 0)
+                    {
+                        if (v.DayOfWeek == 1)
+                        {
+                            sTimeText = v.Hour.ToString("Mon");
+                        }
+                        if (v.DayOfWeek == 2)
+                        {
+                            sTimeText = v.Hour.ToString("Tis");
+                        }
+                        if (v.DayOfWeek == 3)
+                        {
+                            sTimeText = v.Hour.ToString("Ons");
+                        }
+                        if (v.DayOfWeek == 4)
+                        {
+                            sTimeText = v.Hour.ToString("Tor");
+                        }
+                        if (v.DayOfWeek == 5)
+                        {
+                            sTimeText = v.Hour.ToString("Fre");
+                        }
+                        if(v.DayOfWeek == 6)
+                        {
+                            sTimeText = v.Hour.ToString("Sat");
+                        }
+                        if(v.DayOfWeek == 7)
+                        {
+                            sTimeText = v.Hour.ToString("Sun");
+                        }
+                    }
+                    TempValues.Add(new ScadaClasses.Value { X = sTimeText, Y = v.sValue, Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag, Max = 100F, Min = 0F, TimeSpan = tsWeek });
+                }
+
+
+                /*
+                var DiagramScale = new List<ChartValue>();         
+                int iHour = 0, iMinute = 0;
+                var sHourScale = new[] { "00", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "15", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "30", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "45", "", "", "", "", "", "", "", "", "", "", "", "", "", "" };
+                foreach (string s in sHourScale)
+                {
+                    var v = new ChartValue();
+                    v.Minute = iMinute;
+                    v.Hour = myChartSetting.iHour;
+                    v.sTime = s;
+                    v.sValue = "0";
+                    DiagramScale.Add(v);
+                    iMinute++;
+                }
+
+                while (reader.Read())
+                {
+                    iHour = reader.GetInt32(0);
+                    iMinute = reader.GetInt32(1);
+
+                    foreach (ChartValue v in DiagramScale)
+                    {
+                        if (v.Minute == iMinute)
+                        {
+                            v.Hour = iHour;
+                            v.sValue = reader.GetDouble(2).ToString("000.00");
+
+                        }
+                    }
+                }
+
+
+                string sTimeText;
+                foreach (ChartValue v in DiagramScale)
+                {
+                    sTimeText = "";
+                    if ((v.Minute % 15) == 0)
+                    {
+                        sTimeText = v.Hour.ToString("00") + ":" + v.Minute.ToString("00");
+                    }
+                    TempValues.Add(new ScadaClasses.Value { X = sTimeText, Y = v.sValue, Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag, Max = 100F, Min = 0F, TimeSpan = tsHour });
+                }
+
+                */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
                 reader.Close();
                 cmdGetData.Dispose();
@@ -2339,10 +2682,10 @@ namespace Scada
                 var TempValues = new List<ScadaClasses.Value>();
                 int daysInMonth = DateTime.DaysInMonth(myChartSetting.iYear, myChartSetting.iMonth);
 
-                var sMonthScale = new[] { "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31" };
+                var sMonthScale = new[] { "01", "", "", "", "", "", "", "08", "", "", "", "", "", "", "15", "", "", "", "", "", "", "22", "", "", "", "", "", "", "29", "", "" };
                 foreach (string s in sMonthScale)
                 {
-                    TempValues.Add(new ScadaClasses.Value { X = s, Y = "0", Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag });
+                    TempValues.Add(new ScadaClasses.Value { X = s, Y = "0", Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag, Max = 100F, Min = 0F, TimeSpan = tsMonth });
                 }
 
                 /*
@@ -2429,12 +2772,12 @@ namespace Scada
                     {
                         oldMonth++;
                         sMonth = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(oldMonth);
-                        TempValues.Add(new ScadaClasses.Value { X = sMonth, Y = "0", Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag });
+                        TempValues.Add(new ScadaClasses.Value { X = sMonth, Y = "0", Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag, Max = 100F, Min = 0F, TimeSpan = tsYear });
                     }
 
                     sMonth = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(iMonth); ;
                     sValue = reader.GetDouble(1).ToString("000.00");
-                    TempValues.Add(new ScadaClasses.Value { X = sMonth, Y = sValue, Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag });
+                    TempValues.Add(new ScadaClasses.Value { X = sMonth, Y = sValue, Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag, Max = 100F, Min = 0F, TimeSpan = tsYear });
                     oldMonth = iMonth;
                 }
 
@@ -2606,7 +2949,7 @@ namespace Scada
                 {
                     ConnectionString = sConnection
                 };
-                string sqlGetData = "insert into ChartSettings Values( 1,2025,1,1,1,0,0, @ItemID ) ";
+                string sqlGetData = "insert into ChartSettings Values( 1,2026,1,1,1,0,0, @ItemID ) ";
                 Connection.Open();
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
                 cmdGetData.Parameters.AddWithValue("@ItemID", ItemID);
@@ -2640,6 +2983,7 @@ namespace Scada
                                     "Span = @Span, " +
                                     "Year = @Year, " +
                                     "Month = @Month, " +
+                                    "Week = @Week, " +
                                     "Day = @Day, " +
                                     "Hour = @Hour, " +
                                     "Minute = @Minute " +
@@ -2650,6 +2994,7 @@ namespace Scada
                 cmdGetData.Parameters.AddWithValue("@Span", myChartsettiing.iSpan);
                 cmdGetData.Parameters.AddWithValue("@Year", myChartsettiing.iYear);
                 cmdGetData.Parameters.AddWithValue("@Month", myChartsettiing.iMonth);
+                cmdGetData.Parameters.AddWithValue("@Week", myChartsettiing.iWeek);
                 cmdGetData.Parameters.AddWithValue("@Day", myChartsettiing.iDay);
                 cmdGetData.Parameters.AddWithValue("@Hour", myChartsettiing.iHour);
                 cmdGetData.Parameters.AddWithValue("@Minute", myChartsettiing.iMinute);
@@ -2740,7 +3085,12 @@ namespace Scada
                     ConnectionString = sConnection
                 };
 
-                string sqlGetData = "SELECT itemID,itemtype,posLeft,posTop,posWidth,posHeight,Value,HL,LL,page,nextpage,unit,Action,text,items.tagID,tags.tagName,tags.Color,radius,tags.StatusQuality FROM Items LEFT JOIN Tags on tags.tagID = Items.tagID WHERE ( Page = @Page )  ORDER BY itemtype asc";
+                string sqlGetData = "SELECT itemID,itemtype,posLeft,posTop,posWidth,posHeight,Value,HL,LL,page," +
+                                    "nextpage,unit,Action,text,items.tagID,tags.tagName,tags.Color,radius,tags.StatusQuality " +
+                                    "FROM Items " +
+                                    "LEFT JOIN Tags on tags.tagID = Items.tagID " +
+                                    "WHERE ( Page = @Page ) " +
+                                    "ORDER BY itemtype asc";
                 Connection.Open();
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
                 cmdGetData.Parameters.AddWithValue("@Page", Page);
@@ -2760,29 +3110,6 @@ namespace Scada
                     oTempTele.Top = reader.GetDouble(3);
                     oTempTele.Width = reader.GetDouble(4);
                     oTempTele.Height = reader.GetDouble(5);
-
-                    /*
-                    int StatusQuality = 1;
-                    if (reader.IsDBNull(18) == false)
-                    {
-                        StatusQuality = reader.GetInt32(18);
-                    }
-
-                    if (reader.IsDBNull(6) == false)
-                    {
-                        if ( StatusQuality == 0 ) {                          
-                            oTempTele.PV = reader.GetDouble(6).ToString("0.0").Replace(",", ".");
-                        }
-                        else 
-                        {
-                            oTempTele.PV = "-.-";
-                        }
-                    }
-                    else
-                    {
-                        oTempTele.PV = "--.-";
-                    }
-                    */
                     oTempTele.ItemValues = ReadItemValues(oTempTele.ItemID);
 
                     if (reader.IsDBNull(7) == false)

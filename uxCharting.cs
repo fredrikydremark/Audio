@@ -13,8 +13,12 @@ namespace Scada
         public DateTime t { get; set; }
     }
 
-    public class MyValue
+    public class ChartValue
     {
+        public int Year { get; set; }
+        public int Month { get; set; }
+        public int Day { get; set; }
+        public int DayOfWeek { get; set; }
         public int Hour { get; set; }
         public int Minute { get; set; }
         public int Second { get; set; }
@@ -193,7 +197,6 @@ Begin
   End;
 
 
-
   ScaleMarkStartXp := XpStart;
   ScaleMarkStopXp  := XpStart - ScaleMarkLength;
 
@@ -210,9 +213,7 @@ Begin
               ScaleMarkStopXp  := XpStopp - ScaleMarkLength;
               TabDirection := -1;
             end;
-
   end;
-
 
   YValue:=MinValue;
   YValue:=YValue+Scale;
@@ -226,7 +227,7 @@ Line[2].X := ScaleMarkStopXp;
 Line[2].Y := Yp;
 
 if TheAxis = Left then
-      HorizontalHelpLine(MemBitmap, XpStart, XpStopp, Yp);
+  HorizontalHelpLine(MemBitmap, XpStart, XpStopp, Yp);
 
 str(YValue: 5:0, S);
 
@@ -412,7 +413,6 @@ end;
                     );
                 }
             }
-
             return result.Select(y => new ValuePoint(y)).ToList();
         }
 
@@ -464,8 +464,14 @@ end;
                 StrokeCap = SKStrokeCap.Square
             };
             */
-
-            FontSize = 12F;
+            if (h > 250)
+            {
+                FontSize = h / 40.0F;
+            }
+            else
+            {
+                FontSize = h / 15.0F;
+            }
             var TextPaint = new SKPaint
             {
                 IsAntialias = true,
@@ -476,9 +482,8 @@ end;
                 FilterQuality = SKFilterQuality.High,
                 StrokeWidth = 0.5F
             };
-            FontSize = 12F;
+       
      
-            int incColor = 1;
             canvas.Clear();
             canvas.DrawRoundRect(backgroundBar, background);
 
@@ -508,7 +513,7 @@ end;
                         FilterQuality = SKFilterQuality.High,
                         StrokeCap = SKStrokeCap.Round
                     };
-
+                    /* Interpolation Enable
                     var InterpolateValues = new List<ValuePoint>();
                     double OldValue=0;
                     foreach (var Value in LocalValues)
@@ -533,6 +538,7 @@ end;
                         LocalValues[idx].Y =  v.Y.ToString("##.#");
                         idx--;
                     }
+                    */
 
                     int Count = LocalValues.Count;
                     string sv = "0";
@@ -569,7 +575,7 @@ end;
                     while (x >= 0)
                     {
                         x = x - (w / Count);
-                        if (j >= 0)
+                        if ( j >= 0 )
                         {
                             if (LocalValues[j].Y != "0")
                             {
@@ -641,28 +647,33 @@ end;
                                 }
                                 oldPoint = thePoint;
                             }
-
-                          
-
-                            //X Scale
-                            if (incColor == 1)
-                            {
+           
                                 var basetick = new SKPoint(x, h);
                                 var shorttick = new SKPoint(x, h - h / 50);
                                 var longtick = new SKPoint(x, h - h / 30);
                                 var textBounds = new SKRect();
+
                                 if (LocalValues[j].X != "")
                                 {
                                     canvas.DrawLine(basetick, longtick, TextPaint);
-                                    float tw = TextPaint.MeasureText(LocalValues[j].X, ref textBounds);
-                                    var pText = new SKPoint(x - tw / 2 - 1, h - h / 25);
+                                    var pText = new SKPoint();
+                                    if (LocalValues[0].TimeSpan < 3)
+                                    {
+                                       float tw = TextPaint.MeasureText(LocalValues[j].X, ref textBounds);
+                                       pText = new SKPoint(x - tw / 2 - 1, h - h / 25);
+                                    }
+                                    else
+                                    {
+                                       float tw = TextPaint.MeasureText(LocalValues[j].X, ref textBounds);
+                                       pText = new SKPoint(x /*- tw / 2 - 1*/, h - h / 25);
+                                    }
                                     canvas.DrawText(LocalValues[j].X, pText, TextPaint);
                                 }
                                 else
                                 {
                                     //canvas.DrawLine(basetick, shorttick, TextPaint);
                                 }
-                            }
+                            
                         }
                         j--;
                     }
@@ -678,7 +689,7 @@ end;
                             //canvas.DrawPoints(SKPointMode.Polygon, pts.ToArray(), myPaint);
                         }
                     }
-                    incColor++;
+                   
                 }
             }
 

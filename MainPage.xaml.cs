@@ -1579,7 +1579,7 @@ public partial class MainPage : ContentPage
                     }
                     args.Handled = true;
                 };
-                AbsoluteLayout.SetLayoutBounds(tgRow, new Rect(x + 520, y + 2, 50, 22));
+                AbsoluteLayout.SetLayoutBounds(tgRow, new Rect(x + w -80, y + 2, 50, 22));
                 AbsoluteLayout.SetLayoutFlags(tgRow, AbsoluteLayoutFlags.None);
                 SKCanvasViews.Add(tgRow);
             }
@@ -1592,8 +1592,8 @@ public partial class MainPage : ContentPage
                 btnDots.ItemID = 1;
                 btnDots.EnableTouchEvents = true;
                 btnDots.InputTransparent = false;
-                btnDots.HeightRequest = 25;
-                btnDots.WidthRequest = 25;
+                btnDots.HeightRequest = 22;
+                btnDots.WidthRequest = 22;
                 btnDots.SvgBase64 = MyDataAccessLayer.LoadLibItem("Threedots", 1);
                 btnDots.IndicatorType = 3;
                 btnDots.Margin = 0.15F;
@@ -1619,14 +1619,14 @@ public partial class MainPage : ContentPage
                             break;
 
                         case SKTouchAction.Exited:
-                            btnDots.GradientStartColor = ScadaColor.uxItemColor;
-                            btnDots.GradientEndColor = ScadaColor.uxItemColor;
-                            btnDots.IndicatorColor = ScadaColor.uxItemColor;
+                            btnDots.GradientStartColor = ScadaColor.uxPopupItemColor;
+                            btnDots.GradientEndColor = ScadaColor.uxPopupItemColor;
+                            btnDots.IndicatorColor = ScadaColor.uxPopupItemColor;
                             break;
                     }
                     args.Handled = true;
                 };
-                AbsoluteLayout.SetLayoutBounds(btnDots, new Rect(x + 520, y + 2, 50, 22));
+                AbsoluteLayout.SetLayoutBounds(btnDots, new Rect(x + w - 80 + 15, y + 2, 50, 22));
                 AbsoluteLayout.SetLayoutFlags(btnDots, AbsoluteLayoutFlags.None);
                 SKCanvasViews.Add(btnDots);
             }

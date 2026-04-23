@@ -1542,7 +1542,7 @@ public partial class MainPage : ContentPage
                 tgRow.BarBackgroundColor = ScadaColor.uxItemColor;
                 tgRow.BackgroundColor = ScadaColor.uxItemColor.ToMauiColor();
                 tgRow.GradientStartColor = ScadaColor.uxPopupItemColor;
-                tgRow.GradientEndColor = ScadaColor.uxItemColor;
+                tgRow.GradientEndColor = ScadaColor.uxPopupItemColor;
                 tgRow.TextColor = ScadaColor.uxTextColor;
                 tgRow.WidthRequest = 50;
                 tgRow.HeightRequest = 22;
@@ -1586,8 +1586,8 @@ public partial class MainPage : ContentPage
             if (myRow.DataType == 1)
             {
                 var btnDots = new ScadaButton();
-                btnDots.GradientStartColor = ScadaColor.uxItemColor;
-                btnDots.GradientEndColor = ScadaColor.uxItemColor;
+                btnDots.GradientStartColor = ScadaColor.uxPopupItemColor;
+                btnDots.GradientEndColor = ScadaColor.uxPopupItemColor;
                 btnDots.CornerRadius = 15;
                 btnDots.ItemID = 1;
                 btnDots.EnableTouchEvents = true;

@@ -464,8 +464,14 @@ end;
                 StrokeCap = SKStrokeCap.Square
             };
             */
-
-            FontSize = 12F;
+            if (h > 250)
+            {
+                FontSize = h / 40.0F;
+            }
+            else
+            {
+                FontSize = h / 15.0F;
+            }
             var TextPaint = new SKPaint
             {
                 IsAntialias = true,
@@ -476,7 +482,7 @@ end;
                 FilterQuality = SKFilterQuality.High,
                 StrokeWidth = 0.5F
             };
-            FontSize = 12F;
+       
      
             canvas.Clear();
             canvas.DrawRoundRect(backgroundBar, background);

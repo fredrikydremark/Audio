@@ -275,6 +275,7 @@ namespace Scada
         public static int CurrentID = -1;
 
         public static int Previouspage = -1;
+        public static int PreviousScadaPopup = -1;
         public static bool Refresh = false;
 
         //Parameter categories

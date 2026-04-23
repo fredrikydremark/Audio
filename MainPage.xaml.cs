@@ -45,6 +45,15 @@ public partial class MainPage : ContentPage
     {
         Margin = new Thickness(0)
     };
+
+    protected override void OnSizeAllocated(double width, double height)
+    {
+        base.OnSizeAllocated(width, height);
+        ScadaClasses.Previouspage = -1;
+        ScadaClasses.Refresh = true;      
+    }
+
+
     public MainPage()
     {
         InitializeComponent();
@@ -422,8 +431,7 @@ public partial class MainPage : ContentPage
                     ScadaClasses.Previouspage = -1;
                     ScadaClasses.CurrentScadaPopup = ScadaClasses.uxEditParameterText;
                     ScadaClasses.PreviousScadaPopup = ScadaClasses.uxLoginMenu;
-                    edtInputText.Text = ConnectionString;//myRowButton.ButtonRow.col2text;
-                  
+                    edtInputText.Text = ConnectionString;//myRowButton.ButtonRow.col2text;                 
                     ScadaClasses.Refresh = true;
                     break;
 

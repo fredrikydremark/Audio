@@ -679,7 +679,7 @@ namespace Scada
                 {
                     myDataSources.Add(new gridRow
                     {
-                        col1text = "Datasource",
+                        col1text = "Protocol",
                         col1width = 300,
                         col2text = reader.GetString(0),
                         col2width = 400,

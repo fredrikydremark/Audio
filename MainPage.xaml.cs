@@ -45,6 +45,7 @@ public partial class MainPage : ContentPage
     {
         Margin = new Thickness(0)
     };
+    
 
     protected override void OnSizeAllocated(double width, double height)
     {
@@ -52,8 +53,7 @@ public partial class MainPage : ContentPage
         ScadaClasses.Previouspage = -1;
         ScadaClasses.Refresh = true;      
     }
-
-
+    
     public MainPage()
     {
         InitializeComponent();
@@ -1275,7 +1275,7 @@ public partial class MainPage : ContentPage
                 {
                     case SKTouchAction.Released:
                         ScadaClasses.Previouspage = -1;
-                        ScadaClasses.CurrentScadaPopup = ScadaClasses.uxDataSourcesSettings;
+                        ScadaClasses.CurrentScadaPopup = ScadaClasses.uxProtocolSettings;
                         ScadaClasses.CurrentRow = myRowButton.ButtonRow.Id;
                         ScadaClasses.Refresh = true;                      
                         break;
@@ -1611,9 +1611,23 @@ public partial class MainPage : ContentPage
                     switch (args.ActionType)
                     {
                         case SKTouchAction.Released:
+                            switch (myRow.col1text)
+                            {
+                                case "Items":
+                                    ScadaClasses.CurrentScadaPopup = ScadaClasses.uxUploadMenu;
+                                    break;
+                                case "Signals":
+                                      ScadaClasses.CurrentScadaPopup = ScadaClasses.uxTagsGrid;
+                                    break;
+                                case "Pages":
+                                    ScadaClasses.CurrentScadaPopup = ScadaClasses.uxPagesMenu;
+                                    break;
+                                case "Protocols":
+                                    ScadaClasses.CurrentScadaPopup = ScadaClasses.uxProtocols;
+                                    break;
 
-                            ScadaClasses.Previouspage = -1;
-                            ScadaClasses.CurrentScadaPopup = ScadaClasses.uxTagsGrid;
+                            }
+                            ScadaClasses.Previouspage = -1;                          
                             ScadaClasses.Refresh = true;
                             break;
 
@@ -2243,7 +2257,7 @@ public partial class MainPage : ContentPage
                 case SKTouchAction.Released:
           
                     ScadaClasses.Previouspage = -1;
-                    ScadaClasses.CurrentScadaPopup = ScadaClasses.uxDataSources;
+                    ScadaClasses.CurrentScadaPopup = ScadaClasses.uxProtocols;
                     ScadaClasses.Refresh = true;
                     break;
 
@@ -3014,20 +3028,20 @@ public partial class MainPage : ContentPage
 
     public void UpdateGui(List<ScadaClasses.Telegram> ScadaItems)
     {
-        double x = 0, y = 0, w = 0, h = 0;   
-        double wScale = Width / 100;
-        double hScale = Height / 100;
         Window.MaximumWidth = 4000;
         Window.MaximumHeight = 2000;
         Window.MinimumWidth = 1280;
         Window.MinimumHeight = 600;
         Window.IsMaximizable = true;
-        
+        double x = 0, y = 0, w = 0, h = 0;   
+        double wScale = Width / 100;
+        double hScale = Height / 100;
+  
         DataAccessLayer MyDataAccessLayer = new DataAccessLayer(ConnectionString);
 
         if ((ScadaClasses.Previouspage != ScadaClasses.Currentpage) && (ScadaItems.Count > 0))
         {
-            if (MyDataAccessLayer.ReadParameterByName("Design mode") == "1")
+            if (MyDataAccessLayer.ReadParameterByName("Design") == "1")
             {
                Designing = true;                
             }
@@ -3036,7 +3050,7 @@ public partial class MainPage : ContentPage
                Designing = false;
             }
            
-            if (MyDataAccessLayer.ReadParameterByName("Dark mode") == "1")
+            if (MyDataAccessLayer.ReadParameterByName("Dark") == "1")
             {
                 ScadaColor.uxBackGroundColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkBackgroundColor"));
                 ScadaColor.uxItemBackGroundColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkItemBackgroundColor"));
@@ -3359,11 +3373,11 @@ public partial class MainPage : ContentPage
                         }
                         break;
 
-                    case ScadaClasses.uxDataSources:
+                    case ScadaClasses.uxProtocols:
                         ScadaTagsSources();     
                         break;
 
-                    case ScadaClasses.uxDataSourcesSettings:
+                    case ScadaClasses.uxProtocolSettings:
                         ScadaDataSourceSettings();
                         break;
 

@@ -480,7 +480,8 @@ end;
                 TextSize = FontSize,
                 SubpixelText = true,
                 FilterQuality = SKFilterQuality.High,
-                StrokeWidth = 0.5F
+                StrokeWidth = 0.5F,
+                TextAlign = SKTextAlign.Left
             };
        
      
@@ -665,7 +666,8 @@ end;
                                     else
                                     {
                                        float tw = TextPaint.MeasureText(LocalValues[j].X, ref textBounds);
-                                       pText = new SKPoint(x /*- tw / 2 - 1*/, h - h / 25);
+                                    
+                                       pText = new SKPoint(x /*- tw / 2 - 1*/, ( h - h / 25) );
                                     }
                                     canvas.DrawText(LocalValues[j].X, pText, TextPaint);
                                 }

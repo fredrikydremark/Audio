@@ -160,7 +160,7 @@ namespace Scada
                 ScadaItems.Add(oMenuTelegram);
             }
 
-            if (CurrentScadaPopup == ScadaClasses.uxDataSources)
+            if (CurrentScadaPopup == ScadaClasses.uxProtocols)
             {
                 ScadaClasses.Telegram oMenuTelegram = new ScadaClasses.Telegram()
                 {
@@ -170,7 +170,7 @@ namespace Scada
                     Width = 20,
                     Height = 55,
                     Page = Currentpage,
-                    ItemType = ScadaClasses.uxDataSources,
+                    ItemType = ScadaClasses.uxProtocols,
                     ItemID = 777,
                     TagID = 4,
                     TagName = " ",
@@ -184,7 +184,7 @@ namespace Scada
                 ScadaItems.Add(oMenuTelegram);
             }
 
-            if (CurrentScadaPopup == ScadaClasses.uxDataSourcesSettings)
+            if (CurrentScadaPopup == ScadaClasses.uxProtocolSettings)
             {
                 ScadaClasses.Telegram oMenuTelegram = new ScadaClasses.Telegram()
                 {
@@ -194,7 +194,7 @@ namespace Scada
                     Width = 20,
                     Height = 55,
                     Page = Currentpage,
-                    ItemType = ScadaClasses.uxDataSourcesSettings,
+                    ItemType = ScadaClasses.uxProtocolSettings,
                     ItemID = 777,
                     TagID = 4,
                     TagName = " ",

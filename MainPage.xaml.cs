@@ -70,11 +70,11 @@ public partial class MainPage : ContentPage
         //Azure SQL Autentication
         //ConnectionString = "Server = tcp:scada.database.windows.net,1433; Initial Catalog = scada; Persist Security Info = False; User ID = freydr; Password =Admin123>; MultipleActiveResultSets = False; Encrypt = True; TrustServerCertificate = False; Connection Timeout = 30";
 
-        //ConnectionString = "Data Source = PC-5CG5125C24; Initial Catalog = SCADA; Integrated Security = true; TrustServerCertificate=true";
+        ConnectionString = "Data Source = .\\SqlExpress; Initial Catalog = SCADA; Integrated Security = true; TrustServerCertificate=true";
          //ConnectionString = "Server=tcp:scada.database.windows.net,1433;Initial Catalog = scada; Encrypt=True;TrustServerCertificate=False;Connection Timeout = 30; Authentication=Active Directory Default";
 
         //SQL
-        ConnectionString = "Data Source =PC-5CG5125C24; Initial Catalog = SCADA; Integrated Security = true; TrustServerCertificate = true";
+       // ConnectionString = "Data Source =PC-5CG5125C24; Initial Catalog = SCADA; Integrated Security = true; TrustServerCertificate = true";
 
        /*
         ConnectionString = "Server =tcp:scada.database.windows.net,1433;" +

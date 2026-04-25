@@ -45,6 +45,7 @@ public partial class MainPage : ContentPage
     {
         Margin = new Thickness(0)
     };
+    
 
     protected override void OnSizeAllocated(double width, double height)
     {
@@ -52,8 +53,7 @@ public partial class MainPage : ContentPage
         ScadaClasses.Previouspage = -1;
         ScadaClasses.Refresh = true;      
     }
-
-
+    
     public MainPage()
     {
         InitializeComponent();
@@ -1180,7 +1180,7 @@ public partial class MainPage : ContentPage
         AbsoluteLayout.SetLayoutBounds(popupAlarm, new Rect(x, y, w, h));
         AbsoluteLayout.SetLayoutFlags(popupAlarm, AbsoluteLayoutFlags.None);
         SKCanvasViews.Add(popupAlarm);
-        CreateCloseButton(x, y, w, h, ScadaClasses.CurrentScadaPopup );
+        CreateCloseButton(x, y, w, h, ScadaClasses.uxParameters );
 
         DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);
         var gridRows = MyDataAccessLayer.GetDataSources();
@@ -1275,7 +1275,7 @@ public partial class MainPage : ContentPage
                 {
                     case SKTouchAction.Released:
                         ScadaClasses.Previouspage = -1;
-                        ScadaClasses.CurrentScadaPopup = ScadaClasses.uxDataSourcesSettings;
+                        ScadaClasses.CurrentScadaPopup = ScadaClasses.uxProtocolSettings;
                         ScadaClasses.CurrentRow = myRowButton.ButtonRow.Id;
                         ScadaClasses.Refresh = true;                      
                         break;
@@ -1348,7 +1348,7 @@ public partial class MainPage : ContentPage
         AbsoluteLayout.SetLayoutBounds(popupAlarm, new Rect(x, y, w, h));
         AbsoluteLayout.SetLayoutFlags(popupAlarm, AbsoluteLayoutFlags.None);
         SKCanvasViews.Add(popupAlarm);
-        CreateCloseButton(x, y, w, h, ScadaClasses.CurrentScadaPopup);
+        CreateCloseButton(x, y, w, h, -1);
         CreateAddTagButton(x, y, w, h);
 
         y = y + popupAlarm.CornerRadius;
@@ -1611,9 +1611,23 @@ public partial class MainPage : ContentPage
                     switch (args.ActionType)
                     {
                         case SKTouchAction.Released:
+                            switch (myRow.col1text)
+                            {
+                                case "Items":
+                                    ScadaClasses.CurrentScadaPopup = ScadaClasses.uxUploadMenu;
+                                    break;
+                                case "Signals":
+                                      ScadaClasses.CurrentScadaPopup = ScadaClasses.uxTagsGrid;
+                                    break;
+                                case "Pages":
+                                    ScadaClasses.CurrentScadaPopup = ScadaClasses.uxPagesMenu;
+                                    break;
+                                case "Protocols":
+                                    ScadaClasses.CurrentScadaPopup = ScadaClasses.uxProtocols;
+                                    break;
 
-                            ScadaClasses.Previouspage = -1;
-                            ScadaClasses.CurrentScadaPopup = ScadaClasses.uxTagsGrid;
+                            }
+                            ScadaClasses.Previouspage = -1;                          
                             ScadaClasses.Refresh = true;
                             break;
 
@@ -2243,7 +2257,7 @@ public partial class MainPage : ContentPage
                 case SKTouchAction.Released:
           
                     ScadaClasses.Previouspage = -1;
-                    ScadaClasses.CurrentScadaPopup = ScadaClasses.uxDataSources;
+                    ScadaClasses.CurrentScadaPopup = ScadaClasses.uxProtocols;
                     ScadaClasses.Refresh = true;
                     break;
 
@@ -3014,20 +3028,20 @@ public partial class MainPage : ContentPage
 
     public void UpdateGui(List<ScadaClasses.Telegram> ScadaItems)
     {
-        double x = 0, y = 0, w = 0, h = 0;   
-        double wScale = Width / 100;
-        double hScale = Height / 100;
         Window.MaximumWidth = 4000;
         Window.MaximumHeight = 2000;
         Window.MinimumWidth = 1280;
         Window.MinimumHeight = 600;
         Window.IsMaximizable = true;
-        
+        double x = 0, y = 0, w = 0, h = 0;   
+        double wScale = Width / 100;
+        double hScale = Height / 100;
+  
         DataAccessLayer MyDataAccessLayer = new DataAccessLayer(ConnectionString);
 
         if ((ScadaClasses.Previouspage != ScadaClasses.Currentpage) && (ScadaItems.Count > 0))
         {
-            if (MyDataAccessLayer.ReadParameterByName("Design mode") == "1")
+            if (MyDataAccessLayer.ReadParameterByName("Design") == "1")
             {
                Designing = true;                
             }
@@ -3036,7 +3050,7 @@ public partial class MainPage : ContentPage
                Designing = false;
             }
            
-            if (MyDataAccessLayer.ReadParameterByName("Dark mode") == "1")
+            if (MyDataAccessLayer.ReadParameterByName("Dark") == "1")
             {
                 ScadaColor.uxBackGroundColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkBackgroundColor"));
                 ScadaColor.uxItemBackGroundColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkItemBackgroundColor"));
@@ -3251,7 +3265,7 @@ public partial class MainPage : ContentPage
 
                         ScadaItem.gridRows = MyDataAccessLayer.GetTagParams(ScadaClasses.CurrentTag);
 
-                        CreateCloseButton(x, y, w, h, ScadaClasses.PreviousScadaPopup);
+                        CreateCloseButton(x, y, w, h, ScadaClasses.uxTagsGrid);
                         var TagRowColor = ScadaColor.uxItemColor;
                         y = y + 40;
                         for (int r = 0; r < 10; r++)
@@ -3359,11 +3373,11 @@ public partial class MainPage : ContentPage
                         }
                         break;
 
-                    case ScadaClasses.uxDataSources:
+                    case ScadaClasses.uxProtocols:
                         ScadaTagsSources();     
                         break;
 
-                    case ScadaClasses.uxDataSourcesSettings:
+                    case ScadaClasses.uxProtocolSettings:
                         ScadaDataSourceSettings();
                         break;
 
@@ -4864,14 +4878,14 @@ public partial class MainPage : ContentPage
                             args.Handled = true;
                         };
 
-                        AbsoluteLayout.SetLayoutBounds(btnApplyText, new Rect(x + EditPanel.WidthRequest - (EditPanel.WidthRequest / 2) - (btnApplyText.WidthRequest / 2), y + EditPanel.HeightRequest - btnApplyText.HeightRequest * 2, btnApplyText.WidthRequest, btnApplyText.HeightRequest));
+                        AbsoluteLayout.SetLayoutBounds(btnApplyText, new Rect(x + EditPanel.WidthRequest - (EditPanel.WidthRequest / 2) - (btnApplyText.WidthRequest / 2), y + EditPanel.HeightRequest - btnApplyText.HeightRequest * 1.5F, btnApplyText.WidthRequest, btnApplyText.HeightRequest));
                         AbsoluteLayout.SetLayoutFlags(btnApplyText, AbsoluteLayoutFlags.None);
-                        AbsoluteLayout.SetLayoutBounds(EditPanel, new Rect((Width / 100) * ScadaItem.Left,(Height / 100) * ScadaItem.Top,(Width / 100) * ScadaItem.Width,(Height / 100) * ScadaItem.Height));
+                        AbsoluteLayout.SetLayoutBounds(EditPanel, new Rect(( Width / 100) * ScadaItem.Left,(Height / 100) * ScadaItem.Top,(Width / 100) * ScadaItem.Width,(Height / 100) * ScadaItem.Height));
                         AbsoluteLayout.SetLayoutFlags(EditPanel, AbsoluteLayoutFlags.None);
 
                         SKCanvasViews.Add(EditPanel);
                         SKCanvasViews.Add(btnApplyText);
-                        CreateCloseButton(x, y, w, h, ScadaClasses.CurrentScadaPopup);
+                        CreateCloseButton(x, y, w, h, ScadaClasses.uxTagSettings);
                         break;
 
                     case ScadaClasses.uxEditParameterText:
@@ -4924,7 +4938,7 @@ public partial class MainPage : ContentPage
                                     MyDataAccessLayer.UpdateParameterValue(ScadaClasses.CurrentID, edtInputText.Text);
                                    
                                     ScadaClasses.Previouspage = -1;
-                                    ScadaClasses.CurrentScadaPopup = ScadaClasses.PreviousScadaPopup;
+                                    ScadaClasses.CurrentScadaPopup = ScadaClasses.uxLoginMenu;
                                     ScadaClasses.Refresh = true;
                                     break;
 
@@ -4944,7 +4958,7 @@ public partial class MainPage : ContentPage
                             args.Handled = true;
                         };
 
-                        AbsoluteLayout.SetLayoutBounds(btnApplyParamText, new Rect(x + EditParamPanel.WidthRequest - (EditParamPanel.WidthRequest / 2) - (btnApplyParamText.WidthRequest / 2), y + EditParamPanel.HeightRequest - btnApplyParamText.HeightRequest * 2, btnApplyParamText.WidthRequest, btnApplyParamText.HeightRequest));
+                        AbsoluteLayout.SetLayoutBounds(btnApplyParamText, new Rect(x + EditParamPanel.WidthRequest - (EditParamPanel.WidthRequest / 2) - (btnApplyParamText.WidthRequest / 2), y + EditParamPanel.HeightRequest - btnApplyParamText.HeightRequest * 1.5F, btnApplyParamText.WidthRequest, btnApplyParamText.HeightRequest));
                         AbsoluteLayout.SetLayoutFlags(btnApplyParamText, AbsoluteLayoutFlags.None);
                         AbsoluteLayout.SetLayoutBounds(EditParamPanel, new Rect((Width / 100) * ScadaItem.Left, (Height / 100) * ScadaItem.Top, (Width / 100) * ScadaItem.Width, (Height / 100) * ScadaItem.Height));
                         AbsoluteLayout.SetLayoutFlags(EditParamPanel, AbsoluteLayoutFlags.None);
@@ -4991,7 +5005,7 @@ public partial class MainPage : ContentPage
                         h = (Height / 100) * ScadaItem.Height;
                         //AddTagToUxItem(ScadaItem.ItemID, ScadaItem.ItemType, ScadaItem.TagID, 1, "SV");
 
-                        CreateCloseButton(x, y, w, h, ScadaClasses.CurrentScadaPopup);
+                        CreateCloseButton(x, y, w, h, ScadaClasses.uxParameters);
                         CreateFwdButton(x, y, w, h);
                         CreateRwdButton(x, y, w, h);
                         CreateRemoveTagButton(ScadaClasses.CurrentItem, ScadaClasses.CurrentTag, x - (w / 2), y, w, h);
@@ -5797,14 +5811,14 @@ public partial class MainPage : ContentPage
                 absoluteLayout.Add(edtSvgName);
 
                 edtSvgEditor.Placeholder = "Paste your SVG text";
-                edtSvgEditor.WidthRequest = 520;
-                edtSvgEditor.HeightRequest = 200;
+                edtSvgEditor.WidthRequest = w-40;
+                edtSvgEditor.HeightRequest = h/1.5F;
                 edtSvgEditor.TextColor = ScadaColor.uxTextColor.ToMauiColor();
                 edtSvgEditor.BackgroundColor = ScadaColor.uxItemColor.ToMauiColor();
                 edtSvgEditor.PlaceholderColor = ScadaColor.uxItemColor.ToMauiColor();
                 edtSvgEditor.FontAttributes = FontAttributes.None;
                 edtSvgEditor.IsVisible = true;
-                AbsoluteLayout.SetLayoutBounds(edtSvgEditor, new Rect(450, 250, edtSvgEditor.WidthRequest, edtSvgEditor.HeightRequest));
+                AbsoluteLayout.SetLayoutBounds(edtSvgEditor, new Rect(x+20, y+100, edtSvgEditor.WidthRequest, edtSvgEditor.HeightRequest));
                 AbsoluteLayout.SetLayoutFlags(edtSvgEditor, AbsoluteLayoutFlags.None);
                 edtSvgEditor.TextChanged += OnEditorTextChanged;
                 edtSvgEditor.Completed += OnEditorCompleted;
@@ -5815,15 +5829,15 @@ public partial class MainPage : ContentPage
                 (ScadaClasses.CurrentScadaPopup == ScadaClasses.uxEditParameterText))
             {
                 edtInputText.Placeholder = "EditText";
-                edtInputText.WidthRequest = 340;
-                edtInputText.HeightRequest = 30;
+                edtInputText.WidthRequest = w - 40;
+                edtInputText.HeightRequest = h/2;
 
                 edtInputText.TextColor = ScadaColor.uxTextColor.ToMauiColor();
                 edtInputText.BackgroundColor = ScadaColor.uxPopupItemColor.ToMauiColor();
                 edtInputText.PlaceholderColor = ScadaColor.uxItemColor.ToMauiColor();
                 edtInputText.FontAttributes = FontAttributes.Bold;
                 edtInputText.IsVisible = true;
-                AbsoluteLayout.SetLayoutBounds(edtInputText, new Rect(540, 260, edtInputText.WidthRequest, edtInputText.HeightRequest));
+                AbsoluteLayout.SetLayoutBounds(edtInputText, new Rect(x+20, y+70, edtInputText.WidthRequest, edtInputText.HeightRequest));
                 AbsoluteLayout.SetLayoutFlags(edtInputText, AbsoluteLayoutFlags.None);
                 edtInputText.TextChanged += OnEditorTextChanged;
                 edtInputText.Completed += OnEditorCompleted;

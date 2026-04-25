@@ -249,8 +249,8 @@ namespace Scada
         public const int uxEditTagText = 53;
         public const int uxParameters = 54;
         public const int uxEditParameterText = 55;
-        public const int uxDataSources = 56;
-        public const int uxDataSourcesSettings = 57;
+        public const int uxProtocols = 56;
+        public const int uxProtocolSettings = 57;
 
         public const int CmdInvalid = -1;
         public const int Cmdgetpictures = 1;

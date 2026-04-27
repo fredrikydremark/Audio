@@ -1235,7 +1235,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog = scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 double ItemWidth = 10;
                 string sqlGetData = "select defaultWidth from ItemTypes where ItemType = @ItemType";
@@ -1276,7 +1276,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog = scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 double ItemWidth = 10;
                 string sqlGetData = "select defaultHeight from ItemTypes where ItemType =@ItemType";
@@ -1328,7 +1328,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog = scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 string sqlGetData = "select Width,Height from ItemSizes where ItemType =@ItemType and nSize =@Size";
                 Connection.Open();
@@ -3985,7 +3985,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog = scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 string sqlGetData = "SELECT TOP 1 TagID FROM ItemTags where ItemID=@ItemID and TagID=@TagID";
                 Connection.Open();
@@ -4025,7 +4025,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog = scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 string sqlGetData = "SELECT TOP 1 ItemID FROM Items Order By Created desc";
                 Connection.Open();
@@ -4062,7 +4062,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog = scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
                 string sqlGetData = "SELECT TOP 1 TagID FROM Tags Order By Created desc";
                 Connection.Open();
@@ -4254,7 +4254,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog = scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
 
                 string sqlGetData = "select max(page) from items";
@@ -4291,7 +4291,7 @@ namespace Scada
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
-                    ConnectionString = "Data Source=PC-5CG5125C24; Initial Catalog = scada; Integrated Security=true; TrustServerCertificate=true"
+                    ConnectionString = sConnection
                 };
 
                 string sqlGetData = "select max(page) from items";

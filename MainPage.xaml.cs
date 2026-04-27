@@ -571,6 +571,10 @@ public partial class MainPage : ContentPage
     {
         double panelWith = 0.4;
         double panelHeight = 0.55;
+        double x = (Width / 2) - panelWith * Width / 2;
+        double y = (Height / 2) - panelHeight * Height / 2;
+        double w = (panelWith * Width);
+        double h = (panelHeight * Height);
 
         DataAccessLayer MyDataAccessLayer = new DataAccessLayer(ConnectionString);
         SKCanvasPopupViews.Clear();
@@ -586,11 +590,6 @@ public partial class MainPage : ContentPage
         gp.IndicatorColor = ScadaColor.uxPanelColor;
         gp.TextColor = ScadaColor.uxTextColor;
    
-        double x = (Width / 2) - ((panelWith * Width)) / 2;
-        double y = (Height / 2) - ((panelHeight * Height)) / 2;
-        double w = (panelWith * Width);
-        double h = (panelHeight * Height);
-
         gp.WidthRequest = w;
         gp.HeightRequest = h;
         gp.AlternativeTextColor = ScadaColor.uxTextColor;
@@ -600,7 +599,6 @@ public partial class MainPage : ContentPage
         AbsoluteLayout.SetLayoutBounds(gp, new Rect(x, y, w, h));
         AbsoluteLayout.SetLayoutFlags(gp, AbsoluteLayoutFlags.None);
         SKCanvasPopupViews.Add(gp);
-
 
         var s2 = new ScadaSvg();
         s2.AnchorX = 0;
@@ -664,7 +662,7 @@ public partial class MainPage : ContentPage
                      };
                      */
                     ScadaClasses.Previouspage = -1;
-                    ScadaClasses.CurrentScadaPopup = -1;
+                    ScadaClasses.CurrentScadaPopup = ScadaClasses.uxParameters;
                     ScadaClasses.Refresh = true;
                     break;
 
@@ -738,7 +736,7 @@ public partial class MainPage : ContentPage
             }
             args.Handled = true;
         };
-        AbsoluteLayout.SetLayoutBounds(a1, new Rect(x + gp.WidthRequest - (gp.WidthRequest / 2) - (a1.WidthRequest / 2), y + gp.HeightRequest - a1.HeightRequest * 2, a1.WidthRequest, a1.HeightRequest));
+        AbsoluteLayout.SetLayoutBounds(a1, new Rect(x + gp.WidthRequest - (gp.WidthRequest / 2) - (a1.WidthRequest / 2), y + gp.HeightRequest - a1.HeightRequest * 1.5, a1.WidthRequest, a1.HeightRequest));
         AbsoluteLayout.SetLayoutFlags(a1, AbsoluteLayoutFlags.None);
         SKCanvasPopupViews.Add(a1);
     }
@@ -5863,29 +5861,37 @@ public partial class MainPage : ContentPage
 
             if (ScadaClasses.CurrentScadaPopup == ScadaClasses.uxUploadMenu)
             {
+                double panelWith = 0.4;
+                double panelHeight = 0.55;
+                x = (Width / 2) - panelWith * Width / 2;
+                y = (Height / 2) - panelHeight * Height / 2;
+                w = (panelWith * Width);
+                h = (panelHeight * Height);
+
                 edtSvgName.Placeholder = "SvgName";
                 edtSvgName.WidthRequest = 200;
                 edtSvgName.HeightRequest = 30;
                 edtSvgName.TextColor = ScadaColor.uxTextColor.ToMauiColor();
-                edtSvgName.BackgroundColor = ScadaColor.uxItemColor.ToMauiColor();
-                edtSvgName.PlaceholderColor = ScadaColor.uxItemColor.ToMauiColor();
+                edtSvgName.BackgroundColor = ScadaColor.uxPopupItemColor.ToMauiColor();
+                edtSvgName.PlaceholderColor = ScadaColor.uxPopupItemColor.ToMauiColor();
                 edtSvgName.FontAttributes = FontAttributes.None;
                 edtSvgName.IsVisible = true;
-                AbsoluteLayout.SetLayoutBounds(edtSvgName, new Rect(450, 200, edtSvgName.WidthRequest, edtSvgName.HeightRequest));
+                AbsoluteLayout.SetLayoutBounds(edtSvgName, new Rect(x+20, y+40, edtSvgName.WidthRequest, edtSvgName.HeightRequest));
                 AbsoluteLayout.SetLayoutFlags(edtSvgName, AbsoluteLayoutFlags.None);
                 edtSvgName.TextChanged += OnEditorTextChanged;
                 edtSvgName.Completed += OnEditorCompleted;
                 absoluteLayout.Add(edtSvgName);
 
+       
                 edtSvgEditor.Placeholder = "Paste your SVG text";
                 edtSvgEditor.WidthRequest = w-40;
-                edtSvgEditor.HeightRequest = h/1.5F;
+                edtSvgEditor.HeightRequest = h/2F;
                 edtSvgEditor.TextColor = ScadaColor.uxTextColor.ToMauiColor();
-                edtSvgEditor.BackgroundColor = ScadaColor.uxItemColor.ToMauiColor();
+                edtSvgEditor.BackgroundColor = ScadaColor.uxPopupItemColor.ToMauiColor();
                 edtSvgEditor.PlaceholderColor = ScadaColor.uxItemColor.ToMauiColor();
                 edtSvgEditor.FontAttributes = FontAttributes.None;
                 edtSvgEditor.IsVisible = true;
-                AbsoluteLayout.SetLayoutBounds(edtSvgEditor, new Rect(x+20, y+100, edtSvgEditor.WidthRequest, edtSvgEditor.HeightRequest));
+                AbsoluteLayout.SetLayoutBounds(edtSvgEditor, new Rect(x+20, y+75, edtSvgEditor.WidthRequest, edtSvgEditor.HeightRequest));
                 AbsoluteLayout.SetLayoutFlags(edtSvgEditor, AbsoluteLayoutFlags.None);
                 edtSvgEditor.TextChanged += OnEditorTextChanged;
                 edtSvgEditor.Completed += OnEditorCompleted;

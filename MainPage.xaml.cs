@@ -1499,7 +1499,7 @@ public partial class MainPage : ContentPage
         CreateCloseButton(x, y, w, h, -1);
 
         DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);
-        var gridRows = MyDataAccessLayer.ReadParameters(sFilter, 5, 10, 0, 10);
+        var gridRows = MyDataAccessLayer.ReadPages(sFilter, 0, 100, 0, 10);
 
         int r = 0;
         y = y + popupPages.CornerRadius;
@@ -1722,7 +1722,7 @@ public partial class MainPage : ContentPage
                             }
                             else
                             {
-                                tgRow.SV.Value = 1;
+                                tgRow.SV.Value = 1; 
                                 MyDataAccessLayer.UpdateParameterValue(myRowButton.ButtonRow.Id, tgRow.SV.Value.ToString());
                             }
                             tgRow.InvalidateSurface();

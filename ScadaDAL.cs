@@ -297,6 +297,71 @@ namespace Scada
             return (true);
         }
 
+
+        public List<gridRow> ReadPages(string Filter, int StartCatRange, int EndCatRange, int StartRow, int EndRow)
+        {
+            try
+            {
+                string sqlGetData = "";
+                var Connection = new Microsoft.Data.SqlClient.SqlConnection
+                {
+                    ConnectionString = sConnection
+                };
+                Connection.Open();
+                SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
+
+                sqlGetData = "SELECT ID, Page, Name, Category FROM( SELECT *, ROW_NUMBER() OVER(ORDER BY Name) AS row " +
+                             "FROM( SELECT * FROM[Pages] WHERE Category >= @StartCatRange AND Category <= @EndCatRange ) filtered ) numbered WHERE row >= @StartRow AND row <= @EndRow";
+
+                cmdGetData.Parameters.AddWithValue("@StartCatRange", StartCatRange);
+                cmdGetData.Parameters.AddWithValue("@EndCatRange", EndCatRange);
+                cmdGetData.Parameters.AddWithValue("@StartRow", StartRow);
+                cmdGetData.Parameters.AddWithValue("@EndRow", EndRow);
+
+                cmdGetData.CommandText = sqlGetData;
+                SqlDataReader reader = cmdGetData.ExecuteReader();
+
+                var gridRows = new List<gridRow>();
+                int row = 0;
+                while (reader.Read())
+                {
+                    gridRows.Add(new gridRow
+                    {
+                        Id = reader.GetInt32(0),
+                        col1text = reader.GetString(2),
+                        col1width = 100F,
+                        col2text = "",
+                        col2width = 10F,
+                        col3text = "",
+                        col3width = 10F,
+                        col4text = "",
+                        col4width = 10F,
+                        col5text = "",
+                        col5width = 10F,
+                        col6text = "",
+                        col6width = 10F,
+                        Status = -1,
+                        DataType = reader.GetInt32(3),
+                        Row = row
+                    });
+                    row++;
+
+                }
+                cmdGetData.Dispose();
+                Connection.Close();
+                Connection = null;
+                return (gridRows);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString(), ex);
+            }
+            finally
+            {
+            }
+        }
+
+
         public List<gridRow> ReadParameters(string Filter, int StartCatRange, int EndCatRange, int StartRow, int EndRow )
         {
             try

@@ -443,4 +443,4 @@ namespace Scada
                 Angle = Angle + 20;
             }
         }
-        */
+   */

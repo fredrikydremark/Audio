@@ -659,7 +659,7 @@ namespace Scada
             }
         }
 
-        public List<gridRow> GetDataSources()
+        public List<gridRow> GetCommProtocols()
         {
             try
             {

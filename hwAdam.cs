@@ -7,19 +7,21 @@ namespace Scada
 {
     public class Adam
     {
-        static string myPortName = "COM4";
-        static int baudRate = 9600;
-        static SerialPort sp = new SerialPort(myPortName, baudRate);
+        //static string myPortName = "COM4";
+        //static int baudRate = 9600;
+        static SerialPort sp = new SerialPort();
     
         public Adam(string portName, string baud)
         {
-            myPortName = portName;
+            int baudRate = 9600;
+
             if (int.TryParse(baud, out int iBaud))
             {
                 baudRate = iBaud;
             }
-            sp = new SerialPort(myPortName, baudRate);
-
+           
+            sp.PortName = portName;
+            sp.BaudRate = baudRate;
             sp.Parity = Parity.None;
             sp.DataBits = 8;
             sp.StopBits = StopBits.One;
@@ -33,9 +35,9 @@ namespace Scada
                 sp.Open();
             }
             catch (UnauthorizedAccessException ex)
-            {
-              
+            {         
             }
+
             catch (IOException ex)
             {
                

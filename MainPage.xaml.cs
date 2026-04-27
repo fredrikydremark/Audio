@@ -22,11 +22,12 @@ public partial class MainPage : ContentPage
     Editor edtSvgEditor = new Editor { Placeholder = "Paste your SVG text", Text = "Paste your SVG text" };
     Editor edtSvgName = new Editor { Placeholder = "SvgName", Text = "SvgName" };
     Editor edtInputText = new Editor { Placeholder = "InputText", Text = "" };
-
+    
+    bool bStartup = true;
     bool Designing = false;
     bool Moving = false;
     bool bLoginSuccess = false;
-    int infoType = ScadaClasses.infoStartup;
+    int  infoType = ScadaClasses.infoStartup;
 
     double Xpos = 0, Ypos = 0, Xwidth = 0, Yheight = 0;
     double OldXpos = 0, OldYpos = 0;
@@ -62,7 +63,7 @@ public partial class MainPage : ContentPage
         //Preferences.Default.Set("ConnectionString", "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true");
 
         //Local SQLExpress
-        //ConnectionString = Preferences.Default.Get("ConnectionString", ".\\SQLExpress");
+        //ConnectionString = Preferences.Default.Get("ConnectionString", "");
 
         //ConnectionString = "Server=tcp:scada.database.windows.net,1433;Initial Catalog=scada; Encrypt=True;TrustServerCertificate=False;Connection Timeout = 30; Authentication=Active Directory Default";
         //ConnectionString = "Server = tcp:scada.database.windows.net,1433;Initial Catalog = scada; Persist Security Info = False; User ID =freydr; MultipleActiveResultSets = False; Encrypt = True; TrustServerCertificate = False; Authentication = Active Directory Integrated";
@@ -130,20 +131,12 @@ public partial class MainPage : ContentPage
         */
         //Active Directory Default
 
-
-        DataAccessLayer MyDataAccessLayer = new DataAccessLayer(ConnectionString);
+      
+     
         List<ScadaClasses.Telegram> ScadaItems = new List<ScadaClasses.Telegram>();
 
-        var ListOfDigitalTagsToStore = MyDataAccessLayer.GetDigitalTagsToStore(-1);
-        foreach (var Tag in ListOfDigitalTagsToStore)
-        {
-            MyDataAccessLayer.StoreTagValue(Tag.TagID, Tag.Value);
-        }
 
-        if (MyDataAccessLayer.GetTagValueByName("System_EnableADAM") > 0.5)
-        {
-            MyDataAccessLayer.SetTagStatus(1, 1);
-        }
+   
         
         bcktimer.Interval = 2000;
         bcktimer.Elapsed += bckUpdate;
@@ -260,6 +253,21 @@ public partial class MainPage : ContentPage
             {
                 if (!Moving)
                 {
+                    if (bStartup)
+                    {
+                        DataAccessLayer MyDataAccessLayer = new DataAccessLayer(ConnectionString);
+                        var ListOfDigitalTagsToStore = MyDataAccessLayer.GetDigitalTagsToStore(-1);
+                        foreach (var Tag in ListOfDigitalTagsToStore)
+                        {
+                            MyDataAccessLayer.StoreTagValue(Tag.TagID, Tag.Value);
+                        }
+
+                        if (MyDataAccessLayer.GetTagValueByName("Enable ADAM") > 0.5)
+                        {
+                            MyDataAccessLayer.SetTagStatus(1, 1);
+                        }
+                        bStartup = false;
+                    }
                     if (ScadaClasses.Refresh == true)
                     {
                         ScadaClasses.Refresh = false;
@@ -1183,7 +1191,7 @@ public partial class MainPage : ContentPage
         CreateCloseButton(x, y, w, h, ScadaClasses.uxParameters );
 
         DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);
-        var gridRows = MyDataAccessLayer.GetDataSources();
+        var gridRows = MyDataAccessLayer.GetCommProtocols();
      
         int r = 0;
         y = y + popupAlarm.CornerRadius;
@@ -4935,8 +4943,16 @@ public partial class MainPage : ContentPage
                             switch (args.ActionType)
                             {
                                 case SKTouchAction.Pressed:
-                                    MyDataAccessLayer.UpdateParameterValue(ScadaClasses.CurrentID, edtInputText.Text);
-                                   
+                                    // computer specific Config 
+                                    if ( ScadaClasses.CurrentID > 0 )
+                                    {
+                                        MyDataAccessLayer.UpdateParameterValue(ScadaClasses.CurrentID, edtInputText.Text);
+                                    }
+                                    else
+                                    {
+                                        Preferences.Default.Set("ConnectionString", edtInputText.Text);
+                                    }
+                                      
                                     ScadaClasses.Previouspage = -1;
                                     ScadaClasses.CurrentScadaPopup = ScadaClasses.uxLoginMenu;
                                     ScadaClasses.Refresh = true;
@@ -5687,6 +5703,53 @@ public partial class MainPage : ContentPage
                     break;
              }
 
+
+            //Home (house)
+            var btnHome = new ScadaButton();
+            btnHome.GradientStartColor = ScadaColor.uxItemColor;
+            btnHome.GradientEndColor = ScadaColor.uxItemColor;
+            btnHome.CornerRadius = 15;
+            btnHome.ItemID = 1;
+            btnHome.EnableTouchEvents = true;
+            btnHome.InputTransparent = false;
+            btnHome.HeightRequest = 25;
+            btnHome.WidthRequest = 25;
+            btnHome.SvgBase64 = MyDataAccessLayer.LoadLibItem("Home", 1);
+            btnHome.IndicatorType = 3;
+            btnHome.Margin = 0.15F;
+            btnHome.ButtonText = "";
+            btnHome.Touch += (sender, args) =>
+            {
+                switch (args.ActionType)
+                {
+                    case SKTouchAction.Released:
+                        ScadaClasses.Previouspage = -1;
+                        ScadaClasses.Currentpage = 1;
+                        ScadaClasses.CurrentScadaPopup = -1;
+                        ScadaClasses.Refresh = true;
+                        break;
+
+                    case SKTouchAction.Pressed:
+                        break;
+
+                    case SKTouchAction.Moved:
+                        btnHome.GradientStartColor = ScadaColor.uxHoverColor;
+                        btnHome.GradientEndColor = ScadaColor.uxHoverColor;
+                        btnHome.IndicatorColor = ScadaColor.uxHoverColor;
+                        break;
+
+                    case SKTouchAction.Exited:
+                        btnHome.GradientStartColor = ScadaColor.uxItemColor;
+                        btnHome.GradientEndColor = ScadaColor.uxItemColor;
+                        btnHome.IndicatorColor = ScadaColor.uxItemColor;
+                        break;
+                }
+                args.Handled = true;
+            };
+            AbsoluteLayout.SetLayoutBounds(btnHome, new Rect(20 + btnHome.WidthRequest / 5, 20 + btnHome.HeightRequest / 5, 25, 25));
+            AbsoluteLayout.SetLayoutFlags(btnHome, AbsoluteLayoutFlags.None);
+            SKCanvasPopupViews.Add(btnHome);
+
             //Alarm bell
             var btnAlarmbell = new ScadaButton();
             btnAlarmbell.GradientStartColor = ScadaColor.uxItemColor;
@@ -5728,7 +5791,7 @@ public partial class MainPage : ContentPage
                 }
                 args.Handled = true;
             };
-            AbsoluteLayout.SetLayoutBounds(btnAlarmbell, new Rect(20 + btnAlarmbell.WidthRequest / 5, 20 + btnAlarmbell.HeightRequest / 5, 25, 25));
+            AbsoluteLayout.SetLayoutBounds(btnAlarmbell, new Rect(20 + btnAlarmbell.WidthRequest / 5, 60 + btnAlarmbell.HeightRequest / 5, 25, 25));
             AbsoluteLayout.SetLayoutFlags(btnAlarmbell, AbsoluteLayoutFlags.None);
             SKCanvasPopupViews.Add(btnAlarmbell);
 

@@ -1621,6 +1621,10 @@ public partial class MainPage : ContentPage
                         case SKTouchAction.Released:
                             switch (myRow.col1text)
                             {
+                                case "Connection string":
+                                    edtInputText.Text = ConnectionString;
+                                    ScadaClasses.CurrentScadaPopup = ScadaClasses.uxEditParameterText;
+                                    break;
                                 case "Items":
                                     ScadaClasses.CurrentScadaPopup = ScadaClasses.uxUploadMenu;
                                     break;

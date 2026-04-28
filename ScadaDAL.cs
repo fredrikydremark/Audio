@@ -263,6 +263,93 @@ namespace Scada
             return (m);
         }
 
+        public List<ScadaClasses.Adam> GetAdams()
+        {
+            try
+            {
+                var Connection = new Microsoft.Data.SqlClient.SqlConnection
+                {
+                    ConnectionString = sConnection
+                };
+                Connection.Open();
+                string sqlGetData = "select TagID,Adress,Channel,ChType from AdamChannels";
+                                  
+
+                SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
+                cmdGetData.CommandText = sqlGetData;
+                SqlDataReader reader = cmdGetData.ExecuteReader();
+
+                var myAdams = new List<ScadaClasses.Adam>();
+
+                while (reader.Read())
+                {
+                    myAdams.Add(new ScadaClasses.Adam
+                    {
+                        TagID = reader.GetInt32(0),
+                        Adress = reader.GetInt32(1),
+                        Channel = reader.GetInt32(2),
+                        ChType = reader.GetInt32(3)
+
+                    });
+                }
+                cmdGetData.Dispose();
+                Connection.Close();
+                Connection = null;
+                return (myAdams);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString(), ex);
+            }
+            finally
+            {
+            }
+        }
+
+        public List<ScadaClasses.Adam> GetAdamDigitalOutputs()
+        {
+            try
+            {
+                var Connection = new Microsoft.Data.SqlClient.SqlConnection
+                {
+                    ConnectionString = sConnection
+                };
+                Connection.Open();
+                string sqlGetData = "select TagID,Adress,Channel,ChType from AdamChannels Where ChType=4";
+
+
+                SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
+                cmdGetData.CommandText = sqlGetData;
+                SqlDataReader reader = cmdGetData.ExecuteReader();
+
+                var myAdams = new List<ScadaClasses.Adam>();
+
+                while (reader.Read())
+                {
+                    myAdams.Add(new ScadaClasses.Adam
+                    {
+                        TagID = reader.GetInt32(0),
+                        Adress = reader.GetInt32(1),
+                        Channel = reader.GetInt32(2),
+                        ChType = reader.GetInt32(3)
+
+                    });
+                }
+                cmdGetData.Dispose();
+                Connection.Close();
+                Connection = null;
+                return (myAdams);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString(), ex);
+            }
+            finally
+            {
+            }
+        }
+
+
 
 
 
@@ -361,6 +448,37 @@ namespace Scada
             }
         }
 
+
+        public int UpdatePageName(int ID, string sName)
+        {
+            try
+            {
+                var Connection = new Microsoft.Data.SqlClient.SqlConnection
+                {
+                    ConnectionString = sConnection
+                };
+
+                string sqlGetData = "UPDATE Pages SET Name = @Name WHERE ( ID = @ID )";
+                Connection.Open();
+                SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
+                cmdGetData.Parameters.AddWithValue("@Name", sName);
+                cmdGetData.Parameters.AddWithValue("@ID", ID);
+
+                cmdGetData.ExecuteNonQuery();
+                cmdGetData.Dispose();
+                Connection.Close();
+                Connection = null;
+                return (0);
+            }
+            catch (Exception ex)
+            {
+                return (1);
+                throw new Exception(ex.ToString(), ex);
+            }
+            finally
+            {
+            }
+        }
 
         public List<gridRow> ReadParameters(string Filter, int StartCatRange, int EndCatRange, int StartRow, int EndRow )
         {
@@ -558,6 +676,7 @@ namespace Scada
             {
             }
         }
+
 
 
         public int DeleteParameter(string Name)

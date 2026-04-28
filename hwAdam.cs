@@ -6,42 +6,55 @@ using static Scada.ScadaClasses;
 namespace Scada
 {
     public class Adam
-    {
-        //static string myPortName = "COM4";
-        //static int baudRate = 9600;
+    {   /*
+        public static string myPortName = "COM4";
+        public static int baudRate = 9600;
+        static SerialPort sp = new SerialPort(myPortName, baudRate);
+        */
+
         static SerialPort sp = new SerialPort();
-    
         public Adam(string portName, string baud)
         {
+            
             int baudRate = 9600;
-
             if (int.TryParse(baud, out int iBaud))
             {
                 baudRate = iBaud;
             }
-           
-            sp.PortName = portName;
-            sp.BaudRate = baudRate;
-            sp.Parity = Parity.None;
-            sp.DataBits = 8;
-            sp.StopBits = StopBits.One;
-            sp.Handshake = Handshake.None;
-            sp.ReadTimeout = 500;
-            sp.WriteTimeout = 500;
 
+            /*
             try
             {
-              if (!sp.IsOpen)
-                sp.Open();
+               if (!sp.IsOpen)
+                  sp.Close();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+            }
+            */
+         
+            
+            try
+            {
+               if (!sp.IsOpen)
+               {      
+                  sp.PortName = portName;
+                  sp.BaudRate = baudRate;
+                  sp.Parity = Parity.None;
+                  sp.DataBits = 8;
+                  sp.StopBits = StopBits.One;
+                  sp.Handshake = Handshake.None;
+                  sp.ReadTimeout = 500;
+                  sp.WriteTimeout = 500;
+                  sp.Open();
+               }
             }
             catch (UnauthorizedAccessException ex)
             {         
             }
-
             catch (IOException ex)
-            {
-               
-            }
+            {               
+            }            
         }
 
 
@@ -66,25 +79,32 @@ namespace Scada
             Adress = 1;
             if (sp.IsOpen == true)
             {
+                var ListOfDigitalOutputModules = MyDataAccessLayer.GetAdamDigitalOutputs();
+
                 //Write Digital outputs
-                Adress = 2;
-                DigitalOutput = MyDataAccessLayer.GetDigitalOutputs(Adress);
-                for (Channel = 0; Channel < 7; Channel++)
+                //Adress = 2;
+                foreach (var Module in ListOfDigitalOutputModules)
                 {
-                    if (DigitalOutput[Channel] != '-')
+                    DigitalOutput = MyDataAccessLayer.GetDigitalOutputs(Module.Adress);
+                    for (Channel = 0; Channel < 7; Channel++)
                     {
-                        s = String.Concat("#0", Adress.ToString(), "1", Channel.ToString(), "0", DigitalOutput[Channel]);
-                        try
+                        if (DigitalOutput[Channel] != '-')
                         {
-                            sp.WriteLine(s);
-                            message = sp.ReadLine();
-                        }
-                        catch (TimeoutException)
-                        {
-                            break;
+                            s = String.Concat("#0", Adress.ToString(), "1", Channel.ToString(), "0", DigitalOutput[Channel]);
+                            try
+                            {
+                                sp.WriteLine(s);
+                                message = sp.ReadLine();
+                            }
+                            catch (TimeoutException)
+                            {
+                                break;
+                            }
                         }
                     }
                 }
+
+
 
                 try
                 {

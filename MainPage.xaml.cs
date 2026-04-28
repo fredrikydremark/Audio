@@ -179,12 +179,16 @@ public partial class MainPage : ContentPage
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 DataAccessLayer MyDataAccessLayer = new DataAccessLayer(ConnectionString);
-                
+
                 if (MyDataAccessLayer.ReadParameterByName("Enable ADAM") == "1")
                 {
                     Adam AdamLayer = new Adam(MyDataAccessLayer.ReadParameterByName("PortName"), MyDataAccessLayer.ReadParameterByName("Baudrate"));
+          
                     AdamLayer.ReadADAM();
+              
                 }
+
+                    
                 if (MyDataAccessLayer.ReadParameterByName("Enable MQTT") == "1")
                 {
            
@@ -439,7 +443,8 @@ public partial class MainPage : ContentPage
                     ScadaClasses.Previouspage = -1;
                     ScadaClasses.CurrentScadaPopup = ScadaClasses.uxEditParameterText;
                     ScadaClasses.PreviousScadaPopup = ScadaClasses.uxLoginMenu;
-                    edtInputText.Text = ConnectionString;//myRowButton.ButtonRow.col2text;                 
+                    edtInputText.Text = ConnectionString;
+                    ScadaClasses.CurrentType = ScadaClasses.pmComputer;
                     ScadaClasses.Refresh = true;
                     break;
 
@@ -873,6 +878,7 @@ public partial class MainPage : ContentPage
                         ScadaClasses.CurrentScadaPopup = ScadaClasses.uxEditParameterText;
                         edtInputText.Text = myRowButton.ButtonRow.col2text;
                         ScadaClasses.CurrentID = myRowButton.ButtonRow.Id;
+                        ScadaClasses.CurrentType = ScadaClasses.pmParameter;
                         ScadaClasses.Refresh = true;
                         break;
                     /*
@@ -1545,58 +1551,54 @@ public partial class MainPage : ContentPage
             AbsoluteLayout.SetLayoutBounds(myRowButton, new Rect(x, y, myRowButton.WidthRequest, 26));
             AbsoluteLayout.SetLayoutFlags(myRowButton, AbsoluteLayoutFlags.None);
             SKCanvasViews.Add(myRowButton);
-
-         
-         
-                var btnDots = new ScadaButton();
-                btnDots.GradientStartColor = ScadaColor.uxPopupItemColor;
-                btnDots.GradientEndColor = ScadaColor.uxPopupItemColor;
-                btnDots.CornerRadius = 15;
-                btnDots.ItemID = 1;
-                btnDots.EnableTouchEvents = true;
-                btnDots.InputTransparent = false;
-                btnDots.HeightRequest = 22;
-                btnDots.WidthRequest = 22;
-                btnDots.SvgBase64 = MyDataAccessLayer.LoadLibItem("Threedots", 1);
-                btnDots.IndicatorType = 3;
-                btnDots.Margin = 0.15F;
-                btnDots.ButtonText = "";
-                btnDots.Touch += (sender, args) =>
+        
+            var btnDots = new ScadaButton();
+            btnDots.GradientStartColor = ScadaColor.uxPopupItemColor;
+            btnDots.GradientEndColor = ScadaColor.uxPopupItemColor;
+            btnDots.CornerRadius = 15;
+            btnDots.ItemID = 1;
+            btnDots.EnableTouchEvents = true;
+            btnDots.InputTransparent = false;
+            btnDots.HeightRequest = 22;
+            btnDots.WidthRequest = 22;
+            btnDots.SvgBase64 = MyDataAccessLayer.LoadLibItem("Threedots", 1);
+            btnDots.IndicatorType = 3;
+            btnDots.Margin = 0.15F;
+            btnDots.ButtonText = "";
+            btnDots.Touch += (sender, args) =>
+            {
+                switch (args.ActionType)
                 {
-                    switch (args.ActionType)
-                    {
-                        case SKTouchAction.Released:
-                          
-                            edtInputText.Text = myRow.col1text;
-                            ScadaClasses.CurrentScadaPopup = ScadaClasses.uxEditParameterText;
-                    
-                            ScadaClasses.Previouspage = -1;
-                            ScadaClasses.Refresh = true;
-                            break;
+                    case SKTouchAction.Released:                      
+                        edtInputText.Text = myRow.col1text;
+                        ScadaClasses.CurrentScadaPopup = ScadaClasses.uxEditParameterText;
+                        ScadaClasses.CurrentType = ScadaClasses.pmPages;
+                        ScadaClasses.CurrentID = myRow.Id;
+                        ScadaClasses.Previouspage = -1;
+                        ScadaClasses.Refresh = true;
+                        break;
 
-                        case SKTouchAction.Pressed:
-                            break;
+                    case SKTouchAction.Pressed:
+                        break;
 
-                        case SKTouchAction.Moved:
-                            btnDots.GradientStartColor = ScadaColor.uxHoverColor;
-                            btnDots.GradientEndColor = ScadaColor.uxHoverColor;
-                            btnDots.IndicatorColor = ScadaColor.uxHoverColor;
-                            break;
+                    case SKTouchAction.Moved:
+                        btnDots.GradientStartColor = ScadaColor.uxHoverColor;
+                        btnDots.GradientEndColor = ScadaColor.uxHoverColor;
+                        btnDots.IndicatorColor = ScadaColor.uxHoverColor;
+                        break;
 
-                        case SKTouchAction.Exited:
-                            btnDots.GradientStartColor = ScadaColor.uxPopupItemColor;
-                            btnDots.GradientEndColor = ScadaColor.uxPopupItemColor;
-                            btnDots.IndicatorColor = ScadaColor.uxPopupItemColor;
-                            break;
-                    }
-                    args.Handled = true;
-                };
-                AbsoluteLayout.SetLayoutBounds(btnDots, new Rect(x + w - 80 + 15, y + 2, 50, 22));
-                AbsoluteLayout.SetLayoutFlags(btnDots, AbsoluteLayoutFlags.None);
-                SKCanvasViews.Add(btnDots);
-            
-
-       
+                    case SKTouchAction.Exited:
+                        btnDots.GradientStartColor = ScadaColor.uxPopupItemColor;
+                        btnDots.GradientEndColor = ScadaColor.uxPopupItemColor;
+                        btnDots.IndicatorColor = ScadaColor.uxPopupItemColor;
+                        break;
+                }
+                args.Handled = true;
+            };
+            AbsoluteLayout.SetLayoutBounds(btnDots, new Rect(x + w - 80 + 15, y + 2, 50, 22));
+            AbsoluteLayout.SetLayoutFlags(btnDots, AbsoluteLayoutFlags.None);
+            SKCanvasViews.Add(btnDots);
+                   
             y = y + 26;
             r++;
         }
@@ -1760,6 +1762,7 @@ public partial class MainPage : ContentPage
                             {
                                 case "Connection string":
                                     edtInputText.Text = ConnectionString;
+                                    ScadaClasses.CurrentType = ScadaClasses.pmComputer;
                                     ScadaClasses.CurrentScadaPopup = ScadaClasses.uxEditParameterText;
                                     break;
                                 case "Items":
@@ -4500,15 +4503,18 @@ public partial class MainPage : ContentPage
                             {
                                 case SKTouchAction.Pressed:
                                     // computer specific Config 
-                                    if ( ScadaClasses.CurrentID > 0 )
+                                    switch (ScadaClasses.CurrentType)
                                     {
-                                        MyDataAccessLayer.UpdateParameterValue(ScadaClasses.CurrentID, edtInputText.Text);
-                                    }
-                                    else
-                                    {
-                                        Preferences.Default.Set("ConnectionString", edtInputText.Text);
-                                    }
-                                      
+                                        case ScadaClasses.pmComputer:
+                                              Preferences.Default.Set("ConnectionString", edtInputText.Text);
+                                            break;
+                                        case ScadaClasses.pmParameter:
+                                              MyDataAccessLayer.UpdateParameterValue(ScadaClasses.CurrentID, edtInputText.Text);
+                                            break;
+                                        case ScadaClasses.pmPages:
+                                              MyDataAccessLayer.UpdatePageName(ScadaClasses.CurrentID, edtInputText.Text);
+                                            break;
+                                    }                            
                                     ScadaClasses.Previouspage = -1;
                                     ScadaClasses.CurrentScadaPopup = ScadaClasses.uxLoginMenu;
                                     ScadaClasses.Refresh = true;

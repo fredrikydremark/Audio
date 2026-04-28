@@ -478,7 +478,7 @@ namespace Scada
             }
         }
 
-        public List<gridRow> ReadParameters(string Filter, int StartCatRange, int EndCatRange, int StartRow, int EndRow )
+        public List<gridRow> ReadParameters(string Filter,int nColumns, int StartCatRange, int EndCatRange, int StartRow, int EndRow )
         {
             try
             {
@@ -504,27 +504,33 @@ namespace Scada
                 var gridRows = new List<gridRow>();
                 int row = 0;
                 while (reader.Read())
-                {           
-                        gridRows.Add(new gridRow
-                        {
-                            Id = reader.GetInt32(0),
-                            col1text = reader.GetString(1),
-                            col1width = 100F,
-                            col2text = "",
-                            col2width = 10F,
-                            col3text = "",
-                            col3width = 10F,
-                            col4text = "",
-                            col4width = 10F,
-                            col5text = "",
-                            col5width = 10F,
-                            col6text = "",
-                            col6width = 10F,
-                            Status = -1,
-                            DataType= reader.GetInt32(3),
-                            Row = row
-                        });
-                        row++;
+                {
+                    string col1 = reader.GetString(1);
+                    string col2 = "";
+                    if (nColumns > 1)
+                    {
+                       col2 = reader.GetString(2);
+                    }
+                    gridRows.Add(new gridRow
+                    {
+                        Id = reader.GetInt32(0),
+                        col1text = col1,
+                        col1width = 250F,
+                        col2text = col2,
+                        col2width = 100F,
+                        col3text = "",
+                        col3width = 0F,
+                        col4text = "",
+                        col4width = 0F,
+                        col5text = "",
+                        col5width = 0F,
+                        col6text = "",
+                        col6width = 0F,
+                        Status = -1,
+                        DataType= reader.GetInt32(3),
+                        Row = row
+                    });
+                    row++;
                    
                 }
                 cmdGetData.Dispose();
@@ -889,7 +895,7 @@ namespace Scada
             }
         }
 
-
+        /*
         public List<gridRow> GetParams(int Category)
         {
             try
@@ -899,7 +905,7 @@ namespace Scada
                     ConnectionString = sConnection
                 };
                 Connection.Open();
-                string sqlGetData = "select Name,Value,ID from Parameters where Category =@Category";
+                string sqlGetData = "select Name,Value,ID,datatype from Parameters where Category =@Category";
 
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
                 cmdGetData.CommandText = sqlGetData;
@@ -921,6 +927,7 @@ namespace Scada
                         col6text = "",
                         DataType = 1,
                         Id = reader.GetInt32(2),
+                        Data = reader.GetInt32(2),
                         Row = nRow
                     });
                     nRow++;
@@ -939,7 +946,7 @@ namespace Scada
             {
             }
         }
-
+        */
 
 
         public List<gridRow> GetTagParams(int TagID)
@@ -2948,7 +2955,7 @@ namespace Scada
 
                 var Scale = new DateTime(myChartSetting.iYear, 1, 1, 0, 0, 0);
                 var EndScale = Scale.AddDays(365);
-                int w = 8;
+
                 while (Scale < EndScale)
                 {
                     var v = new ChartValue();              
@@ -2961,7 +2968,6 @@ namespace Scada
 
                 int i = 0;
              
-
                 int Day;
                 int Month;
                 SqlDataReader reader = cmdGetData.ExecuteReader();

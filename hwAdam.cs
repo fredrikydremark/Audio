@@ -99,6 +99,10 @@ namespace Scada
                         {
                             return;
                         }
+                        catch (Exception)
+                        {
+                            return;
+                        }
                     }
                 }
             }

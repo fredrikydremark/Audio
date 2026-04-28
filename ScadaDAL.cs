@@ -1,5 +1,4 @@
-﻿
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using System.Globalization;
 using System.Text;
 using static Scada.ScadaClasses;
@@ -306,7 +305,7 @@ namespace Scada
             }
         }
 
-        public List<ScadaClasses.Adam> GetAdamDigitalOutputs()
+        public List<ScadaClasses.Adam> GetAdamModules(int ChType)
         {
             try
             {
@@ -315,10 +314,9 @@ namespace Scada
                     ConnectionString = sConnection
                 };
                 Connection.Open();
-                string sqlGetData = "select TagID,Adress,Channel,ChType from AdamChannels Where ChType=4";
-
-
+                string sqlGetData = "select TagID,Adress,Channel,ChType from AdamChannels Where ChType=@ChType";
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
+                cmdGetData.Parameters.AddWithValue("@ChType", ChType);
                 cmdGetData.CommandText = sqlGetData;
                 SqlDataReader reader = cmdGetData.ExecuteReader();
 

@@ -228,7 +228,7 @@ namespace Scada
                     SV = "0.0",
                     Text = " ",
                     Radius = 10,
-                    gridRows = MyDataAccessLayer.ReadParameters("",5,10,0,10)
+                    gridRows = MyDataAccessLayer.ReadParameters("",1,5,10,0,10)
                 };
                 ScadaItems.Add(oMenuTelegram);
             }

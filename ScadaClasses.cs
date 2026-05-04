@@ -295,33 +295,23 @@ namespace Scada
         public const int infoNormal = 0;
         public const int infoStartup = 1;
 
-        /*
-        public class Param
-        {
-            public string Data { get; set; }
-            public int TypeOfData { get; set; }
-        }
-        */
+        public const int pmComputer = 1;
+        public const int pmParameter = 2;
+        public const int pmPages = 3;
 
-        /*
-        public class PopupRow
+        public const int chAnalogInput = 1;
+        public const int chAnalogOutput = 2;
+        public const int chDigitalInput = 3;
+        public const int chDigitalOutput = 4;
+
+        public class Adam
         {
-            public int ItemID { get; set; }
             public int TagID { get; set; }
-            public int Left { get; set; }
-            public int Top { get; set; }
-            public int Width { get; set; }
-            public int Height { get; set; }
-            public int ItemType { get; set; }
-            public string InputType { get; set; }
-            public string GridAction { get; set; }
-            public string Action { get; set; }
-            public string Text { get; set; }
-            public string Destination { get; set; }
-            public string DestinationType { get; set; }
-            public string Value { get; set; }
+            public int Adress { get; set; }
+            public int Channel { get; set; }
+            public int ChType { get; set; }
         }
-        */
+
 
         public class Tag
         {

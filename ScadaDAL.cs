@@ -1,6 +1,8 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using ExCSS;
+using Microsoft.Data.SqlClient;
 using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 using static Scada.ScadaClasses;
 
 
@@ -2828,23 +2830,26 @@ namespace Scada
                 {
                     ConnectionString = sConnection
                 };
+         
 
-                string sqlGetData = "SELECT [Day], Max(Totals) AS[Value] FROM( " +
+                string sqlGetData = "SELECT [Month],[Day],[Hour], Max(Totals) AS[Value] FROM( " +
                         " SELECT " +
                         "[Year]  = DATEPART(YEAR, [time]), " +
                         "[Month]  = DATEPART(MONTH, [time]), " +
                         "[Day]  = DATEPART(DAY, [time]), " +
+                        "[Hour]  = DATEPART(HOUR, [time]), " +
                                 "Totals = Max(Value) " +
                                 "FROM ChannelData " +
                                 "WHERE tagID = @sTag " +
                                 "GROUP BY " +
                                   "DATEPART(YEAR, [time])," +
                                   "DATEPART(MONTH, [time])," +
-                                  "DATEPART(DAY, [time]) " +
+                                  "DATEPART(DAY, [time])," +
+                                  "DATEPART(HOUR, [time]) " +
                                 " ) AS q " +
                                 "WHERE [Month]= @sMonth and [Year] = @sYear " +
-                                "GROUP BY [Day], [Month], [Year] " +
-                                "ORDER BY Day";
+                                "GROUP BY [Hour], [Day], [Month], [Year] " +
+                                "ORDER BY Year,Month,Day,Hour ";
 
 
                 Connection.Open();
@@ -2857,6 +2862,57 @@ namespace Scada
                 SqlDataReader reader = cmdGetData.ExecuteReader();
 
                 var TempValues = new List<ScadaClasses.Value>();
+                var DiagramScale = new List<ChartValue>();
+
+                var Scale = new DateTime(myChartSetting.iYear, myChartSetting.iMonth, 1, 0, 0, 0);
+                var EndScale = Scale.AddMonths(1);
+
+                while (Scale < EndScale)
+                {
+                    var v = new ChartValue();
+                    v.Hour = Scale.Hour;
+                    v.Day = Scale.Day;
+                    v.Month = Scale.Month;
+                    v.sValue = "";
+                    DiagramScale.Add(v);
+                    Scale = Scale.AddHours(1);
+                }
+
+  
+                int Day;
+                int Hour;
+                while (reader.Read())
+                {
+                    Day = reader.GetInt32(1);
+                    Hour = reader.GetInt32(2);
+
+                    foreach (ChartValue v in DiagramScale)
+                    {
+                        if (v.Day == Day)
+                        {
+                            if (v.Hour == Hour)
+                            {
+                                v.sValue = reader.GetDouble(3).ToString("000.00");
+                            }
+                        }
+                    }
+                }
+
+
+                string sTimeText;
+                foreach (ChartValue v in DiagramScale)
+                {
+                    sTimeText = "";
+                    if (v.DayOfWeek == 1)
+                    {
+                        sTimeText = v.Day.ToString();
+                    }
+                    TempValues.Add(new ScadaClasses.Value { X = sTimeText, Y = v.sValue, Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag, Max = 100F, Min = 0F, TimeSpan = tsYear });
+                }
+
+
+
+                /*FY
                 int daysInMonth = DateTime.DaysInMonth(myChartSetting.iYear, myChartSetting.iMonth);
 
                 var sMonthScale = new[] { "01", "", "", "", "", "", "", "08", "", "", "", "", "", "", "15", "", "", "", "", "", "", "22", "", "", "", "", "", "", "29", "", "" };
@@ -2864,7 +2920,7 @@ namespace Scada
                 {
                     TempValues.Add(new ScadaClasses.Value { X = s, Y = "0", Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag, Max = 100F, Min = 0F, TimeSpan = tsMonth });
                 }
-
+                */
                 /*
                 while (reader.Read())
                 {
@@ -2881,13 +2937,14 @@ namespace Scada
                     oldDay = iDay;
                 }
                 */
+                /*FY
                 int iDay;
                 while (reader.Read())
                 {
                     iDay = reader.GetInt32(0);
                     TempValues[iDay - 1].Y = reader.GetDouble(1).ToString("000.00");
                 }
-
+                */
                 reader.Close();
                 cmdGetData.Dispose();
                 Connection.Close();
@@ -3005,10 +3062,6 @@ namespace Scada
                     }            
                     TempValues.Add(new ScadaClasses.Value { X = sTimeText, Y = v.sValue, Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag, Max = 100F, Min = 0F, TimeSpan = tsYear });
                 }
-
-
-
-
 
 
 

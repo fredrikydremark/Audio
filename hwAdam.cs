@@ -39,8 +39,12 @@ namespace Scada
             {         
             }
             catch (IOException ex)
-            {               
-            }            
+            {
+            }
+            catch (Exception)
+            {
+                return;
+            }
         }
 
 
@@ -57,6 +61,11 @@ namespace Scada
             catch (IOException ex)
             {
             }
+            catch (Exception)
+            {
+                return;
+            }
+
         }
 
 
@@ -193,6 +202,11 @@ namespace Scada
                     {
                         return;
                     }
+                    catch (Exception)
+                    {
+                        return;
+                    }
+
                 }
             }
         }

@@ -1,8 +1,6 @@
-﻿using ExCSS;
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using System.Globalization;
 using System.Text;
-using System.Text.RegularExpressions;
 using static Scada.ScadaClasses;
 
 
@@ -2872,6 +2870,7 @@ namespace Scada
                     var v = new ChartValue();
                     v.Hour = Scale.Hour;
                     v.Day = Scale.Day;
+                    v.DayOfWeek = (int)Scale.DayOfWeek;
                     v.Month = Scale.Month;
                     v.sValue = "";
                     DiagramScale.Add(v);
@@ -2903,7 +2902,7 @@ namespace Scada
                 foreach (ChartValue v in DiagramScale)
                 {
                     sTimeText = "";
-                    if (v.DayOfWeek == 1)
+                    if ((v.DayOfWeek == 1) && (v.Hour==0) && (v.Minute==0))
                     {
                         sTimeText = v.Day.ToString();
                     }

@@ -8,7 +8,6 @@ using System.Text.RegularExpressions;
 using static Scada.DataAccessLayer;
 
 namespace Scada;
-
 public partial class MainPage : ContentPage
 {
     ScadaClasses.SystemColors ScadaColor = new ScadaClasses.SystemColors();
@@ -188,7 +187,7 @@ public partial class MainPage : ContentPage
             
                 }
                 
-                /*
+                
                 if (MyDataAccessLayer.ReadParameterByName("Enable simulation") == "1")
                 {
                     float RampSignal = MyDataAccessLayer.GetTagValueByName("RampSignal");
@@ -214,7 +213,7 @@ public partial class MainPage : ContentPage
                     var d1 = (rnd1.NextDouble() * 15F);
                     MyDataAccessLayer.SetTagValueByName("RandomSignal", RampSignal + (float)(d1));
                 }
-                */
+                
 
                 var ListOfAnalogTagsToStore = MyDataAccessLayer.GetAnalogTagsToStore();
                 foreach (var Tag in ListOfAnalogTagsToStore)
@@ -534,8 +533,8 @@ public partial class MainPage : ContentPage
                     bLoginSuccess = true;
                     infoType = ScadaClasses.infoStartup;
                     //Go
-                    uxtimer.Enabled = true;
-                    bcktimer.Enabled = true;
+                    //uxtimer.Enabled = true;
+                    //bcktimer.Enabled = true;
                     break;
 
                 case SKTouchAction.Released:
@@ -4270,7 +4269,7 @@ public partial class MainPage : ContentPage
                         mySvgButton2.EnableFaceFade();
                         mySvgButton3.EnableFaceFade();
                         mySvgButton4.EnableFaceFade();
-                        Thread.Sleep(200);
+                        //Thread.Sleep(200);
                         break;
 
                     case ScadaClasses.uxItemTagsMenu:
@@ -4380,7 +4379,7 @@ public partial class MainPage : ContentPage
                                 SKCanvasViews.Add(myItemTagsBtn);
                                 y = y + 26;
                             }
-                            Thread.Sleep(100);
+                            //Thread.Sleep(100);
                         }
                         break;
 
@@ -5260,7 +5259,7 @@ public partial class MainPage : ContentPage
                                 SKCanvasViews.Add(myButton);
                                 y = y + 26;
                             }
-                            Thread.Sleep(200);
+                           // Thread.Sleep(200);
                         }
                         break;
 

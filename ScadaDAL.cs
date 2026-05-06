@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.SqlClient;
+﻿
+using Microsoft.Data.SqlClient;
 using System.Globalization;
 using System.Text;
 using static Scada.ScadaClasses;
@@ -2877,7 +2878,7 @@ namespace Scada
                     Scale = Scale.AddHours(1);
                 }
 
-  
+         
                 int Day;
                 int Hour;
                 while (reader.Read())
@@ -2891,6 +2892,7 @@ namespace Scada
                         {
                             if (v.Hour == Hour)
                             {
+            
                                 v.sValue = reader.GetDouble(3).ToString("000.00");
                             }
                         }
@@ -2904,7 +2906,10 @@ namespace Scada
                     sTimeText = "";
                     if ((v.DayOfWeek == 1) && (v.Hour==0) && (v.Minute==0))
                     {
-                        sTimeText = v.Day.ToString();
+                        var dateTime = new DateTime(myChartSetting.iYear, myChartSetting.iMonth,v.Day, 0, 0, 0, 0);
+                        sTimeText = dateTime.ToString("MMM d");
+
+                        //sTimeText = v.Day.ToString("00");
                     }
                     TempValues.Add(new ScadaClasses.Value { X = sTimeText, Y = v.sValue, Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag, Max = 100F, Min = 0F, TimeSpan = tsYear });
                 }

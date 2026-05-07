@@ -2587,15 +2587,15 @@ namespace Scada
             }
         }
 
-        /*
-        private static int WeekOfYearISO8601(DateTime date)
+        
+        private int WeekOfYearISO8601(DateTime date)
         {
             var day = (int)CultureInfo.CurrentCulture.Calendar.GetDayOfWeek(date);
             return CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(date.AddDays(4 - (day == 0 ? 7 : day)), CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
         }
 
 
-        public static DateTime FirstDateOfWeekISO8601(int year, int weekOfYear)
+        public  DateTime FirstDateOfWeekISO8601(int year, int weekOfYear)
         {
             DateTime jan1 = new DateTime(year, 1, 1);
             int daysOffset = DayOfWeek.Thursday - jan1.DayOfWeek;
@@ -2612,7 +2612,7 @@ namespace Scada
             var result = firstThursday.AddDays(weekNum * 7);
             return result.AddDays(-3);
         }
-        */
+        
 
 
         public List<ScadaClasses.Value> GetOneWeekPlotData(ScadaClasses.ChartSetting myChartSetting, ScadaClasses.Tag MyTag)
@@ -2678,28 +2678,29 @@ namespace Scada
                 var DiagramScale = new List<ChartValue>();
 
                 var Scale = new DateTime(myChartSetting.iYear, myChartSetting.iMonth, myChartSetting.iDay, 0, 0, 0);
-                var EndScale = Scale.AddDays(-7);
-                int w = 8;
+                var EndScale = Scale.AddDays(-7.1);
+                int DayOfWeek = 8;
                 while (Scale > EndScale)
                 {
                     var v = new ChartValue();
-                    v.DayOfWeek = w;
+                    v.Day = Scale.Day;
+                    v.DayOfWeek = DayOfWeek;
                     v.Hour = Scale.Hour;
                     v.Minute = Scale.Minute;
                     v.Second = Scale.Second;
                     v.sValue = "";
                     DiagramScale.Add(v);
-                    Scale = Scale.AddHours(-1);
-                    if (v.Hour == 0) 
+                    Scale = Scale.AddHours(-1); 
+                    if (v.Hour == 0)
                     {
-                        w = w - 1;
+                        DayOfWeek = DayOfWeek - 1;
                     }
+
                 }
-                int i = 0;
                 DiagramScale.Reverse();
 
-                int DayOfWeek;
-                int Hour;
+                DayOfWeek = 0;
+                int Hour=0;
                 SqlDataReader reader = cmdGetData.ExecuteReader();
                 while (reader.Read())
                 {
@@ -2717,10 +2718,10 @@ namespace Scada
                        
                         }
                     }
-                    i++;
                 }
 
                 string sTimeText;
+                DateTime myDateTime = new DateTime();
                 foreach (ChartValue v in DiagramScale)
                 {
                     sTimeText = "";
@@ -2728,31 +2729,40 @@ namespace Scada
                     {
                         if (v.DayOfWeek == 1)
                         {
-                            sTimeText = v.Hour.ToString("Mon");
+                            myDateTime = FirstDateOfWeekISO8601(myChartSetting.iYear, myChartSetting.iWeek);
+
+                            //myDateTime = new DateTime(myChartSetting.iYear, myChartSetting.iMonth,myChartSetting.iDay, 0, 0, 0, 0);
+                            sTimeText = "Mon " + myDateTime.ToString("d MMM"); 
                         }
                         if (v.DayOfWeek == 2)
                         {
-                            sTimeText = v.Hour.ToString("Tis");
+                            //myDateTime = new DateTime(myChartSetting.iYear, myChartSetting.iMonth, v.Day, 0, 0, 0, 0);
+                            sTimeText = "Tue";
                         }
                         if (v.DayOfWeek == 3)
                         {
-                            sTimeText = v.Hour.ToString("Ons");
+                            myDateTime = new DateTime(myChartSetting.iYear, myChartSetting.iMonth, v.Day, 0, 0, 0, 0);
+                            sTimeText = "Wed";
                         }
                         if (v.DayOfWeek == 4)
                         {
-                            sTimeText = v.Hour.ToString("Tor");
+                            myDateTime = new DateTime(myChartSetting.iYear, myChartSetting.iMonth, v.Day, 0, 0, 0, 0);
+                            sTimeText = "Thu";
                         }
                         if (v.DayOfWeek == 5)
                         {
-                            sTimeText = v.Hour.ToString("Fre");
+                            myDateTime = new DateTime(myChartSetting.iYear, myChartSetting.iMonth, v.Day, 0, 0, 0, 0);
+                            sTimeText = "Fri";
                         }
-                        if(v.DayOfWeek == 6)
+                        if (v.DayOfWeek == 6)
                         {
-                            sTimeText = v.Hour.ToString("Sat");
+                            myDateTime = new DateTime(myChartSetting.iYear, myChartSetting.iMonth, v.Day, 0, 0, 0, 0);
+                            sTimeText = "Sat";
                         }
-                        if(v.DayOfWeek == 7)
+                        if (v.DayOfWeek == 7)
                         {
-                            sTimeText = v.Hour.ToString("Sun");
+                            myDateTime = new DateTime(myChartSetting.iYear, myChartSetting.iMonth, v.Day, 0, 0, 0, 0);
+                            sTimeText = "Sun";
                         }
                     }
                     TempValues.Add(new ScadaClasses.Value { X = sTimeText, Y = v.sValue, Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag, Max = 100F, Min = 0F, TimeSpan = tsWeek });

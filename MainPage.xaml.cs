@@ -655,7 +655,7 @@ public partial class MainPage : ContentPage
                      */
                     ScadaClasses.Previouspage = -1;
                     ScadaClasses.CurrentScadaPopup = ScadaClasses.uxParameters;
-                    ScadaClasses.Refresh = true;
+                    //ScadaClasses.Refresh = true;
                     break;
 
                 case SKTouchAction.Pressed:
@@ -1076,7 +1076,7 @@ public partial class MainPage : ContentPage
     private void ScadaAlarmGrid()
     {
         double panelWith = 0.7;
-        double panelHeight = 0.7;
+        double panelHeight = 0.6;
 
         double x = (Width / 2) - panelWith * Width / 2;
         double y = (Height / 2) - panelHeight * Height / 2;
@@ -1105,10 +1105,11 @@ public partial class MainPage : ContentPage
         SKCanvasViews.Add(popupAlarm);
         CreateCloseButton(x, y, w, h, -1);
 
-        y = y + popupAlarm.CornerRadius;
+        double HeaderHeight = 40F;
+        y = y + HeaderHeight;
         var TheColor = ScadaColor.uxItemColor;
-        y = y + 20;
-        for (int r = 0; r < 17; r++)
+        
+        for (int r = 0; r <= 10; r++)
         {
             if ((r % 2) == 0)
             {
@@ -1166,7 +1167,10 @@ public partial class MainPage : ContentPage
                 switch (args.ActionType)
                 {
                     case SKTouchAction.Released:
+                        SKCanvasPopupViews.Clear();
+
                         ScadaAlarmPopup(myRowButton.ButtonRow.Id, myRowButton.ButtonRow.TagID, myRowButton.ButtonRow.col2text);
+                       
                         foreach (SKCanvasView viewItem in SKCanvasPopupViews)
                         {
                             absoluteLayout.Add(viewItem);
@@ -3372,7 +3376,7 @@ public partial class MainPage : ContentPage
                         AbsoluteLayout.SetLayoutFlags(trh, AbsoluteLayoutFlags.None);
                         SKCanvasViews.Add(trh);
 
-                        double wTSButton = ((Width / 100) * ScadaItem.Width) / 3;
+                        double wTSButton = ((Width / 100) * ScadaItem.Width) / 4;
                         double hTSButton = 24;
                         double xTSButton = (Width / 100) * ScadaItem.Left + ((trh.WidthRequest / 2) - (wTSButton / 2));
                         double yTSButton = (Height / 100) * ScadaItem.Top + (10.0);
@@ -3556,7 +3560,7 @@ public partial class MainPage : ContentPage
                         var GraphItems = MyDataAccessLayer.GetItemTags(ScadaItem.ItemID);
                         foreach (var myGraph in GraphItems)
                         {
-                            double wTagButton = ((Width / 100) * ScadaItem.Width) / 3;
+                            double wTagButton = ((Width / 100) * ScadaItem.Width) / 4;
                             double hTagButton = 24;
                             double xTagButton = (Width / 100) * ScadaItem.Left + ((trh.WidthRequest / 2) - (wTSButton / 2));
                             double yTagButton = (Height / 100) * ScadaItem.Top + btnY;
@@ -3809,7 +3813,34 @@ public partial class MainPage : ContentPage
                         SKCanvasViews.Add(pr);
                         break;
 
-
+                    case ScadaClasses.uxLine:
+                        var SKLine = new ScadaLine();
+                        SKLine.ItemID = ScadaItem.ItemID;
+                        SKLine.StyleId = ScadaItem.ItemID.ToString();
+                        SKLine.AnchorX = 0;
+                        SKLine.AnchorY = 0;
+                        SKLine.CornerRadius = 10;
+                        SKLine.BarBackgroundColor = ScadaColor.uxBackGroundColor;
+                        SKLine.BackgroundColor = ScadaColor.uxBackGroundColor.ToMauiColor();
+                        SKLine.GradientStartColor = ScadaColor.uxItemColor;
+                        SKLine.GradientEndColor = ScadaColor.uxItemColor;
+                        SKLine.WidthRequest = wScale * ScadaItem.Width;
+                        SKLine.HeightRequest = hScale * ScadaItem.Height;
+                        SKLine.AlternativeTextColor = ScadaColor.uxTextColor;
+                        SKLine.TextColor = ScadaColor.uxTextColor;
+                        SKLine.FontSize = 10;
+                        SKLine.IsEnabled = true;
+                        SKLine.IsVisible = true;            
+                        SKLine.EnableTouchEvents = true;
+                        SKLine.InputTransparent = false;
+                        if (Designing == true)
+                        {
+                            SKLine = (ScadaLine)AttachDesignEvents(SKLine, ScadaItem);
+                        }
+                        AbsoluteLayout.SetLayoutBounds(SKLine, new Rect(wScale * ScadaItem.Left, hScale * ScadaItem.Top, wScale * ScadaItem.Width, hScale * ScadaItem.Height));
+                        AbsoluteLayout.SetLayoutFlags(SKLine, AbsoluteLayoutFlags.None);
+                        SKCanvasViews.Add(SKLine);
+                        break;
                     case ScadaClasses.uxSimulator:
                         var sim = new Simulator();
                         sim.ItemID = ScadaItem.ItemID;
@@ -5587,28 +5618,7 @@ public partial class MainPage : ContentPage
                         break;
 
 
-                    case ScadaClasses.uxLine:
-                        var SKLine = new ScadaLine();
-                        SKLine.ItemID = ScadaItem.ItemID;
-                        SKLine.StyleId = ScadaItem.ItemID.ToString();
-                        SKLine.AnchorX = 0;
-                        SKLine.AnchorY = 0;
-                        SKLine.CornerRadius = 10;
-                        SKLine.BarBackgroundColor = ScadaColor.uxBackGroundColor;
-                        SKLine.BackgroundColor = ScadaColor.uxBackGroundColor.ToMauiColor();
-                        SKLine.GradientStartColor = ScadaColor.uxItemColor;
-                        SKLine.GradientEndColor = ScadaColor.uxItemColor;
-                        SKLine.WidthRequest = wScale * ScadaItem.Width;
-                        SKLine.HeightRequest = hScale * ScadaItem.Height;
-                        SKLine.AlternativeTextColor = ScadaColor.uxTextColor;
-                        SKLine.TextColor = ScadaColor.uxTextColor;
-                        SKLine.FontSize = 10;
-                        SKLine.IsEnabled = true;
-                        SKLine.IsVisible = true;
-                        AbsoluteLayout.SetLayoutBounds(SKLine, new Rect(wScale * ScadaItem.Left, hScale * ScadaItem.Top, wScale * ScadaItem.Width, hScale * ScadaItem.Height));
-                        AbsoluteLayout.SetLayoutFlags(SKLine, AbsoluteLayoutFlags.None);
-                        SKCanvasViews.Add(SKLine);
-                    break;
+                  
              }
 
 

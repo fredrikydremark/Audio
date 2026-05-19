@@ -11,8 +11,8 @@ namespace Scada
     public class ScadaPanel : SKCanvasView
     {
         bool bFaceFade = true;
-        bool bIndicatorFade = true;
-        float localBtnIndicatorIntensity = 70f;
+        //bool bIndicatorFade = true;
+        //float localBtnIndicatorIntensity = 70f;
         float localBtnFaceIntensity = 0f;
         bool FaceFadeEnabled = false;
 
@@ -189,6 +189,7 @@ namespace Scada
             bFaceFade = true;
         }
 
+        /*
         public async void EnableFaceFade()
         {
             FaceFadeEnabled = true;
@@ -228,7 +229,7 @@ namespace Scada
                 await Task.Delay(10);
             }
         }
-
+        */
 
 
     

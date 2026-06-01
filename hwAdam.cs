@@ -35,10 +35,10 @@ namespace Scada
                   sp.Open();
                }
             }
-            catch (UnauthorizedAccessException ex)
+            catch (UnauthorizedAccessException)
             {         
             }
-            catch (IOException ex)
+            catch (IOException )
             {
             }
             catch (Exception)
@@ -55,10 +55,10 @@ namespace Scada
                if (sp != null && sp.IsOpen)
                   sp.Close();
             }
-            catch (UnauthorizedAccessException ex)
+            catch (UnauthorizedAccessException )
             {
             }
-            catch (IOException ex)
+            catch (IOException )
             {
             }
             catch (Exception)
@@ -100,11 +100,11 @@ namespace Scada
                         {
                             return;
                         }
-                        catch (UnauthorizedAccessException ex)
+                        catch (UnauthorizedAccessException )
                         {
                             return;
                         }
-                        catch (IOException ex)
+                        catch (IOException )
                         {
                             return;
                         }
@@ -194,11 +194,11 @@ namespace Scada
                     {
                         message = "--.-";
                     }
-                    catch (UnauthorizedAccessException ex)
+                    catch (UnauthorizedAccessException )
                     {
                         return;
                     }
-                    catch (IOException ex)
+                    catch (IOException )
                     {
                         return;
                     }

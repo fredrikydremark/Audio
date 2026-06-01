@@ -463,7 +463,7 @@ namespace Scada
                         }
                     }
                 }
-                await Task.Delay(10);
+                await Task.Delay(30);
             }
         }
 

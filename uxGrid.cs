@@ -156,11 +156,15 @@ namespace Scada
             //var PathEffect = SKPathEffect.CreateDash(new[] { 5f, 20f }, 25),
             //var effect = SKPathEffect.CreateDash(new[] { 10f, 20f }, 25);
             //var paint = new SKPaint { Color = SKColors.Black, IsStroke = true, StrokeWidth = 1, PathEffect = effect };
-
-            float h = (float)Window.MaximumHeight;
-            float w = (float)Window.MaximumWidth;
-            //float h = Top + bh;
-            //float w = Left + bw;
+            float h = 640;
+            float w = 1024;
+            if (Window != null)
+            {
+                h = (float)Window.MaximumHeight;
+                w = (float)Window.MaximumWidth;
+            }
+           
+            
 
             for (float x = Left; x < w; x += 10)
             {

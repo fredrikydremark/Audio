@@ -1099,7 +1099,7 @@ public partial class MainPage : ContentPage
         popupAlarm.TextColor = ScadaColor.uxTextColor;
         popupAlarm.IsEnabled = true;
         popupAlarm.IsVisible = true;
-        //popupAlarm.EnableFaceFade();
+        
         AbsoluteLayout.SetLayoutBounds(popupAlarm, new Rect(x, y, w, h));
         AbsoluteLayout.SetLayoutFlags(popupAlarm, AbsoluteLayoutFlags.None);
         SKCanvasViews.Add(popupAlarm);
@@ -4296,10 +4296,10 @@ public partial class MainPage : ContentPage
                             y = y + 26;
                         }
 
-                        mySvgButton1.EnableFaceFade();
-                        mySvgButton2.EnableFaceFade();
-                        mySvgButton3.EnableFaceFade();
-                        mySvgButton4.EnableFaceFade();
+                        //mySvgButton1.EnableFaceFade();
+                        //mySvgButton2.EnableFaceFade();
+                        //mySvgButton3.EnableFaceFade();
+                        // mySvgButton4.EnableFaceFade();
                         //Thread.Sleep(200);
                         break;
 

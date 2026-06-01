@@ -1409,7 +1409,7 @@ public partial class MainPage : ContentPage
         AbsoluteLayout.SetLayoutFlags(popupTags, AbsoluteLayoutFlags.None);
         SKCanvasViews.Add(popupTags);
         CreateCloseButton(x, y, w, h, ScadaClasses.uxParameters);
-        CreateCloseButton(x, y, w, h, -1);
+        
         CreateFwdButton(x, y, w, h);
         CreateRwdButton(x, y, w, h);
         CreateRemoveTagButton(ScadaClasses.CurrentItem, ScadaClasses.CurrentTag, x - (w / 2), y, w, h);
@@ -2563,6 +2563,7 @@ public partial class MainPage : ContentPage
 
     public SKCanvasView AttachDesignEvents(SKCanvasView sn, ScadaClasses.Telegram ScadaItem)
     {
+        sn.EnableTouchEvents = true;
         sn.Touch += (sender, args) =>
         {
             var pt = args.Location;
@@ -3310,7 +3311,7 @@ public partial class MainPage : ContentPage
 
                     case ScadaClasses.uxButton:                      
                         var SKButton = new ScadaButton();
-                        SKButton.Init(wScale, hScale, SKButton, ScadaItem, ScadaColor);
+                        SKButton.Init(wScale, hScale, SKButton, ScadaItem, ScadaColor, Designing);
                         if (Designing == true)
                         {
                             SKButton = (ScadaButton)AttachDesignEvents(SKButton, ScadaItem);

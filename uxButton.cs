@@ -49,7 +49,7 @@ namespace Scada
         float localBtnFaceIntensity = 0f;
         bool FaceFadeEnabled = false;
 
-        public ScadaButton Init(double wScale, double hScale, ScadaButton scb, ScadaClasses.Telegram Item, ScadaClasses.SystemColors Color)
+        public ScadaButton Init(double wScale, double hScale, ScadaButton scb, ScadaClasses.Telegram Item, ScadaClasses.SystemColors Color, bool Designing)
         {
             scb.AnchorX = 0;
             scb.AnchorY = 0;
@@ -63,11 +63,11 @@ namespace Scada
             scb.ButtonFaceIntensity = 0;
             scb.IndicatorIntensity = 0;
             scb.IndicatorType = 1;
-              
+
             if ((Item.Action == "TOGGLE") || (Item.Action == "ON") || (Item.Action == "OFF"))
             {
-               scb.IndicatorType = 5;
-               scb.IndicatorColor = Color.uxHoverColor;
+                scb.IndicatorType = 5;
+                scb.IndicatorColor = Color.uxHoverColor;
             }
 
             scb.WidthRequest = wScale * Item.Width;
@@ -107,19 +107,30 @@ namespace Scada
                 idx++;
             }
 
-            scb.IsEnabled = true;
-            scb.IsVisible = true;
-            scb.EnableTouchEvents = true;
-            scb.InputTransparent = false;
-            scb.Start();
+         
+            if (Designing == true)
+            {
+                scb.IsEnabled = true;
+                scb.IsVisible = true;
+                scb.EnableTouchEvents = true;
+                scb.InputTransparent = false;
+                //scb.Start();
 
+            }
+            else
+            {
+                scb.IsEnabled = true;
+                scb.IsVisible = true;
+                scb.EnableTouchEvents = true;
+                scb.InputTransparent = false;
+                scb.Start();
                 scb.Touch += (sender, args) =>
                 {
                     switch (args.ActionType)
                     {
                         case SKTouchAction.Released:
                             if (Item.Action == "TOGGLE")
-                            {                          
+                            {
                                 if (scb.SV.Value > 0.5)
                                 {
                                     scb.SV.Value = 0;
@@ -127,32 +138,32 @@ namespace Scada
                                 else
                                 {
                                     scb.SV.Value = 1;
-                                }                                                                                  
-                                MyDataAccessLayer.UpdateTagValue(scb.SV.TagID, scb.SV.Value,0);
+                                }
+                                MyDataAccessLayer.UpdateTagValue(scb.SV.TagID, scb.SV.Value, 0);
                                 MyDataAccessLayer.StoreTagValue(scb.SV.TagID, scb.SV.Value);
-                             
+
                             }
                             else if (Item.Action == "ON")
                             {
                                 scb.SV.Value = 1;
-                                MyDataAccessLayer.UpdateTagValue(scb.SV.TagID, scb.SV.Value,0);
+                                MyDataAccessLayer.UpdateTagValue(scb.SV.TagID, scb.SV.Value, 0);
                                 MyDataAccessLayer.StoreTagValue(scb.SV.TagID, scb.SV.Value);
                             }
                             else if (Item.Action == "OFF")
                             {
                                 scb.SV.Value = 0;
-                                MyDataAccessLayer.UpdateTagValue(scb.SV.TagID, scb.SV.Value,0);
+                                MyDataAccessLayer.UpdateTagValue(scb.SV.TagID, scb.SV.Value, 0);
                                 MyDataAccessLayer.StoreTagValue(scb.SV.TagID, scb.SV.Value);
                             }
                             else if (Item.Action == "POPUPALARM")
                             {
                                 ScadaClasses.Previouspage = -1;
                                 ScadaClasses.CurrentScadaPopup = ScadaClasses.uxAlarmGrid;
-                            }                         
+                            }
                             else if (Item.Action == "POPUPLOGIN")
                             {
                                 ScadaClasses.Previouspage = -1;
-                                ScadaClasses.CurrentScadaPopup = ScadaClasses.uxLoginMenu;                                                                        
+                                ScadaClasses.CurrentScadaPopup = ScadaClasses.uxLoginMenu;
                             }
                             else if (Item.Action == "POPUPDESIGN")
                             {
@@ -160,13 +171,13 @@ namespace Scada
                                 ScadaClasses.CurrentScadaPopup = ScadaClasses.uxDesignMenu;
                             }
                             else
-                            {                   
-                                ScadaClasses.Currentpage = Item.Nextpage;                               
+                            {
+                                ScadaClasses.Currentpage = Item.Nextpage;
                             }
                             scb.GradientStartColor = Color.uxItemColor;
                             scb.GradientEndColor = Color.uxItemColor;
                             ScadaClasses.Refresh = true;
-                       
+
                             break;
 
                         case SKTouchAction.Pressed:
@@ -187,10 +198,11 @@ namespace Scada
                     }
                     args.Handled = true;
                 };
-            
-            return (scb);
-        }
 
+
+            }
+            return(scb);
+        }
 
 
         public static BindableProperty ItemIDProperty = BindableProperty.Create(nameof(ItemID), typeof(int),

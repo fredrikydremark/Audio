@@ -24,6 +24,7 @@ public partial class MainPage : ContentPage
     
     bool bStartup = true;
     bool Designing = false;
+    bool Editing = false;
     bool Moving = false;
     bool bLoginSuccess = false;
     int  infoType = ScadaClasses.infoStartup;
@@ -2563,6 +2564,7 @@ public partial class MainPage : ContentPage
 
     public SKCanvasView AttachDesignEvents(SKCanvasView sn, ScadaClasses.Telegram ScadaItem)
     {
+       
         sn.EnableTouchEvents = true;
         sn.Touch += (sender, args) =>
         {
@@ -2584,6 +2586,7 @@ public partial class MainPage : ContentPage
 
                 case SKTouchAction.Released:
                     Moving = false;
+                    Editing = true;
                     ScadaClasses.CurrentScadaPopup = ScadaClasses.uxConfigMenu;
                     Xpos = sn.X;
                     Ypos = sn.Y;
@@ -2687,9 +2690,20 @@ public partial class MainPage : ContentPage
                             switch (args.ActionType)
                             {
                                 case SKTouchAction.Pressed:
+                                    Thread.Sleep(100);
                                     ScadaClasses.CurrentScadaPopup = callerPopup;
                                     ScadaClasses.Previouspage = -1;
-                                    ScadaClasses.Refresh = true;
+                                    ScadaClasses.Refresh = true; 
+                                    
+                                    if (ScadaClasses.CurrentScadaPopup == -1)
+                                    {
+                                        Editing = false;
+                                    }
+
+
+
+
+
                                     break;
 
                                 case SKTouchAction.Moved:
@@ -2953,7 +2967,8 @@ public partial class MainPage : ContentPage
             {
                Designing = false;
             }
-           
+
+            
             if (MyDataAccessLayer.ReadParameterByName("Dark") == "1")
             {
                 ScadaColor.uxBackGroundColor = RGBStringToColor(MyDataAccessLayer.ReadParameterByName("SystemDkBackgroundColor"));
@@ -3312,7 +3327,7 @@ public partial class MainPage : ContentPage
                     case ScadaClasses.uxButton:                      
                         var SKButton = new ScadaButton();
                         SKButton.Init(wScale, hScale, SKButton, ScadaItem, ScadaColor, Designing);
-                        if (Designing == true)
+                        if ((Designing == true)&&(Editing==false))
                         {
                             SKButton = (ScadaButton)AttachDesignEvents(SKButton, ScadaItem);
                         }
@@ -5836,6 +5851,8 @@ public partial class MainPage : ContentPage
 
             Content = absoluteLayout;
             ScadaClasses.Previouspage = ScadaClasses.Currentpage;
+            
+
         }
 
         foreach (SKCanvasView uxItem in SKCanvasViews)

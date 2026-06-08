@@ -1063,7 +1063,7 @@ public partial class MainPage : ContentPage
         var base64EncodedBytes = System.Convert.FromBase64String(base64EncodedData);
         return System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
     }
-
+   
     void OnEditorTextChanged(object sender, TextChangedEventArgs e)
     {
 
@@ -2690,11 +2690,13 @@ public partial class MainPage : ContentPage
                             switch (args.ActionType)
                             {
                                 case SKTouchAction.Pressed:
-                                    Thread.Sleep(100);
+                                    //Thread.Sleep(100);
                                     ScadaClasses.CurrentScadaPopup = callerPopup;
                                     ScadaClasses.Previouspage = -1;
-                                    ScadaClasses.Refresh = true; 
-                                    
+                                    ScadaClasses.Refresh = true;
+                                    SKCanvasPopupViews.Clear();
+                                    SKCanvasViews.Clear();
+                                    Thread.Sleep(200);
                                     if (ScadaClasses.CurrentScadaPopup == -1)
                                     {
                                         Editing = false;
@@ -4138,7 +4140,7 @@ public partial class MainPage : ContentPage
                             var pt = args.Location;
                             switch (args.ActionType)
                             {
-                                case SKTouchAction.Pressed:                          
+                                case SKTouchAction.Released:                          
                                     ScadaClasses.CurrentScadaPopup = ScadaClasses.uxItemTagsMenu;
                                     ScadaClasses.Previouspage = -1;
                                     ScadaClasses.Refresh = true;                             
@@ -4187,7 +4189,7 @@ public partial class MainPage : ContentPage
                             var pt = args.Location;
                             switch (args.ActionType)
                             {
-                                case SKTouchAction.Pressed:                              
+                                case SKTouchAction.Released:                              
                                     ScadaClasses.CurrentScadaPopup = ScadaClasses.uxItemTypeMenu;
                                     ScadaClasses.Previouspage = -1;
                                     ScadaClasses.Refresh = true;                       
@@ -4236,7 +4238,7 @@ public partial class MainPage : ContentPage
                             var pt = args.Location;
                             switch (args.ActionType)
                             {
-                                case SKTouchAction.Pressed:                                 
+                                case SKTouchAction.Released:                                 
                                     ScadaClasses.CurrentScadaPopup = ScadaClasses.uxItemSizeMenu;
                                     ScadaClasses.Previouspage = -1;
                                     ScadaClasses.Refresh = true;                        
@@ -4891,6 +4893,7 @@ public partial class MainPage : ContentPage
                                             break;
                                         case ScadaClasses.pmPages:
                                               MyDataAccessLayer.UpdatePageName(ScadaClasses.CurrentID, edtInputText.Text);
+                                              ScadaClasses.Currentpage = MyDataAccessLayer.GetPageNoByName(edtInputText.Text);
                                             break;
                                     }                            
                                     ScadaClasses.Previouspage = -1;
@@ -5790,6 +5793,18 @@ public partial class MainPage : ContentPage
             {
                 absoluteLayout.Add(viewItem);
             }
+
+            //Content = absoluteLayout;
+            /*
+            Thread.Sleep(1000);
+            foreach (SKCanvasView viewItem in SKCanvasPopupViews)
+            {
+                absoluteLayout.Remove(viewItem);
+            }
+            */
+            
+
+
 
             if (ScadaClasses.CurrentScadaPopup == ScadaClasses.uxUploadMenu)
             {

@@ -483,6 +483,45 @@ namespace Scada
             }
         }
 
+
+        public int GetPageNoByName(string Name)
+        {
+            try
+            {
+                int iPage = -1;
+                
+                var Connection = new Microsoft.Data.SqlClient.SqlConnection
+                {
+                    ConnectionString = sConnection
+                };
+                Connection.Open();
+                string sqlGetData = "select Page from Pages where Name = @Name";
+                SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
+                cmdGetData.Parameters.AddWithValue("@Name", Name);
+                cmdGetData.CommandText = sqlGetData;
+                SqlDataReader reader = cmdGetData.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    iPage = reader.GetInt32(0);                   
+                }
+                cmdGetData.Dispose();
+                Connection.Close();
+                Connection = null;
+                return (iPage);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString(), ex);
+            }
+            finally
+            {
+            }
+        }
+
+
+        
+
         public List<gridRow> ReadParameters(string Filter,int nColumns, int StartCatRange, int EndCatRange, int StartRow, int EndRow )
         {
             try

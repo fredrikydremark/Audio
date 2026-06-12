@@ -540,7 +540,33 @@ end;
                         idx--;
                     }
                     */
+                    /*                    for (int i = 0; i < LocalValues.Count - 1; i++)
+                    {
+                        if (Double.TryParse(LocalValues[i].Y, out double dValue) && Double.TryParse(LocalValues[i + 1].Y, out double dNextValue))
+                        {
+                            float x0 = w * (i / (float)(LocalValues.Count - 1));
+                            float y0 = h - (h * (float)(dValue / MaxValue));
+                            float x1 = w * ((i + 1) / (float)(LocalValues.Count - 1));
+                            float y1 = h - (h * (float)(dNextValue / MaxValue));
+                            canvas.DrawLine(x0, y0, x1, y1, myPaint);
+                            canvas.DrawCircle(x0, y0, w/100, my2Paint);
+                        }
+                    }
+                    */
+                    /*
+                    try
+                    {
+                        LocalValues[23].Y = "50";
 
+                        LocalValues[24].Y = "60";
+
+                        LocalValues[48].Y = "60";
+
+                    }
+                    catch
+                    {
+                    }
+                    */
                     int Count = LocalValues.Count;
                     string sv = "0";
                     for (int m = 0; m < Count; m++)
@@ -563,7 +589,7 @@ end;
                                 sv = "0,0";
                             }
                         }
-                        LocalValues[m].Y = sv;
+                        //LocalValues[m].Y = sv;
                     }
 
                     int j = Count - 1;
@@ -578,7 +604,7 @@ end;
                         x = x - (w / Count);
                         if ( j >= 0 )
                         {
-                            if (LocalValues[j].Y != "0")
+                            if (LocalValues[j].Y != "")
                             {
                                 thePoint = new SKPoint(x, h - (float)(Convert.ToDouble(LocalValues[j].Y) / 100.0F) * h);
                                 if (oldPoint.X > -1)
@@ -600,6 +626,7 @@ end;
                                     if (LocalValues[0].TypeOfTag == 2)
                                     {
                                         canvas.DrawRect(thePoint.X, thePoint.Y, (w / Count) / 1.5F, thePoint.Y + h, myPaint);
+                                        thePoint.Y = 0F;
                                     }
                                     if (LocalValues[0].TypeOfTag == 3)
                                     {
@@ -646,10 +673,10 @@ end;
                                     }
 
                                 }
-                                oldPoint = thePoint;
+                                
                             }
-           
-                                var basetick = new SKPoint(x, h);
+                            oldPoint = thePoint;
+                            var basetick = new SKPoint(x, h);
                                 var shorttick = new SKPoint(x, h - h / 50);
                                 var longtick = new SKPoint(x, h - h / 30);
                                 var textBounds = new SKRect();

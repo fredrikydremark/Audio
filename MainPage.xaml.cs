@@ -3431,7 +3431,7 @@ public partial class MainPage : ContentPage
                             var pt = args.Location;
                             switch (args.ActionType)
                             {
-                                case SKTouchAction.Pressed:
+                                case SKTouchAction.Released:
                                     //TimeScale Span menu
                                     ScadaClasses.CurrentItem = ScadaItem.ItemID;
 
@@ -3495,7 +3495,7 @@ public partial class MainPage : ContentPage
                             var pt = args.Location;
                             switch (args.ActionType)
                             {
-                                case SKTouchAction.Pressed:
+                                case SKTouchAction.Released:
                                     ChartSetTimeScaleStep(ScadaItem.ItemID, 1);
                                     ScadaClasses.Refresh = true;
                                     break;
@@ -3552,7 +3552,7 @@ public partial class MainPage : ContentPage
                             var pt = args.Location;
                             switch (args.ActionType)
                             {
-                                case SKTouchAction.Pressed:
+                                case SKTouchAction.Released:
                                     ChartSetTimeScaleStep(ScadaItem.ItemID, -1);
                                     ScadaClasses.Refresh = true;
                                     break;
@@ -3616,7 +3616,7 @@ public partial class MainPage : ContentPage
                                 var pt = args.Location;
                                 switch (args.ActionType)
                                 {
-                                    case SKTouchAction.Pressed:
+                                    case SKTouchAction.Released:
                                         ScadaClasses.CurrentItem = ScadaItem.ItemID;
                                         ScadaClasses.CurrentTag = myGraph.TagID;
                                         ScadaClasses.CurrentRow = myTagButton.TagSequence;
@@ -3683,7 +3683,7 @@ public partial class MainPage : ContentPage
                             var pt = args.Location;
                             switch (args.ActionType)
                             {
-                                case SKTouchAction.Pressed:
+                                case SKTouchAction.Released:
                                     ScadaClasses.CurrentItem = ScadaItem.ItemID;
                                     ScadaClasses.CurrentTag = 0;
                                     ScadaClasses.CurrentRow = btnRow;

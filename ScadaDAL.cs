@@ -2769,38 +2769,30 @@ namespace Scada
                         if (v.DayOfWeek == 1)
                         {
                             myDateTime = FirstDateOfWeekISO8601(myChartSetting.iYear, myChartSetting.iWeek);
-
-                            //myDateTime = new DateTime(myChartSetting.iYear, myChartSetting.iMonth,myChartSetting.iDay, 0, 0, 0, 0);
                             sTimeText = "Mon " + myDateTime.ToString("d MMM"); 
                         }
                         if (v.DayOfWeek == 2)
                         {
-                            //myDateTime = new DateTime(myChartSetting.iYear, myChartSetting.iMonth, v.Day, 0, 0, 0, 0);
                             sTimeText = "Tue";
                         }
                         if (v.DayOfWeek == 3)
                         {
-                            myDateTime = new DateTime(myChartSetting.iYear, myChartSetting.iMonth, v.Day, 0, 0, 0, 0);
                             sTimeText = "Wed";
                         }
                         if (v.DayOfWeek == 4)
                         {
-                            myDateTime = new DateTime(myChartSetting.iYear, myChartSetting.iMonth, v.Day, 0, 0, 0, 0);
                             sTimeText = "Thu";
                         }
                         if (v.DayOfWeek == 5)
                         {
-                            myDateTime = new DateTime(myChartSetting.iYear, myChartSetting.iMonth, v.Day, 0, 0, 0, 0);
                             sTimeText = "Fri";
                         }
                         if (v.DayOfWeek == 6)
                         {
-                            myDateTime = new DateTime(myChartSetting.iYear, myChartSetting.iMonth, v.Day, 0, 0, 0, 0);
                             sTimeText = "Sat";
                         }
                         if (v.DayOfWeek == 7)
                         {
-                            myDateTime = new DateTime(myChartSetting.iYear, myChartSetting.iMonth, v.Day, 0, 0, 0, 0);
                             sTimeText = "Sun";
                         }
                     }

@@ -425,7 +425,9 @@ end;
 
             float w = e.Info.Width;
             float h = e.Info.Height;
-            float MaxValue = 100;
+            float MaxScale = 40;
+            float ScaleFactor = 100 / MaxScale;
+
             var backgroundBar = new SKRoundRect(new SKRect(0, 0, w, h), 5, 5);
             var background = new SKPaint { Color = GradientStartColor, IsAntialias = true };
 
@@ -606,7 +608,7 @@ end;
                         {
                             if (LocalValues[j].Y != "")
                             {
-                                thePoint = new SKPoint(x, h - (float)(Convert.ToDouble(LocalValues[j].Y) / 100.0F) * h);
+                                thePoint = new SKPoint(x, h - ((float)(Convert.ToDouble(LocalValues[j].Y)*ScaleFactor) / 100.0F) * h);
                                 if (oldPoint.X > -1)
                                 {
                                     if (LocalValues[0].TypeOfTag == 0)
@@ -625,6 +627,7 @@ end;
                                     }
                                     if (LocalValues[0].TypeOfTag == 2)
                                     {
+                                        //canvas.DrawRect(thePoint.X, thePoint.Y*ScaleFactor, (w / Count) / 1.5F, thePoint.Y + h, myPaint);
                                         canvas.DrawRect(thePoint.X, thePoint.Y, (w / Count) / 1.5F, thePoint.Y + h, myPaint);
                                         thePoint.Y = 0F;
                                     }
@@ -727,21 +730,21 @@ end;
             var pathY = new SKPath { FillType = SKPathFillType.EvenOdd };
 
             float Scale = 0F;
-            while (Scale < MaxValue)
+            while (Scale < MaxScale)
             {
-                if (Scale % 20 == 0)
+                if (Scale % 10 == 0)
                 {
-                    pathY.MoveTo(0, h - (Scale / 100.0F) * h);
-                    pathY.LineTo(w / 100, h - (Scale / 100.0F) * h);
+                    pathY.MoveTo(0, h - (Scale / 100.0F) * h * ScaleFactor);
+                    pathY.LineTo(w / 100, h - (Scale / 100.0F) * h * ScaleFactor);
                     if (Scale > 1)
                     {
-                        canvas.DrawText(Scale.ToString(), w / 80, h - (Scale / 100.0F) * h, TextPaint);
+                        canvas.DrawText(Scale.ToString(), w / 80, h - (Scale / 100.0F) * h * ScaleFactor, TextPaint);
                     }
                 }
                 else
                 {
-                    pathY.MoveTo(0, h - (Scale / 100.0F) * h);
-                    pathY.LineTo(w / 150, h - (Scale / 100.0F) * h);
+                    pathY.MoveTo(0, h - (Scale / 100.0F) * h * ScaleFactor);
+                    pathY.LineTo(w / 150, h - (Scale / 100.0F) * h * ScaleFactor);
                 }
                 Scale = Scale + 5.0F;
             }

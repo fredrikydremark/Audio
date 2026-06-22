@@ -246,18 +246,17 @@ public partial class MainPage : ContentPage
                 if (!Moving)
                 {
                     if (bStartup)
-                    {
+                    {                    
                         DataAccessLayer MyDataAccessLayer = new DataAccessLayer(ConnectionString);
+                        
+                        MyDataAccessLayer.SetTagStatus(1, 1);
                         var ListOfDigitalTagsToStore = MyDataAccessLayer.GetDigitalTagsToStore(-1);
                         foreach (var Tag in ListOfDigitalTagsToStore)
                         {
                             MyDataAccessLayer.StoreTagValue(Tag.TagID, Tag.Value);
                         }
 
-                        if (MyDataAccessLayer.GetTagValueByName("Enable ADAM") > 0.5)
-                        {
-                            MyDataAccessLayer.SetTagStatus(1, 1);
-                        }
+                    
                         bStartup = false;
                     }
                     if (ScadaClasses.Refresh == true)

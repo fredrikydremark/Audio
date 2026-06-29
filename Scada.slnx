@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="Scada.csproj">
+    <BuildType Project="Debug" />
     <Deploy />
   </Project>
 </Solution>

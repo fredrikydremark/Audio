@@ -2872,13 +2872,13 @@ namespace Scada
                 };
          
 
-                string sqlGetData = "SELECT [Month],[Day],[Hour], Max(Totals) AS[Value] FROM( " +
+                string sqlGetData = "SELECT [Month],[Day],[Hour], Avg(Totals) AS[Value] FROM( " +
                         " SELECT " +
                         "[Year]  = DATEPART(YEAR, [time]), " +
                         "[Month]  = DATEPART(MONTH, [time]), " +
                         "[Day]  = DATEPART(DAY, [time]), " +
                         "[Hour]  = DATEPART(HOUR, [time]), " +
-                                "Totals = Max(Value) " +
+                                "Totals = Avg(Value) " +
                                 "FROM ChannelData " +
                                 "WHERE tagID = @sTag " +
                                 "GROUP BY " +
@@ -3014,12 +3014,12 @@ namespace Scada
                 {
                     ConnectionString = sConnection
                 };
-                string sqlGetData = "SELECT [Day],[Month],Max(Totals) AS[Value] FROM( " +
+                string sqlGetData = "SELECT [Day],[Month],Avg(Totals) AS[Value] FROM( " +
                        " SELECT " +
                        "[Year]  = DATEPART(YEAR, [time]), " +
                        "[Month]  = DATEPART(MONTH, [time]), " +
                        "[Day]  = DATEPART(DAY, [time]), " +
-                               "Totals = Max(Value) " +
+                               "Totals = Avg(Value) " +
                                "FROM ChannelData " +
                                "WHERE tagID = @sTag " +
                                "GROUP BY " +

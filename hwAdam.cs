@@ -1,5 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
-using System.IO.Ports;
+﻿using System.IO.Ports;
 using System.Text;
 using static Scada.ScadaClasses;
 

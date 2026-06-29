@@ -526,7 +526,7 @@ public partial class MainPage : ContentPage
             var pt = args.Location;
             switch (args.ActionType)
             {
-                case SKTouchAction.Pressed:
+                case SKTouchAction.Released:
                     ScadaClasses.Previouspage = -1;
                     ScadaClasses.CurrentScadaPopup = -1;
                     ScadaClasses.Refresh = true;
@@ -537,7 +537,7 @@ public partial class MainPage : ContentPage
                     //bcktimer.Enabled = true;
                     break;
 
-                case SKTouchAction.Released:
+                case SKTouchAction.Pressed:
                     break;
 
                 case SKTouchAction.Moved:
@@ -705,15 +705,15 @@ public partial class MainPage : ContentPage
             switch (args.ActionType)
             {
                 case SKTouchAction.Pressed:
+                    break;
+
+                case SKTouchAction.Released:
                     ScadaClasses.Previouspage = -1;
                     //CurrentScadaPopup = -1;
                     string sBase64 = Base64Encode(edtSvgEditor.Text);
                     MyDataAccessLayer.DeleteLibItem(edtSvgName.Text);
                     MyDataAccessLayer.SaveLibItem(edtSvgName.Text, 1, sBase64);
                     ScadaClasses.Refresh = true;
-                    break;
-
-                case SKTouchAction.Released:
                     break;
 
                 case SKTouchAction.Moved:
@@ -2688,23 +2688,18 @@ public partial class MainPage : ContentPage
                             var pt = args.Location;
                             switch (args.ActionType)
                             {
-                                case SKTouchAction.Pressed:
-                                    //Thread.Sleep(100);
+                                case SKTouchAction.Released:
+                                   
                                     ScadaClasses.CurrentScadaPopup = callerPopup;
                                     ScadaClasses.Previouspage = -1;
                                     ScadaClasses.Refresh = true;
                                     SKCanvasPopupViews.Clear();
                                     SKCanvasViews.Clear();
-                                    Thread.Sleep(200);
+                                    //Thread.Sleep(200);
                                     if (ScadaClasses.CurrentScadaPopup == -1)
                                     {
                                         Editing = false;
                                     }
-
-
-
-
-
                                     break;
 
                                 case SKTouchAction.Moved:
@@ -2754,7 +2749,7 @@ public partial class MainPage : ContentPage
             var pt = args.Location;
             switch (args.ActionType)
             {
-                case SKTouchAction.Pressed:
+                case SKTouchAction.Released:
                     MyDataAccessLayer.DeleteTagByName("%your%");
                     var newTag = new ScadaClasses.Tag();
                     newTag.Name = "your Tag name";
@@ -2817,7 +2812,7 @@ public partial class MainPage : ContentPage
             var pt = args.Location;
             switch (args.ActionType)
             {
-                case SKTouchAction.Pressed:
+                case SKTouchAction.Released:
                     MyDataAccessLayer.DeleteTagFromUxItem(ItemID, TagID);
                     ScadaClasses.CurrentScadaPopup = -1;
                     ScadaClasses.Previouspage = -1;
@@ -2869,7 +2864,7 @@ public partial class MainPage : ContentPage
             var pt = args.Location;
             switch (args.ActionType)
             {
-                case SKTouchAction.Pressed:
+                case SKTouchAction.Released:
                     //CurrentScadaPopup = -1;
                     ScadaClasses.Previouspage = -1;
                     iMenuOffsetRows = iMenuOffsetRows + 5;
@@ -2920,7 +2915,7 @@ public partial class MainPage : ContentPage
             var pt = args.Location;
             switch (args.ActionType)
             {
-                case SKTouchAction.Pressed:
+                case SKTouchAction.Released:
                     //CurrentScadaPopup = -1;
                     ScadaClasses.Previouspage = -1;
                     iMenuOffsetRows = iMenuOffsetRows - 5;
@@ -3327,6 +3322,7 @@ public partial class MainPage : ContentPage
 
                     case ScadaClasses.uxButton:                      
                         var SKButton = new ScadaButton();
+                        SKButton.SvgBase64 = MyDataAccessLayer.LoadLibItem(ScadaItem.Action,1);
                         SKButton.Init(wScale, hScale, SKButton, ScadaItem, ScadaColor, Designing);
                         if ((Designing == true)&&(Editing==false))
                         {
@@ -3758,7 +3754,7 @@ public partial class MainPage : ContentPage
                             {
                                 switch (args.ActionType)
                                 {
-                                    case SKTouchAction.Pressed:                                     
+                                    case SKTouchAction.Released:                                     
                                         if (SKToggle.SV.Value > 0.5)
                                         {
                                             SKToggle.SV.Value = 0;
@@ -4032,7 +4028,7 @@ public partial class MainPage : ContentPage
                             var pt = args.Location;
                             switch (args.ActionType)
                             {
-                                case SKTouchAction.Pressed:                  
+                                case SKTouchAction.Released:                  
                                     MyDataAccessLayer.deleteItem(ScadaClasses.CurrentItem);
                                     ScadaClasses.CurrentScadaPopup = -1;
                                     ScadaClasses.Previouspage = -1;
@@ -4081,7 +4077,7 @@ public partial class MainPage : ContentPage
                             var pt = args.Location;
                             switch (args.ActionType)
                             {
-                                case SKTouchAction.Pressed:
+                                case SKTouchAction.Released:
                                     ScadaClasses.Telegram oTelegram = new ScadaClasses.Telegram()
                                     {
                                         MessageType = ScadaItem.MessageType,
@@ -4286,7 +4282,7 @@ public partial class MainPage : ContentPage
                             var pt = args.Location;
                             switch (args.ActionType)
                             {
-                                case SKTouchAction.Pressed:
+                                case SKTouchAction.Released:
                                     ScadaClasses.CurrentScadaPopup = ScadaClasses.uxPageChangeMenu;
                                     ScadaClasses.Previouspage = -1;
                                     ScadaClasses.Refresh = true;                               
@@ -4597,7 +4593,7 @@ public partial class MainPage : ContentPage
                             var pt = args.Location;
                             switch (args.ActionType)
                             {
-                                case SKTouchAction.Pressed:
+                                case SKTouchAction.Released:
                                     ScadaClasses.CurrentScadaPopup = ScadaClasses.uxItemTagsMenu;
                                     ScadaClasses.Previouspage = -1;
                                     ScadaClasses.Refresh = true;
@@ -4647,7 +4643,7 @@ public partial class MainPage : ContentPage
                             var pt = args.Location;
                             switch (args.ActionType)
                             {
-                                case SKTouchAction.Pressed:
+                                case SKTouchAction.Released:
                                     ScadaClasses.CurrentScadaPopup = ScadaClasses.uxItemTypeMenu;
                                     ScadaClasses.Previouspage = -1;
                                     ScadaClasses.Refresh = true;
@@ -4698,7 +4694,7 @@ public partial class MainPage : ContentPage
                             var pt = args.Location;
                             switch (args.ActionType)
                             {
-                                case SKTouchAction.Pressed:
+                                case SKTouchAction.Released:
                                     ScadaClasses.CurrentScadaPopup = ScadaClasses.uxPagesMenu;
                                     ScadaClasses.Previouspage = -1;
                                     ScadaClasses.Refresh = true;                            
@@ -4772,7 +4768,7 @@ public partial class MainPage : ContentPage
                             var pt = args.Location;
                             switch (args.ActionType)
                             {
-                                case SKTouchAction.Pressed:                                 
+                                case SKTouchAction.Released:                                 
                                     switch (ScadaClasses.CurrentRow)
                                     {
                                         case 0:
@@ -4809,7 +4805,7 @@ public partial class MainPage : ContentPage
                                     ScadaClasses.Refresh = true;
                                     break;
 
-                                case SKTouchAction.Released:
+                                case SKTouchAction.Pressed:
                                     break;
 
                                 case SKTouchAction.Moved:
@@ -4881,7 +4877,7 @@ public partial class MainPage : ContentPage
                             var pt = args.Location;
                             switch (args.ActionType)
                             {
-                                case SKTouchAction.Pressed:
+                                case SKTouchAction.Released:
                                     switch (ScadaClasses.CurrentType)
                                     {
                                         case ScadaClasses.pmComputer:
@@ -4900,7 +4896,7 @@ public partial class MainPage : ContentPage
                                     ScadaClasses.Refresh = true;
                                     break;
 
-                                case SKTouchAction.Released:
+                                case SKTouchAction.Pressed:
                                     break;
 
                                 case SKTouchAction.Moved:

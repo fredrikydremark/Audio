@@ -59,10 +59,10 @@ namespace Scada
             scb.GradientStartColor = Color.uxItemColor;
             scb.GradientEndColor = Color.uxItemColor;
             scb.IndicatorColor = Color.uxOffColor;
-            scb.IndicatorType = 1;
+            scb.IndicatorType = 3;
             scb.ButtonFaceIntensity = 0;
             scb.IndicatorIntensity = 0;
-            scb.IndicatorType = 1;
+            
 
             if ((Item.Action == "TOGGLE") || (Item.Action == "ON") || (Item.Action == "OFF"))
             {

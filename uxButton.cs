@@ -78,7 +78,7 @@ namespace Scada
 
             scb.StyleId = Item.ItemID.ToString();
             scb.ButtonText = Item.Text;
-            scb.FontSize = 18.5F;
+            scb.FontSize = 14.5F;
             scb.EnableFaceFade();
             scb.EnableIndicatorBlink();
             scb.PV = new ItemValue();
@@ -704,19 +704,19 @@ namespace Scada
                         );
 
                         float Offset = info.Height - h + info.Height * Padding;
-                        float ScaleX = (info.Height / picture.CullRect.Width) * 0.9F;
-                        float ScaleY = (info.Height / picture.CullRect.Height) * 0.9F;
+                        float ScaleX = (info.Height / picture.CullRect.Width) * 0.7F;
+                        float ScaleY = (info.Height / picture.CullRect.Height) * 0.7F;
                         var matrix = SKMatrix.CreateScale(ScaleX * (1 - Padding * 2), ScaleY * (1 - Padding * 2));
                         var img = SKImage.FromPicture(picture, dimension, matrix);
 
                         canvas.DrawRoundRect(progressBar, facePaint);
-                        canvas.DrawImage(img, new SKPoint(info.Height / 20, info.Height / 20));
+                        canvas.DrawImage(img, new SKPoint(info.Width / 6, info.Height / 20));
 
-                        //NewTextPaint.MeasureText(ButtonText, ref textBounds);
-                        //float x = info.Width / 2 - textBounds.MidX;
+                        NewTextPaint.MeasureText(ButtonText, ref textBounds);
+                        float x = info.Width / 2 - textBounds.MidX;
                         //canvas.DrawText(ButtonText, x, yText, NewTextPaint);
 
-                        canvas.DrawText(ButtonText, xText + info.Height, yText, NewTextPaint);
+                        canvas.DrawText(ButtonText, x, info.Height-(info.Height/10), NewTextPaint);
                     }
                     catch
                     {

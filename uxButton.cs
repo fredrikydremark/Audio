@@ -660,8 +660,7 @@ namespace Scada
                     var center = new SKPoint(radius + 2.5f, (info.Height / 2) + 0.5f);
                     NewTextPaint.MeasureText(ButtonRow.col6text, ref textBounds);
                     float y = info.Height / 2 - textBounds.MidY;
-
-             
+         
                     canvas.DrawRoundRect(progressBar, facePaint);
                     canvas.DrawCircle(center, radius, circlePaint);
                     canvas.DrawText(ButtonRow.col1text, xText + 5, y, NewTextPaint);
@@ -710,13 +709,14 @@ namespace Scada
                         var img = SKImage.FromPicture(picture, dimension, matrix);
 
                         canvas.DrawRoundRect(progressBar, facePaint);
-                        canvas.DrawImage(img, new SKPoint(info.Width / 6, info.Height / 20));
+                        float centerY = info.Height / 2 + (info.Height * 0.08F);
+                        float centerX = (info.Width / 2) + (info.Width * 0.16F);
+                        canvas.DrawImage(img, new SKPoint(centerX - img.Width / 2, centerY - img.Height / 2));
 
                         NewTextPaint.MeasureText(ButtonText, ref textBounds);
                         float x = info.Width / 2 - textBounds.MidX;
-                        //canvas.DrawText(ButtonText, x, yText, NewTextPaint);
+                        canvas.DrawText(ButtonText, x, yText, NewTextPaint);
 
-                        canvas.DrawText(ButtonText, x, info.Height-(info.Height/10), NewTextPaint);
                     }
                     catch
                     {
@@ -725,6 +725,42 @@ namespace Scada
 
                 if (IndicatorType == cIndicator_4)
                 {
+                    if (SvgBase64 == "") return;
+
+                    var mySKSvg = new SKSvg();
+                    try
+                    {
+                        string sBase64Svg = SvgBase64;
+                        byte[] data = Convert.FromBase64String(sBase64Svg);
+                        string decodedString = Encoding.UTF8.GetString(data);
+                        var picture = mySKSvg.FromSvg(decodedString);
+
+                        if (picture == null) return;
+                        var dimension = new SkiaSharp.SKSizeI
+                        (
+                             (int)Math.Ceiling(info.Height * 1.0),
+                             (int)Math.Ceiling(info.Height * 1.0)
+                        );
+
+                        float Offset = info.Height - h + info.Height * Padding;
+                        float ScaleX = (info.Height / picture.CullRect.Width) * 0.7F;
+                        float ScaleY = (info.Height / picture.CullRect.Height) * 0.7F;
+                        var matrix = SKMatrix.CreateScale(ScaleX * (1 - Padding * 2), ScaleY * (1 - Padding * 2));
+                        var img = SKImage.FromPicture(picture, dimension, matrix);
+
+                        canvas.DrawRoundRect(progressBar, facePaint);
+                        float centerY = info.Height / 2 + (info.Height * 0.08F);
+                        float centerX = (info.Width / 2) + (info.Width * 0.16F);
+                        canvas.DrawImage(img, new SKPoint(10, centerY - img.Height / 2));
+
+                        NewTextPaint.MeasureText(ButtonText, ref textBounds);
+                        float x = info.Width / 2;
+                        canvas.DrawText(ButtonText, 40, yText, NewTextPaint);
+
+                    }
+                    catch
+                    {
+                    }
                 }
 
                 if (IndicatorType == 5)
@@ -749,8 +785,8 @@ namespace Scada
                 if (IndicatorType == cIndicator_9)
                 {
                     float h1 = info.Height;
-                    float radius = (h1 / 2.5f);
-                    var center = new SKPoint(radius + 2.5f, (info.Height / 2) + 0.5f);
+                    float radius = (h1 / 2f);
+                    var center = new SKPoint(radius + 0.5f, (info.Height / 2) + 0.5f);
 
                     //Draw Circle
                     var circlePaint = new SKPaint { Color = GradientStartColor, TextSize = FontSize, FilterQuality = SKFilterQuality.High, IsAntialias = true };
@@ -772,11 +808,11 @@ namespace Scada
                              (int)Math.Ceiling(info.Height * 1.0)
                         );
                         float Offset = info.Height - h + info.Height * Padding;
-                        float ScaleX = (info.Height / picture.CullRect.Width) * 0.6F;
-                        float ScaleY = (info.Height / picture.CullRect.Height) * 0.6F;
+                        float ScaleX = (info.Height / picture.CullRect.Width) * 0.7F;
+                        float ScaleY = (info.Height / picture.CullRect.Height) * 0.7F;
                         var matrix = SKMatrix.CreateScale(ScaleX * (1 - Padding * 2), ScaleY * (1 - Padding * 2));
                         var img = SKImage.FromPicture(picture, dimension, matrix);
-                        canvas.DrawImage(img, new SKPoint(Offset + 8, Offset + 10));
+                        canvas.DrawImage(img, new SKPoint(Offset+4.0F , Offset+4.0F ));
                         canvas.DrawText(ButtonText, xText + info.Height, yText, NewTextPaint);
                     }
                 }

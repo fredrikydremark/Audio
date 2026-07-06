@@ -880,7 +880,7 @@ public partial class MainPage : ContentPage
                 btnDots.HeightRequest = 22;
                 btnDots.WidthRequest = 22;
                 btnDots.SvgBase64 = MyDataAccessLayer.LoadLibItem("Threedots", 1);
-                btnDots.IndicatorType = 3;
+                btnDots.IndicatorType = 9;
                 btnDots.Margin = 0.15F;
                 btnDots.ButtonText = "";
                 btnDots.Touch += (sender, args) =>
@@ -2086,7 +2086,7 @@ public partial class MainPage : ContentPage
                 btnDots.HeightRequest = 22;
                 btnDots.WidthRequest = 22;
                 btnDots.SvgBase64 = MyDataAccessLayer.LoadLibItem("Threedots", 1);
-                btnDots.IndicatorType = 3;
+                btnDots.IndicatorType = 9;
                 btnDots.Margin = 0.15F;
                 btnDots.ButtonText = "";
                 btnDots.Touch += (sender, args) =>
@@ -2671,12 +2671,13 @@ public partial class MainPage : ContentPage
             HeightRequest = 25,
             Background = ScadaColor.uxBackGroundColor.ToMauiColor(),
             BarBackgroundColor = ScadaColor.uxBackGroundColor,
-            IndicatorType = 3,
+            IndicatorType = 9,
             GradientStartColor = ScadaColor.uxItemColor,
             GradientEndColor = ScadaColor.uxItemColor,
             CornerRadius = 10,
             TextColor = ScadaColor.uxTextColor,
             FontSize = 21.5F,
+            Margin = 0.15F,
             SvgBase64 = MyDataAccessLayer.LoadLibItem("CloseCross", 1),
             ButtonText = ""
         };
@@ -2732,12 +2733,13 @@ public partial class MainPage : ContentPage
             HeightRequest = 25,
             Background = ScadaColor.uxBackGroundColor.ToMauiColor(),
             BarBackgroundColor = ScadaColor.uxBackGroundColor,
-            IndicatorType = 3,
+            IndicatorType = 9,
             GradientStartColor = ScadaColor.uxItemColor,
             GradientEndColor = ScadaColor.uxItemColor,
             CornerRadius = 10,
             TextColor = ScadaColor.uxTextColor,
             FontSize = 21.5F,
+            Margin = 0.15F,
             SvgBase64 = MyDataAccessLayer.LoadLibItem("GreenPlus", 1),
             ButtonText = ""
         };
@@ -2795,12 +2797,13 @@ public partial class MainPage : ContentPage
             HeightRequest = 25,
             Background = ScadaColor.uxBackGroundColor.ToMauiColor(),
             BarBackgroundColor = ScadaColor.uxBackGroundColor,
-            IndicatorType = 3,
+            IndicatorType = 9,
             GradientStartColor = ScadaColor.uxItemColor,
             GradientEndColor = ScadaColor.uxItemColor,
             CornerRadius = 10,
             TextColor = ScadaColor.uxTextColor,
             FontSize = 21.5F,
+            Margin = 0.15F,
             SvgBase64 = MyDataAccessLayer.LoadLibItem("Trashcan", 1),
             ButtonText = ""
         };
@@ -2847,12 +2850,13 @@ public partial class MainPage : ContentPage
             HeightRequest = 25,
             Background = ScadaColor.uxBackGroundColor.ToMauiColor(),
             BarBackgroundColor = ScadaColor.uxBackGroundColor,
-            IndicatorType = 3,
+            IndicatorType = 9,
             GradientStartColor = ScadaColor.uxItemColor,
             GradientEndColor = ScadaColor.uxItemColor,
             CornerRadius = 10,
             TextColor = ScadaColor.uxTextColor,
             FontSize = 21.5F,
+            Margin = 0.15F,
             SvgBase64 = MyDataAccessLayer.LoadLibItem("Arrowright", 1),
             ButtonText = ""
         };
@@ -2898,12 +2902,13 @@ public partial class MainPage : ContentPage
             HeightRequest = 25,
             Background = ScadaColor.uxBackGroundColor.ToMauiColor(),
             BarBackgroundColor = ScadaColor.uxBackGroundColor,
-            IndicatorType = 3,
+            IndicatorType = 9,
             GradientStartColor = ScadaColor.uxItemColor,
             GradientEndColor = ScadaColor.uxItemColor,
             CornerRadius = 10,
             TextColor = ScadaColor.uxTextColor,
             FontSize = 21.5F,
+            Margin = 0.15F,
             SvgBase64 = MyDataAccessLayer.LoadLibItem("Arrowleft", 1),
             ButtonText = ""
         };
@@ -4010,13 +4015,14 @@ public partial class MainPage : ContentPage
                             HeightRequest = 25,
                             Background = ScadaColor.uxBackGroundColor.ToMauiColor(),
                             BarBackgroundColor = ScadaColor.uxBackGroundColor,
-                            IndicatorType = 3,
+                            IndicatorType = 9,
 
                             GradientStartColor = ScadaColor.uxItemColor,
                             GradientEndColor = ScadaColor.uxItemColor,
                             CornerRadius = 10,
                             TextColor = ScadaColor.uxTextColor,
                             FontSize = 21.5F,
+                            Margin = 0.15F,
                             SvgBase64 = MyDataAccessLayer.LoadLibItem("Trashcan", 1),
                             ButtonText = ""
                         };
@@ -4060,12 +4066,13 @@ public partial class MainPage : ContentPage
                             HeightRequest = 25,
                             Background = ScadaColor.uxBackGroundColor.ToMauiColor(),
                             BarBackgroundColor = ScadaColor.uxBackGroundColor,
-                            IndicatorType = 3,
+                            IndicatorType = 9,
                             GradientStartColor = ScadaColor.uxItemColor,
                             GradientEndColor = ScadaColor.uxItemColor,
                             CornerRadius = 10,
                             TextColor = ScadaColor.uxTextColor,
                             FontSize = 21.5F,
+                            Margin = 0.15F,
                             SvgBase64 = MyDataAccessLayer.LoadLibItem("GreenPlus", 1),
                             ButtonText = ""
                         };
@@ -4119,12 +4126,13 @@ public partial class MainPage : ContentPage
                             HeightRequest = 25,
                             Background = ScadaColor.uxBackGroundColor.ToMauiColor(),
                             BarBackgroundColor = ScadaColor.uxBackGroundColor,
-                            IndicatorType = 3,
+                            IndicatorType = 4,
                             GradientStartColor = ScadaColor.uxPopupItemColor,
                             GradientEndColor = ScadaColor.uxPopupItemColor,
                             CornerRadius = 0,
                             TextColor = ScadaColor.uxTextColor,
                             FontSize = 16.5F,
+                            Margin = 0.15F,
                             SvgBase64 = MyDataAccessLayer.LoadLibItem("InputSource", 1),
                             ButtonText = "Input"
                         };
@@ -4167,13 +4175,14 @@ public partial class MainPage : ContentPage
                             HeightRequest = 25,
                             Background = ScadaColor.uxBackGroundColor.ToMauiColor(),
                             BarBackgroundColor = ScadaColor.uxBackGroundColor,
-                            IndicatorType = 3,
+                            IndicatorType = 4,
 
                             GradientStartColor = ScadaColor.uxPopupItemColor,
                             GradientEndColor = ScadaColor.uxPopupItemColor,
                             CornerRadius = 0,
                             TextColor = ScadaColor.uxTextColor,
                             FontSize = 16.5F,
+                            Margin = 0.15F,
                             SvgBase64 = MyDataAccessLayer.LoadLibItem("RobotArm", 1),
                             ButtonText = "Visual"
                         };
@@ -4217,12 +4226,13 @@ public partial class MainPage : ContentPage
                             HeightRequest = 25,
                             Background = ScadaColor.uxBackGroundColor.ToMauiColor(),
                             BarBackgroundColor = ScadaColor.uxBackGroundColor,
-                            IndicatorType = 3,
+                            IndicatorType = 4,
                             GradientStartColor = ScadaColor.uxPopupItemColor,
                             GradientEndColor = ScadaColor.uxPopupItemColor,
                             CornerRadius = 0,
                             TextColor = ScadaColor.uxTextColor,
                             FontSize = 16.5F,
+                            Margin = 0.15F,     
                             SvgBase64 = MyDataAccessLayer.LoadLibItem("GrayPlus", 1),
                             ButtonText = "Size"
                         };
@@ -4265,13 +4275,14 @@ public partial class MainPage : ContentPage
                             HeightRequest = 25,
                             Background = ScadaColor.uxBackGroundColor.ToMauiColor(),
                             BarBackgroundColor = ScadaColor.uxBackGroundColor,
-                            IndicatorType = 3,
+                            IndicatorType = 4,
 
                             GradientStartColor = ScadaColor.uxPopupItemColor,
                             GradientEndColor = ScadaColor.uxPopupItemColor,
                             CornerRadius = 0,
                             TextColor = ScadaColor.uxTextColor,
                             FontSize = 16.5F,
+                            Margin = 0.15F,
                             SvgBase64 = MyDataAccessLayer.LoadLibItem("AndroidLogo", 1),
                             ButtonText = "Page"
                         };
@@ -4365,7 +4376,7 @@ public partial class MainPage : ContentPage
                                 HeightRequest = 25,
                                 Background = ScadaColor.uxBackGroundColor.ToMauiColor(),
                                 BarBackgroundColor = ScadaColor.uxBackGroundColor,
-                                IndicatorType = 3,
+                                IndicatorType = 4,
                                 IndicatorColor = GetStatusColor(row.Status),
                                 GradientStartColor = ScadaColor.uxPopupItemColor,
                                 GradientEndColor = ScadaColor.uxPopupItemColor,
@@ -5630,8 +5641,6 @@ public partial class MainPage : ContentPage
                             }
                         }
                         break;
-
-
                   
              }
 
@@ -5647,7 +5656,7 @@ public partial class MainPage : ContentPage
             btnHome.HeightRequest = 25;
             btnHome.WidthRequest = 25;
             btnHome.SvgBase64 = MyDataAccessLayer.LoadLibItem("Home", 1);
-            btnHome.IndicatorType = 3;
+            btnHome.IndicatorType = 9;
             btnHome.Margin = 0.15F;
             btnHome.ButtonText = "";
             btnHome.Touch += (sender, args) =>
@@ -5693,7 +5702,7 @@ public partial class MainPage : ContentPage
             btnAlarmbell.HeightRequest = 25;
             btnAlarmbell.WidthRequest = 25;
             btnAlarmbell.SvgBase64 = MyDataAccessLayer.LoadLibItem("Alarmbell", 1);
-            btnAlarmbell.IndicatorType = 3;
+            btnAlarmbell.IndicatorType = 9;
             btnAlarmbell.Margin = 0.15F;
             btnAlarmbell.ButtonText = "";
             btnAlarmbell.Touch += (sender, args) =>
@@ -5738,7 +5747,7 @@ public partial class MainPage : ContentPage
             btnSettings.HeightRequest = 25;
             btnSettings.WidthRequest = 25;
             btnSettings.SvgBase64 = MyDataAccessLayer.LoadLibItem("CogWheel", 1);
-            btnSettings.IndicatorType = 3;
+            btnSettings.IndicatorType = 9;
             btnSettings.Margin = 0.15F;
             btnSettings.ButtonText = "";
             btnSettings.Touch += (sender, args) =>

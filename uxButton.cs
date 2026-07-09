@@ -702,16 +702,16 @@ namespace Scada
                              (int)Math.Ceiling(info.Height * 1.0)
                         );
 
-                        float Offset = info.Height - h + info.Height * Padding;
-                        float ScaleX = (info.Height / picture.CullRect.Width) * 0.7F;
-                        float ScaleY = (info.Height / picture.CullRect.Height) * 0.7F;
+                        //float Offset = info.Height - h + info.Height * Padding;
+                        float ScaleX = (info.Height / picture.CullRect.Width) * 0.67F;
+                        float ScaleY = (info.Height / picture.CullRect.Height) * 0.67F;
                         var matrix = SKMatrix.CreateScale(ScaleX * (1 - Padding * 2), ScaleY * (1 - Padding * 2));
                         var img = SKImage.FromPicture(picture, dimension, matrix);
 
                         canvas.DrawRoundRect(progressBar, facePaint);
                         float centerY = info.Height / 2 + (info.Height * 0.08F);
-                        float centerX = (info.Width / 2) + (info.Width * 0.16F);
-                        canvas.DrawImage(img, new SKPoint(centerX - img.Width / 2, centerY - img.Height / 2));
+                        float centerX = (info.Width / 2);
+                        canvas.DrawImage(img, new SKPoint(centerX + img.Width / 6 - img.Width / 2, centerY - img.Height / 2));
 
                         NewTextPaint.MeasureText(ButtonText, ref textBounds);
                         float x = info.Width / 2 - textBounds.MidX;

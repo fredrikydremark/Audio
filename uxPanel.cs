@@ -23,8 +23,8 @@ namespace Scada
             scb.CornerRadius = 10;
             scb.BarBackgroundColor = Color.uxBackGroundColor;
             scb.BackgroundColor = Color.uxPanelColor.ToMauiColor();
-            scb.GradientStartColor = Color.uxItemColor;
-            scb.GradientEndColor = Color.uxItemColor;
+            scb.GradientStartColor = Color.uxPanelColor;
+            scb.GradientEndColor = Color.uxPanelColor;
            
             scb.WidthRequest = wScale * Item.Width;
             scb.HeightRequest = hScale * Item.Height;

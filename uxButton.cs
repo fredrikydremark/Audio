@@ -37,13 +37,14 @@ namespace Scada
         public int Status { get; set; }
         public string ?Color { get; set; }
         public int DataType { get; set; }
+        public float Value { get; set; }
         public int Row { get; set; }    
         public int Id { get; set; }
     }
 
     public class ScadaButton : SKCanvasView
     {
-        bool bFaceFade = true;
+        public bool bFaceFade = true;
         bool bIndicatorFade = true;
         float localBtnIndicatorIntensity = 70f;
         float localBtnFaceIntensity = 0f;
@@ -62,7 +63,7 @@ namespace Scada
             scb.IndicatorType = 3;
             scb.ButtonFaceIntensity = 0;
             scb.IndicatorIntensity = 0;
-            
+
 
             if ((Item.Action == "TOGGLE") || (Item.Action == "ON") || (Item.Action == "OFF"))
             {
@@ -79,8 +80,13 @@ namespace Scada
             scb.StyleId = Item.ItemID.ToString();
             scb.ButtonText = Item.Text;
             scb.FontSize = 14.5F;
-            scb.EnableFaceFade();
-            scb.EnableIndicatorBlink();
+            if (scb.IndicatorType == 5) 
+            {
+                scb.EnableFaceFade(); 
+            }
+            //scb.EnableFaceFade();too slow
+            //scb.EnableIndicatorBlink();
+           
             scb.PV = new ItemValue();
             scb.PV.TagID = -1;
             scb.PV.Value = -1;
@@ -123,7 +129,8 @@ namespace Scada
                 scb.IsVisible = true;
                 scb.EnableTouchEvents = true;
                 scb.InputTransparent = false;
-                scb.Start();
+                //scb.Start();
+                /*
                 scb.Touch += (sender, args) =>
                 {
                     switch (args.ActionType)
@@ -177,7 +184,7 @@ namespace Scada
                             scb.GradientStartColor = Color.uxItemColor;
                             scb.GradientEndColor = Color.uxItemColor;
                             ScadaClasses.Refresh = true;
-
+                         
                             break;
 
                         case SKTouchAction.Pressed:
@@ -198,7 +205,7 @@ namespace Scada
                     }
                     args.Handled = true;
                 };
-
+                */
 
             }
             return(scb);

@@ -550,11 +550,20 @@ namespace Scada
                 while (reader.Read())
                 {
                     string col1 = reader.GetString(1);
-                    string col2 = "";
+                    string col2 = reader.GetString(2);
+                    float fValue = 0;
+                    if (col2=="1")
+                     { fValue = 1; } 
+
                     if (nColumns > 1)
                     {
                        col2 = reader.GetString(2);
                     }
+                    else
+                    {
+                       col2 = "";
+                    }
+                    
                     gridRows.Add(new gridRow
                     {
                         Id = reader.GetInt32(0),
@@ -571,6 +580,7 @@ namespace Scada
                         col6text = "",
                         col6width = 0F,
                         Status = -1,
+                        Value = fValue,
                         DataType= reader.GetInt32(3),
                         Row = row
                     });

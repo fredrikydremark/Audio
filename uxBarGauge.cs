@@ -69,7 +69,7 @@ namespace Scada
                         scb.State = 2;
                         MyDataAccessLayer.UpdateTagValue(scb.SV.TagID, scb.SV.Value,0);
                         MyDataAccessLayer.StoreTagValue(scb.SV.TagID, scb.SV.Value);
-                        ScadaClasses.Refresh = true;
+                        //ScadaClasses.Refresh = true;
                         break;
 
                     case SKTouchAction.Moved:

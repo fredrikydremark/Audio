@@ -54,6 +54,7 @@ namespace Scada
                 }
                 i++;
             }
+            /*
             scb.Touch += (sender, args) =>
             {
                 switch (args.ActionType)
@@ -127,7 +128,7 @@ namespace Scada
                         break;
                 }
             };
-    
+    */
             scb.IsEnabled = true;
             scb.IsVisible = true;
             scb.EnableTouchEvents = true;

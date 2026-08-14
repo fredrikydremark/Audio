@@ -6,7 +6,7 @@ namespace Scada
 {
     public class CircularProgress : SKCanvasView
     {
-        bool bFaceFade = true;
+        public bool bFaceFade = true;
         bool bIndicatorFade = true;
         float localBtnIndicatorIntensity = 255f;
         float localBtnFaceIntensity = 255f;
@@ -49,6 +49,7 @@ namespace Scada
                 }
                 i++;
             }
+            /*
             scb.Touch += (sender, args) =>
             {
                 switch (args.ActionType)
@@ -122,7 +123,7 @@ namespace Scada
                         break;
                 }
             };
-    
+             */
             scb.IsEnabled = true;
             scb.IsVisible = true;
             scb.EnableTouchEvents = true;

@@ -47,7 +47,7 @@ namespace Scada
                 }
                 i++;
             }
-
+            /*
             scb.Touch += (sender, args) =>
             {
                 var pt = args.Location;
@@ -86,6 +86,7 @@ namespace Scada
                 }
                 args.Handled = true;
             };
+            */
 
             scb.IsEnabled = true;
             scb.IsVisible = true;

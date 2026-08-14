@@ -177,7 +177,7 @@ namespace Scada
     }
     */
 
-    public class ScadaClasses
+    public  class ScadaClasses
     {
         public const int uxPanel = 0;
         public const int uxSvg = 1;
@@ -266,17 +266,18 @@ namespace Scada
         public const int Cmdgriddata = 41;
         public const int Cmdendofpackets = 99;
 
-        public static int Currentpage = 1;
-        public static int CurrentScadaPopup = -1;
-        public static int CurrentItem = 0;
-        public static int CurrentRow = 0;
-        public static int CurrentType = 0;
-        public static int CurrentTag = 0;
-        public static int CurrentID = -1;
+        public int Currentpage = 1;
+        public int CurrentScadaPopup = -1;
+        public  int CurrentItem = 0;
+        public  int CurrentRow = 0;
+        public  int CurrentType = 0;
+        public  int CurrentTag = 0;
+        public  int CurrentID = -1;
+        public  int CurrentCategory = -1;
 
-        public static int Previouspage = -1;
-        public static int PreviousScadaPopup = -1;
-        public static bool Refresh = false;
+        public  int Previouspage = -1;
+        public  int PreviousScadaPopup = -1;
+        //public static bool Refresh = false;
 
         //Parameter categories
         public const int CategoryAdam = 101;

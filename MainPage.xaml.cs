@@ -19,7 +19,7 @@ public partial class MainPage : ContentPage
 
     //private static WebSocket client;
     public static string ConnectionString = "";
-    ScadaPopups MyPopups = new ScadaPopups();
+    //ScadaPopups MyPopups = new ScadaPopups();
     Editor edtSvgEditor = new Editor { Placeholder = "Paste your SVG text", Text = "Paste your SVG text" };
     Editor edtSvgName = new Editor { Placeholder = "SvgName", Text = "SvgName" };
     Editor edtInputText = new Editor { Placeholder = "InputText", Text = "" };
@@ -479,7 +479,11 @@ public partial class MainPage : ContentPage
         AbsoluteLayout.SetLayoutBounds(btnSettings, new Rect(x + btnSettings.WidthRequest/5, y + btnSettings.HeightRequest/5, 25, 25));
         AbsoluteLayout.SetLayoutFlags(btnSettings, AbsoluteLayoutFlags.None);
         SKCanvasPopupViews.Add(btnSettings);
+       
+        
+        CreateCloseButton(x, y, w, h, ScadaClasses.uxLoginMenu);
 
+        /*
         if (iType == 0)
         {
             var btnClose = new ScadaButton();
@@ -500,10 +504,10 @@ public partial class MainPage : ContentPage
                 switch (args.ActionType)
                 {
                     case SKTouchAction.Released:
-                        /*ScadaClasses.Previouspage = -1;
-                        ScadaClasses.CurrentScadaPopup = -1;
-                        ScadaClasses.Refresh = true;*/
-                        RefreshGui();
+                        //ScadaClasses.Previouspage = -1;
+                        //ScadaClasses.CurrentScadaPopup = -1;
+                        //ScadaClasses.Refresh = true;
+                        //RefreshGui();
                         break;
 
                     case SKTouchAction.Pressed:
@@ -527,7 +531,7 @@ public partial class MainPage : ContentPage
             AbsoluteLayout.SetLayoutFlags(btnClose, AbsoluteLayoutFlags.None);
             SKCanvasPopupViews.Add(btnClose);
         }
-
+        */
         var a1 = new ScadaButton();
         a1.CornerRadius = 10;
         a1.IndicatorType = 1;
@@ -1409,7 +1413,261 @@ public partial class MainPage : ContentPage
     }
 
 
+    private void ScadaItemTypesMenu(Telegram ScadaItem)
+    {
+        double panelWith = 0.2;
+        double panelHeight = 0.4;
 
+        double x = (Width / 2) - panelWith * Width / 2;
+        double y = (Height / 2) - panelHeight * Height / 2;
+        double w = (panelWith * Width);
+        double h = (panelHeight * Height);
+        ScadaItem.Width = w;
+        ScadaItem.Height = h;
+
+        DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);
+
+        var FloatPanel3 = new ScadaButton();
+        FloatPanel3.ItemID = ScadaItem.ItemID;
+        FloatPanel3.StyleId = ScadaItem.ItemID.ToString();
+        FloatPanel3.AnchorX = 0;
+        FloatPanel3.AnchorY = 0;
+        FloatPanel3.CornerRadius = 10;
+        FloatPanel3.BarBackgroundColor = ScadaColor.uxBackGroundColor;
+        FloatPanel3.BackgroundColor = ScadaColor.uxBackGroundColor.ToMauiColor();
+        FloatPanel3.GradientStartColor = ScadaColor.uxPopupColor;
+        FloatPanel3.GradientEndColor = ScadaColor.uxPopupColor;
+        FloatPanel3.IndicatorColor = ScadaColor.uxBackGroundColor;
+
+        FloatPanel3.WidthRequest = (Width / 100) * ScadaItem.Width;
+        FloatPanel3.HeightRequest = (Height / 100) * ScadaItem.Height;
+        FloatPanel3.AlternativeTextColor = ScadaColor.uxTextColor;
+        FloatPanel3.TextColor = ScadaColor.uxTextColor;
+        FloatPanel3.IsEnabled = true;
+        FloatPanel3.IsVisible = true;
+        FloatPanel3.IndicatorType = 10;
+        AbsoluteLayout.SetLayoutBounds(FloatPanel3, new Rect(
+            (Width / 100) * ScadaItem.Left,
+            (Height / 100) * ScadaItem.Top,
+            (Width / 100) * ScadaItem.Width,
+            (Height / 100) * ScadaItem.Height));
+        AbsoluteLayout.SetLayoutFlags(FloatPanel3, AbsoluteLayoutFlags.None);
+        SKCanvasPopupViews.Add(FloatPanel3);
+
+
+        x = (Width / 100) * ScadaItem.Left;
+        y = (Height / 100) * ScadaItem.Top;
+        w = (Width / 100) * ScadaItem.Width;
+        h = (Height / 100) * ScadaItem.Height;
+        ScadaItem.gridRows = MyDataAccessLayer.ReadItemTypes(sFilter, iMenuOffsetRows, iMenuOffsetRows + 5);
+
+        //Next and Previous buttons 
+        CreateCloseButton(x, y, w, h, ScadaGlobals.CurrentScadaPopup);
+        CreateFwdButton(x, y, w, h);
+        CreateRwdButton(x, y, w, h);
+
+        y = y + FloatPanel3.CornerRadius + 50;
+        foreach (gridRow row in ScadaItem.gridRows)
+        {
+            var myButton = new ScadaButton
+            {
+                WidthRequest = (Width / 100) * ScadaItem.Width,
+                HeightRequest = 25,
+                Background = ScadaColor.uxBackGroundColor.ToMauiColor(),
+                BarBackgroundColor = ScadaColor.uxBackGroundColor,
+                IndicatorType = 3,
+                IndicatorColor = GetStatusColor(row.Status),
+                GradientStartColor = ScadaColor.uxPopupItemColor,
+                GradientEndColor = ScadaColor.uxPopupItemColor,
+                CornerRadius = 0,
+                TextColor = ScadaColor.uxTextColor,
+                FontSize = 16.5F,
+                SvgBase64 = MyDataAccessLayer.LoadLibItem("Compass", 1)
+            };
+
+            myButton.ButtonRow = row;
+            myButton.ButtonText = row.col1text;
+            myButton.EnableTouchEvents = true;
+            myButton.InputTransparent = false;
+
+            myButton.Touch += (sender, args) =>
+            {
+                var pt = args.Location;
+                switch (args.ActionType)
+                {
+                    case SKTouchAction.Released:
+                        ScadaClasses.Telegram oTelegram = new ScadaClasses.Telegram()
+                        {
+                            MessageType = ScadaItem.MessageType,
+                            Page = ScadaItem.Nextpage,
+                            ItemType = row.TagID,
+                            ItemID = ScadaGlobals.CurrentItem,
+                            TagID = row.TagID,
+                            TagName = ScadaItem.TagName,
+                            Action = ScadaItem.Action,
+                        };
+                        MyDataAccessLayer.SetItemType(oTelegram);
+                        MyDataAccessLayer.AddItemDefaultTags(oTelegram);
+
+                        if (oTelegram.ItemType == ScadaClasses.uxButton)
+                        {
+                            ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxItemAction;
+                        }
+                        else
+                        {
+                            ScadaGlobals.CurrentScadaPopup = -1;
+                        }
+
+                        //ScadaClasses.Previouspage = -1;
+                        //ScadaClasses.Refresh = true;
+                        break;
+
+                    case SKTouchAction.Moved:
+                        myButton.GradientStartColor = ScadaColor.uxHoverColor;
+                        myButton.GradientEndColor = ScadaColor.uxHoverColor;
+                        myButton.IndicatorColor = GetStatusColor(row.Status);
+                        break;
+
+                    case SKTouchAction.Exited:
+                        myButton.GradientStartColor = ScadaColor.uxPopupItemColor;
+                        myButton.GradientEndColor = ScadaColor.uxPopupItemColor;
+                        myButton.IndicatorColor = GetStatusColor(row.Status);
+                        break;
+                }
+                args.Handled = true;
+            };
+            AbsoluteLayout.SetLayoutBounds(myButton, new Rect(x, y, WidthRequest, 20));
+            AbsoluteLayout.SetLayoutFlags(myButton, AbsoluteLayoutFlags.None);
+            if (y < ((Height / 100) * ScadaItem.Top) + ((Height / 100) * ScadaItem.Height) - 26)
+            {
+                SKCanvasPopupViews.Add(myButton);
+                y = y + 26;
+            }
+        }
+    }
+
+    private void ScadaItemSizesMenu(Telegram ScadaItem)
+    {
+        double panelWith = 0.2;
+        double panelHeight = 0.4;
+
+        double x = (Width / 2) - panelWith * Width / 2;
+        double y = (Height / 2) - panelHeight * Height / 2;
+        double w = (panelWith * Width);
+        double h = (panelHeight * Height);
+        ScadaItem.Width = w;
+        ScadaItem.Height = h;
+
+        DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);
+
+        var FloatPanelSizes = new ScadaButton();
+        FloatPanelSizes.ItemID = ScadaItem.ItemID;
+        FloatPanelSizes.StyleId = ScadaItem.ItemID.ToString();
+        FloatPanelSizes.AnchorX = 0;
+        FloatPanelSizes.AnchorY = 0;
+        FloatPanelSizes.CornerRadius = 10;
+        FloatPanelSizes.BarBackgroundColor = ScadaColor.uxBackGroundColor;
+        FloatPanelSizes.BackgroundColor = ScadaColor.uxBackGroundColor.ToMauiColor();
+        FloatPanelSizes.GradientStartColor = ScadaColor.uxPopupColor;
+        FloatPanelSizes.GradientEndColor = ScadaColor.uxPopupColor;
+        FloatPanelSizes.IndicatorColor = ScadaColor.uxBackGroundColor;
+
+        FloatPanelSizes.WidthRequest = (Width / 100) * ScadaItem.Width;
+        FloatPanelSizes.HeightRequest = (Height / 100) * ScadaItem.Height;
+        FloatPanelSizes.AlternativeTextColor = ScadaColor.uxTextColor;
+        FloatPanelSizes.TextColor = ScadaColor.uxTextColor;
+        FloatPanelSizes.IsEnabled = true;
+        FloatPanelSizes.IsVisible = true;
+        FloatPanelSizes.IndicatorType = 10;
+        AbsoluteLayout.SetLayoutBounds(FloatPanelSizes, new Rect(
+            (Width / 100) * ScadaItem.Left,
+            (Height / 100) * ScadaItem.Top,
+            (Width / 100) * ScadaItem.Width,
+            (Height / 100) * ScadaItem.Height));
+        AbsoluteLayout.SetLayoutFlags(FloatPanelSizes, AbsoluteLayoutFlags.None);
+        SKCanvasPopupViews.Add(FloatPanelSizes);
+
+        x = (Width / 100) * ScadaItem.Left;
+        y = (Height / 100) * ScadaItem.Top;
+        w = (Width / 100) * ScadaItem.Width;
+        h = (Height / 100) * ScadaItem.Height;
+
+        CreateCloseButton(x, y, w, h, ScadaGlobals.CurrentScadaPopup);
+        ScadaItem.gridRows = MyDataAccessLayer.GetItemSizes(ScadaGlobals.CurrentType);
+        y = y + FloatPanelSizes.CornerRadius + 50;
+
+        foreach (gridRow row in ScadaItem.gridRows)
+        {
+            var myItemTagsBtn = new ScadaButton
+            {
+                WidthRequest = (Width / 100) * ScadaItem.Width,
+                HeightRequest = 25,
+                Background = ScadaColor.uxBackGroundColor.ToMauiColor(),
+                BarBackgroundColor = ScadaColor.uxBackGroundColor,
+                IndicatorType = 3,
+                IndicatorColor = GetStatusColor(row.Status),
+                GradientStartColor = ScadaColor.uxPopupItemColor,
+                GradientEndColor = ScadaColor.uxPopupItemColor,
+                CornerRadius = 0,
+                TextColor = ScadaColor.uxTextColor,
+                FontSize = 16.5F,
+                SvgBase64 = MyDataAccessLayer.LoadLibItem("InputSource", 1)
+
+            };
+
+            myItemTagsBtn.ButtonRow = row;
+            myItemTagsBtn.ButtonText = row.col1text;
+            myItemTagsBtn.EnableTouchEvents = true;
+            myItemTagsBtn.InputTransparent = false;
+            myItemTagsBtn.Touch += (sender, args) =>
+            {
+                var pt = args.Location;
+                switch (args.ActionType)
+                {
+                    case SKTouchAction.Released:
+                        ScadaClasses.Telegram oTelegram = new ScadaClasses.Telegram()
+                        {
+                            MessageType = ScadaItem.MessageType,
+                            Page = ScadaItem.Nextpage,
+                            ItemType = ScadaGlobals.CurrentType,
+                            ItemID = ScadaGlobals.CurrentItem,
+                            TagID = row.TagID,
+                            TagName = ScadaItem.TagName,
+                            size = row.Row,
+                            Action = ScadaItem.Action,
+                        };
+                        ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxTagsMenu;
+                        ScadaGlobals.Previouspage = -1;
+                        ScadaGlobals.CurrentRow = row.Id;
+                        MyDataAccessLayer.SetItemSize(oTelegram);
+                        //ScadaClasses.Refresh = true;
+                        break;
+
+                    case SKTouchAction.Moved:
+                        myItemTagsBtn.GradientStartColor = ScadaColor.uxHoverColor;
+                        myItemTagsBtn.GradientEndColor = ScadaColor.uxHoverColor;
+                        myItemTagsBtn.IndicatorColor = GetStatusColor(row.Status);
+                        break;
+
+                    case SKTouchAction.Exited:
+                        myItemTagsBtn.GradientStartColor = ScadaColor.uxPopupItemColor;
+                        myItemTagsBtn.GradientEndColor = ScadaColor.uxPopupItemColor;
+                        myItemTagsBtn.IndicatorColor = GetStatusColor(row.Status);
+                        break;
+                }
+                args.Handled = true;
+            };
+
+            AbsoluteLayout.SetLayoutBounds(myItemTagsBtn, new Rect(x, y, FloatPanelSizes.WidthRequest, 20));
+            AbsoluteLayout.SetLayoutFlags(myItemTagsBtn, AbsoluteLayoutFlags.None);
+            if (y < ((Height / 100) * ScadaItem.Top) + ((Height / 100) * ScadaItem.Height) - 26)
+            {
+                SKCanvasPopupViews.Add(myItemTagsBtn);
+                y = y + 26;
+            }
+
+        }
+    }
 
     private void ScadaConfigMenu( Telegram ScadaItem )
     {
@@ -1557,9 +1815,6 @@ public partial class MainPage : ContentPage
         AbsoluteLayout.SetLayoutFlags(myAddItemButton, AbsoluteLayoutFlags.None);
         SKCanvasPopupViews.Add(myAddItemButton);
         
-
-    
-
         y = y + FloatPanel.CornerRadius + 50;
 
         var mySvgButton1 = new ScadaButton
@@ -1586,6 +1841,14 @@ public partial class MainPage : ContentPage
             switch (args.ActionType)
             {
                 case SKTouchAction.Released:
+                    SKCanvasPopupViews.Clear();
+                    ScadaSignals();            
+                    foreach (SKCanvasView viewItem in SKCanvasPopupViews)
+                    {
+                        absoluteLayout.Add(viewItem);
+                    }
+                    Content = absoluteLayout;
+
                     //ScadaClasses.CurrentScadaPopup = ScadaClasses.uxItemTagsMenu;
                     //ScadaClasses.Previouspage = -1;
                     //ScadaClasses.Refresh = true;                            
@@ -1635,7 +1898,15 @@ public partial class MainPage : ContentPage
             var pt = args.Location;
             switch (args.ActionType)
             {
-                case SKTouchAction.Released:
+                case SKTouchAction.Released:                
+                    SKCanvasPopupViews.Clear();
+                    ScadaItemTypesMenu(ScadaItem);
+                    foreach (SKCanvasView viewItem in SKCanvasPopupViews)
+                    {
+                        absoluteLayout.Add(viewItem);
+                    }
+                    Content = absoluteLayout;
+
                     ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxItemTypeMenu;
                     ScadaGlobals.Previouspage = -1;
                     //ScadaGlobals.Refresh = true;                       
@@ -1686,6 +1957,14 @@ public partial class MainPage : ContentPage
             switch (args.ActionType)
             {
                 case SKTouchAction.Released:
+                    SKCanvasPopupViews.Clear();
+                    ScadaItemSizesMenu(ScadaItem);
+                    foreach (SKCanvasView viewItem in SKCanvasPopupViews)
+                    {
+                        absoluteLayout.Add(viewItem);
+                    }
+                    Content = absoluteLayout;
+
                     //ScadaClasses.CurrentScadaPopup = ScadaClasses.uxItemSizeMenu;
                     //ScadaClasses.Previouspage = -1;
                     //ScadaClasses.Refresh = true;                
@@ -1736,6 +2015,13 @@ public partial class MainPage : ContentPage
             switch (args.ActionType)
             {
                 case SKTouchAction.Released:
+                    SKCanvasPopupViews.Clear();
+                    ScadaPages();
+                    foreach (SKCanvasView viewItem in SKCanvasPopupViews)
+                    {
+                        absoluteLayout.Add(viewItem);
+                    }
+                    Content = absoluteLayout;
                     //ScadaClasses.CurrentScadaPopup = ScadaClasses.uxPageChangeMenu;
                     //ScadaClasses.Previouspage = -1;
                     //ScadaClasses.Refresh = true;                       
@@ -2180,13 +2466,16 @@ public partial class MainPage : ContentPage
 
     private void ScadaSignals()
     {
-        double panelWith = 0.4;
-        double panelHeight = 0.55;
+
+        double panelWith = 0.2;
+        double panelHeight = 0.4;
 
         double x = (Width / 2) - panelWith * Width / 2;
         double y = (Height / 2) - panelHeight * Height / 2;
         double w = (panelWith * Width);
         double h = (panelHeight * Height);
+
+
         var popupAlarm = new ScadaButton();
         popupAlarm.AnchorX = 0;
         popupAlarm.AnchorY = 0;
@@ -2212,7 +2501,7 @@ public partial class MainPage : ContentPage
         y = y + popupAlarm.CornerRadius;
         var TheColor = ScadaColor.uxItemColor;
         y = y + 30;
-        for (int r = 0; r < 14; r++)
+        for (int r = 0; r < 6; r++)
         {
             if ((r % 2) == 0)
             {
@@ -2310,7 +2599,7 @@ public partial class MainPage : ContentPage
             myRowButton.InputTransparent = false;
             myRowButton.EnableTouchEvents = true;
 
-            AbsoluteLayout.SetLayoutBounds(myRowButton, new Rect(x, y, myRowButton.WidthRequest, 26));
+            AbsoluteLayout.SetLayoutBounds(myRowButton, new Rect(x, y, w, 26));
             AbsoluteLayout.SetLayoutFlags(myRowButton, AbsoluteLayoutFlags.None);
             SKCanvasPopupViews.Add(myRowButton);
             y = y + 26;
@@ -5255,6 +5544,7 @@ public partial class MainPage : ContentPage
                         break;
 
                     case ScadaClasses.uxItemSizeMenu:
+                        /*
                         var FloatPanelSizes = new ScadaButton();
                         FloatPanelSizes.ItemID = ScadaItem.ItemID;
                         FloatPanelSizes.StyleId = ScadaItem.ItemID.ToString();
@@ -5360,7 +5650,7 @@ public partial class MainPage : ContentPage
                                 SKCanvasPopupViews.Add(myItemTagsBtn);
                                 y = y + 26;
                             }
-                        }
+                        }*/
                         break;
 
                     case ScadaClasses.uxItemAction:
@@ -5866,6 +6156,9 @@ public partial class MainPage : ContentPage
                         break;
 
                     case ScadaClasses.uxItemTypeMenu:
+                        //ScadaItemTypesMenu();
+
+                        /*
                         var FloatPanel3 = new ScadaButton();
                         FloatPanel3.ItemID = ScadaItem.ItemID;
                         FloatPanel3.StyleId = ScadaItem.ItemID.ToString();
@@ -5957,8 +6250,8 @@ public partial class MainPage : ContentPage
                                             ScadaGlobals.CurrentScadaPopup = -1;
                                         }
 
-                                        /*ScadaClasses.Previouspage = -1;
-                                        ScadaClasses.Refresh = true;*/
+                                        //ScadaClasses.Previouspage = -1;
+                                        //ScadaClasses.Refresh = true;
                                         break;
 
                                     case SKTouchAction.Moved:
@@ -5982,8 +6275,9 @@ public partial class MainPage : ContentPage
                                 SKCanvasPopupViews.Add(myButton);
                                 y = y + 26;
                             }
-                           // Thread.Sleep(200);
+                         
                         }
+                        */
                         break;
 
                         case ScadaClasses.uxPagesMenu:

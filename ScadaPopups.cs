@@ -7,6 +7,7 @@ using SkiaSharp.Views.Maui.Controls;
 
 namespace Scada
 { 
+    /*
     public class ScadaPopups
     {
         public List<ScadaClasses.Telegram> AddCurrentPopup(int CurrentScadaPopup,int Currentpage,int CurrentTag,int CurrentItem,double Width,double Height,
@@ -515,4 +516,5 @@ namespace Scada
 
      
     }
+    */
 }

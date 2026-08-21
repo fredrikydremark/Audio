@@ -1620,9 +1620,10 @@ namespace Scada
 
         */
 
-        public int SetItemType(ScadaClasses.Telegram oTelegram)
-        {
-            oTelegram = defaultItemSize(oTelegram);
+        public int SetItemType(int ItemID, int ItemType)
+        {  
+            double ItemWidth =GetDefaultWidth(ItemType);
+            double ItemHeight = GetDefaultHeight(ItemType);
             try
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
@@ -1633,10 +1634,10 @@ namespace Scada
                 string sqlGetData = "UPDATE Items SET itemtype = @Value,posWidth=@w,posHeight=@h WHERE ( ItemID = @ItemID )";
                 Connection.Open();
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
-                cmdGetData.Parameters.AddWithValue("@ItemID", oTelegram.ItemID);
-                cmdGetData.Parameters.AddWithValue("@Value", oTelegram.ItemType);
-                cmdGetData.Parameters.AddWithValue("@w", oTelegram.Width);
-                cmdGetData.Parameters.AddWithValue("@h", oTelegram.Height);
+                cmdGetData.Parameters.AddWithValue("@ItemID", ItemID);
+                cmdGetData.Parameters.AddWithValue("@Value", ItemType);
+                cmdGetData.Parameters.AddWithValue("@w", ItemWidth);
+                cmdGetData.Parameters.AddWithValue("@h", ItemHeight);
 
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
@@ -3229,7 +3230,7 @@ namespace Scada
                 {
                     ConnectionString = sConnection
                 };
-                string sqlGetData = "select ItemTags.tagID,tags.Color,tags.TypeOfTag from ItemTags left join tags on tags.tagID = ItemTags.tagID  where ItemID = @ItemID";
+                string sqlGetData = "select ItemTags.tagID,tags.Color,tags.TypeOfTag,ItemTags.TagSequence from ItemTags left join tags on tags.tagID = ItemTags.tagID  where ItemID = @ItemID";
                 Connection.Open();
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
                 cmdGetData.Parameters.AddWithValue("@ItemID", ItemID);
@@ -3243,7 +3244,8 @@ namespace Scada
                     {
                         TagID = reader.GetInt32(0),
                         Color = reader.GetString(1),
-                        TypeOfTag = reader.GetInt32(2)
+                        TypeOfTag = reader.GetInt32(2),
+                        TagSequence = reader.GetInt32(3)
                     });
                 }
                 reader.Close();
@@ -3948,7 +3950,7 @@ namespace Scada
                 };
                 Connection.Open();
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
-                sqlGetData = "select * FROM( SELECT *, ROW_NUMBER() OVER (ORDER BY ItemType) as row FROM ItemTypes) a WHERE row > @StartRow and row <= @EndRow";
+                sqlGetData = "select ItemType,Description,defaultWidth,defaultHeight,Digital FROM( SELECT *, ROW_NUMBER() OVER (ORDER BY ItemType) as row FROM ItemTypes) a WHERE row > @StartRow and row <= @EndRow";
                 cmdGetData.Parameters.AddWithValue("@StartRow", StartRow);
                 cmdGetData.Parameters.AddWithValue("@EndRow", EndRow);
 
@@ -3960,7 +3962,7 @@ namespace Scada
                 {
                     gridRows.Add(new gridRow
                     {
-                        TagID = reader.GetInt32(0),
+                        ItemType = reader.GetInt32(0),
                         col1text = reader.GetString(1),
                         col1width = 100F,
                         col2text = "",
@@ -4103,6 +4105,7 @@ namespace Scada
                         col6text = "",
                         col6width = 10F,
                         Status = 5,
+                        TagSequence = reader.GetInt32(2),
                         Id = reader.GetInt32(2)
                     });
                 }
@@ -4458,89 +4461,89 @@ namespace Scada
             }
         }
 
-        public int AddItemDefaultTags(ScadaClasses.Telegram Item)
+        public int AddItemDefaultTags(int ItemID, int ItemType)
         {
-            DeleteAllTagsFromUxItem(Item.ItemID);
-            switch (Item.ItemType)
+            DeleteAllTagsFromUxItem(ItemID);
+            switch (ItemType)
             {
                 case ScadaClasses.uxNumeric:
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 1, "Processvalue");
+                    AddItemTag(ItemID, ItemType, -1, 1, "Processvalue");
                     break;
 
                 case ScadaClasses.uxButton:
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 1, "Setvalue");
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 2, "Feedback");
+                    AddItemTag(ItemID, ItemType, -1, 1, "Setvalue");
+                    AddItemTag(ItemID, ItemType, -1, 2, "Feedback");
                     break;
 
                 case ScadaClasses.uxToggle:
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 1, "Setvalue");
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 2, "Feedback");
+                    AddItemTag(ItemID, ItemType, -1, 1, "Setvalue");
+                    AddItemTag(ItemID, ItemType, -1, 2, "Feedback");
                     break;
 
                 case ScadaClasses.uxBarGraph:
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 1, "Processvalue");
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 2, "Setvalue");
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 3, "Outputvalue");
+                    AddItemTag(ItemID, ItemType, -1, 1, "Processvalue");
+                    AddItemTag(ItemID, ItemType, -1, 2, "Setvalue");
+                    AddItemTag(ItemID, ItemType, -1, 3, "Outputvalue");
                     break;
 
                 case ScadaClasses.uxCircularProgress:
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 1, "Processvalue");
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 2, "Setvalue");
+                    AddItemTag(ItemID, ItemType, -1, 1, "Processvalue");
+                    AddItemTag(ItemID, ItemType, -1, 2, "Setvalue");
                     break;
 
                 case ScadaClasses.uxCircularGauge:
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 1, "Processvalue");
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 2, "Setvalue");
+                    AddItemTag(ItemID, ItemType, -1, 1, "Processvalue");
+                    AddItemTag(ItemID, ItemType, -1, 2, "Setvalue");
                     break;
                 case ScadaClasses.uxGyro:
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 1, "Bankangle");
+                    AddItemTag(ItemID, ItemType, -1, 1, "Bankangle");
                     break;
                 case ScadaClasses.uxCompass:
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 1, "Processvalue");
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 2, "Setvalue");
+                    AddItemTag(ItemID, ItemType, -1, 1, "Processvalue");
+                    AddItemTag(ItemID, ItemType, -1, 2, "Setvalue");
                     break;
                 case ScadaClasses.uxAltimeter:
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 1, "Altitude");
+                    AddItemTag(ItemID, ItemType, -1, 1, "Altitude");
                     break;
                 case ScadaClasses.uxAirspeed:
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 1, "Airspeed");
+                    AddItemTag(ItemID, ItemType, -1, 1, "Airspeed");
                     break;
                 case ScadaClasses.uxRobot:
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 1, "Gripper");
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 2, "Lower arm");
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 3, "Upper arm");
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 4, "X Traverse");
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 5, "Y Traverse");
+                    AddItemTag(ItemID, ItemType, -1, 1, "Gripper");
+                    AddItemTag(ItemID, ItemType, -1, 2, "Lower arm");
+                    AddItemTag(ItemID, ItemType, -1, 3, "Upper arm");
+                    AddItemTag(ItemID, ItemType, -1, 4, "X Traverse");
+                    AddItemTag(ItemID, ItemType, -1, 5, "Y Traverse");
                     break;
 
                 case ScadaClasses.uxHistoryChart:
-                    CreateChartSettings(Item.ItemID);
+                    CreateChartSettings(ItemID);
                     break;
 
                 case ScadaClasses.uxController:
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 1, "Process value");
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 2, "Set value");
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 3, "Output value");
+                    AddItemTag(ItemID, ItemType, -1, 1, "Process value");
+                    AddItemTag(ItemID, ItemType, -1, 2, "Set value");
+                    AddItemTag(ItemID, ItemType, -1, 3, "Output value");
                     break;
 
                 case ScadaClasses.uxSimulator:
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 1, "Process value");
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 2, "Acutator");
+                    AddItemTag(ItemID, ItemType, -1, 1, "Process value");
+                    AddItemTag(ItemID, ItemType, -1, 2, "Acutator");
                     break;
 
                 case ScadaClasses.uxInterference:
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 1, "Process value");
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 2, "Output value");
+                    AddItemTag(ItemID, ItemType, -1, 1, "Process value");
+                    AddItemTag(ItemID, ItemType, -1, 2, "Output value");
                     break;
 
                 case ScadaClasses.uxAutomotivePower:
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 1, "Power");
+                    AddItemTag(ItemID, ItemType, -1, 1, "Power");
                     break;
                 case ScadaClasses.uxAutomotiveSpeed:
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 1, "Speed");
+                    AddItemTag(ItemID, ItemType, -1, 1, "Speed");
                     break;
                 case ScadaClasses.uxProgressBar:
-                    AddItemTag(Item.ItemID, Item.ItemType, -1, 1, "Progress");
+                    AddItemTag(ItemID, ItemType, -1, 1, "Progress");
                     break;
 
             }
@@ -4639,7 +4642,7 @@ namespace Scada
             addItem(oTele);
             int ItemID = GetLatestItemID();
             oTele.ItemID = ItemID;
-            AddItemDefaultTags(oTele);
+            AddItemDefaultTags(ItemID, oTele.ItemType);
             return (MaxPage);
         }
 

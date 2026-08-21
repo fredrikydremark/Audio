@@ -273,6 +273,7 @@ namespace Scada
         public  int CurrentType = 0;
         public  int CurrentTag = 0;
         public  int CurrentID = -1;
+        public int CurrentTagSequence = 0;
         public  int CurrentCategory = -1;
 
         public  int Previouspage = -1;
@@ -328,6 +329,7 @@ namespace Scada
             public int AlarmEnable { get; set; }
             public int StoreIntervalSec { get; set; }
             public int Driver { get; set; }
+            public int TagSequence { get; set; }
         }
 
         public class LibItem

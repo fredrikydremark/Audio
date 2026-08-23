@@ -1453,7 +1453,7 @@ public partial class MainPage : ContentPage
         /*
         x = (Width / 100) * ScadaItem.Left;
         y = (Height / 100) * ScadaItem.Top;
-        w = (Width / 100) * ScadaItem.Width;
+        w = (Width / 100) * ScadaItem.Width;F
         h = (Height / 100) * ScadaItem.Height;
         */
         ScadaItem.gridRows = MyDataAccessLayer.ReadItemTypes(sFilter, iMenuOffsetRows, iMenuOffsetRows + 5);
@@ -2435,11 +2435,11 @@ public partial class MainPage : ContentPage
                             MyDataAccessLayer.SetItemTag(ScadaItem.ItemID, row.TagID, ScadaClasses.CurrentRow);
                         }
                         */
-                        ScadaGlobals.CurrentTag = row.TagID;
+                        //ScadaGlobals.CurrentTag = row.TagID;
 
                         if (ScadaGlobals.CurrentTag == 0)
                         {
-                            //MyDataAccessLayer.AddItemTag(ScadaGlobals.CurrentItem, ScadaGlobals.CurrentType, row.TagID, row.Row, "");
+                            MyDataAccessLayer.AddItemTag(ScadaGlobals.CurrentItem, ScadaGlobals.CurrentType, row.TagID, row.Row, "");
                         }
                         else
                         {
@@ -4838,7 +4838,7 @@ public partial class MainPage : ContentPage
 
                                         ScadaGlobals.CurrentItem = ScadaItem.ItemID;
                                         ScadaGlobals.CurrentTag = myGraph.TagID;
-                                        ScadaGlobals.CurrentRow = myTagButton.TagSequence;
+                                        ScadaGlobals.CurrentTagSequence = myTagButton.TagSequence;
                                         ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxTagsMenu;
                                         ScadaGlobals.CurrentType = ScadaClasses.uxHistoryChart;
                                         SKCanvasPopupViews.Clear();

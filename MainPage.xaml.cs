@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.Maui.Layouts;
 using SkiaSharp;
+using SkiaSharp.Internals;
 using SkiaSharp.Views.Maui;
 using SkiaSharp.Views.Maui.Controls;
 using System.Globalization;
@@ -564,7 +565,12 @@ public partial class MainPage : ContentPage
                     //Go
                     //uxtimer.Enabled = true;
                     //bcktimer.Enabled = true;
-                    RefreshGui();
+                    foreach (SKCanvasView viewItem in SKCanvasPopupViews)
+                    {
+                        absoluteLayout.Remove(viewItem);
+                    }
+                    SKCanvasPopupViews.Clear();
+                    //RefreshGui();
                     break;
 
                 case SKTouchAction.Pressed:
@@ -3073,10 +3079,23 @@ public partial class MainPage : ContentPage
                                     break;
 
                             }
+                            ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxParameters;
+                            ScadaGlobals.Previouspage = -1;
+                            RefreshGui();                   
                             break;
+
+                        case SKTouchAction.Pressed:
+                            break;
+
+                        case SKTouchAction.Moved:                         
+                            break;
+
+                        case SKTouchAction.Exited:                          
+                            break;
+
                     }
                     args.Handled = true;
-                    RefreshGui();
+                   
                     /*
                     var Items = new List<ScadaClasses.Telegram> { };
                     Items = MyDataAccessLayer.getItems(ScadaClasses.Currentpage);
@@ -4262,7 +4281,7 @@ public partial class MainPage : ContentPage
                         break;
 
                     case ScadaClasses.uxParameters:
-                        //ScadaParameters();
+                        ScadaParameters();
                         break;
 
                     case ScadaClasses.uxTagsGrid:
@@ -6749,9 +6768,22 @@ public partial class MainPage : ContentPage
                 absoluteLayout.Remove(viewItem);
             }
             */
-            
 
-
+            /*
+            var editor = new SkiaEditor
+            {
+                HorizontalOptions = LayoutOptions.Fill,
+                MaxLines = 1,
+                FontSize = 16,
+                TextColor = Colors.Black,
+                CursorColor = Colors.DodgerBlue,
+                BackgroundColor = Color.Parse("#F5F5F5"),
+                Padding = new Thickness(12, 8),
+                ReturnType = ReturnType.Done,
+                KeyboardType = SkiaEditor.SkiaEditorKeyboard.Default,
+            };
+            editor.TextSubmitted += (s, text) => Console.WriteLine(text);
+            */
 
             if (ScadaGlobals.CurrentScadaPopup == ScadaClasses.uxUploadMenu)
             {

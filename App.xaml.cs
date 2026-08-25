@@ -18,7 +18,7 @@
             Window myWindow = new Window(new AppShell());
             if (OperatingSystem.IsWindows())
             {
-                myWindow.Width = 1200;
+                myWindow.Width = 1000;
                 myWindow.Height = 600;
             }
             var displayInfo = DeviceDisplay.Current.MainDisplayInfo;

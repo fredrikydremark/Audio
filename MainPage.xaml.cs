@@ -2319,7 +2319,103 @@ public partial class MainPage : ContentPage
 
 
 
+    private void ScadaEditParameterText()
+    {
+        double panelWith = 0.4;
+        double panelHeight = 0.55;
 
+        double x = (Width / 2) - panelWith * Width / 2;
+        double y = (Height / 2) - panelHeight * Height / 2;
+        double w = (panelWith * Width);
+        double h = (panelHeight * Height);
+
+        DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);
+
+        var EditParamPanel = new ScadaButton();
+        EditParamPanel.ItemID = -1; // ScadaItem.ItemID;
+        EditParamPanel.StyleId = "-1"; // ScadaItem.ItemID.ToString();
+        EditParamPanel.AnchorX = 0;
+        EditParamPanel.AnchorY = 0;
+        EditParamPanel.CornerRadius = 10;
+        EditParamPanel.BarBackgroundColor = ScadaColor.uxPanelColor;
+        EditParamPanel.BackgroundColor = ScadaColor.uxPanelColor.ToMauiColor();
+        EditParamPanel.GradientStartColor = ScadaColor.uxItemBackGroundColor;
+        EditParamPanel.GradientEndColor = ScadaColor.uxItemBackGroundColor;
+        EditParamPanel.IndicatorColor = ScadaColor.uxPanelColor;
+        EditParamPanel.WidthRequest = w;
+        EditParamPanel.HeightRequest = h;
+        EditParamPanel.AlternativeTextColor = ScadaColor.uxTextColor;
+        EditParamPanel.TextColor = ScadaColor.uxTextColor;
+        EditParamPanel.IsEnabled = true;
+        EditParamPanel.IsVisible = true;
+        EditParamPanel.IndicatorType = 0;
+
+        var btnApplyParamText = new ScadaButton();
+        btnApplyParamText.CornerRadius = 10;
+        btnApplyParamText.IndicatorType = 1;
+        btnApplyParamText.BarBackgroundColor = ScadaColor.uxPanelColor;
+        btnApplyParamText.BackgroundColor = ScadaColor.uxPanelColor.ToMauiColor();
+        btnApplyParamText.GradientStartColor = ScadaColor.uxPopupItemColor;
+        btnApplyParamText.GradientEndColor = ScadaColor.uxPopupItemColor;
+        btnApplyParamText.IndicatorColor = ScadaColor.uxItemColor;
+        btnApplyParamText.TextColor = ScadaColor.uxTextColor;
+        btnApplyParamText.ButtonText = "Apply";
+        btnApplyParamText.WidthRequest = 70;
+        btnApplyParamText.HeightRequest = 40;
+        btnApplyParamText.FontSize = 18;
+        btnApplyParamText.IsEnabled = true;
+        btnApplyParamText.IsVisible = true;
+        btnApplyParamText.EnableTouchEvents = true;
+        btnApplyParamText.InputTransparent = false;
+        btnApplyParamText.Touch += (sender, args) =>
+        {
+            var pt = args.Location;
+            switch (args.ActionType)
+            {
+                case SKTouchAction.Released:
+                    switch (ScadaGlobals.CurrentType)
+                    {
+                        case ScadaClasses.pmComputer:
+                            Preferences.Default.Set("ConnectionString", edtInputText.Text);
+                            break;
+                        case ScadaClasses.pmParameter:
+                            MyDataAccessLayer.UpdateParameterValue(ScadaGlobals.CurrentID, edtInputText.Text);
+                            break;
+                        case ScadaClasses.pmPages:
+                            MyDataAccessLayer.UpdatePageName(ScadaGlobals.CurrentID, edtInputText.Text);
+                            ScadaGlobals.Currentpage = MyDataAccessLayer.GetPageNoByName(edtInputText.Text);
+                            break;
+                    }
+                    //ScadaClasses.Previouspage = -1;
+                    //ScadaClasses.CurrentScadaPopup = ScadaClasses.PreviousScadaPopup;
+                    //ScadaClasses.Refresh = true;
+                    break;
+
+                case SKTouchAction.Pressed:
+                    break;
+
+                case SKTouchAction.Moved:
+                    btnApplyParamText.GradientStartColor = ScadaColor.uxHoverColor;
+                    btnApplyParamText.GradientEndColor = ScadaColor.uxHoverColor;
+                    break;
+
+                case SKTouchAction.Exited:
+                    btnApplyParamText.GradientStartColor = ScadaColor.uxPopupItemColor;
+                    btnApplyParamText.GradientEndColor = ScadaColor.uxPopupItemColor;
+                    break;
+            }
+            args.Handled = true;
+        };
+
+        AbsoluteLayout.SetLayoutBounds(btnApplyParamText, new Rect(x + EditParamPanel.WidthRequest - (EditParamPanel.WidthRequest / 2) - (btnApplyParamText.WidthRequest / 2), y + EditParamPanel.HeightRequest - btnApplyParamText.HeightRequest * 1.5F, btnApplyParamText.WidthRequest, btnApplyParamText.HeightRequest));
+        AbsoluteLayout.SetLayoutFlags(btnApplyParamText, AbsoluteLayoutFlags.None);
+        AbsoluteLayout.SetLayoutBounds(EditParamPanel, new Rect(x, y,  w, h));
+        AbsoluteLayout.SetLayoutFlags(EditParamPanel, AbsoluteLayoutFlags.None);
+
+        SKCanvasPopupViews.Add(EditParamPanel);
+        SKCanvasPopupViews.Add(btnApplyParamText);
+        CreateCloseButton(x, y, w, h, ScadaGlobals.PreviousScadaPopup);
+    }
 
 
 
@@ -2859,8 +2955,32 @@ public partial class MainPage : ContentPage
                         ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxEditParameterText;
                         ScadaGlobals.CurrentType = ScadaClasses.pmPages;
                         ScadaGlobals.CurrentID = myRow.Id;
-                        ScadaGlobals.Previouspage = -1;
-                        //ScadaGlobals.Refresh = true;
+                        //ScadaGlobals.Previouspage = -1;
+
+                        SKCanvasPopupViews.Clear();
+                        ScadaEditParameterText();   
+                       
+                        foreach (SKCanvasView viewItem in SKCanvasPopupViews)
+                        {
+                            absoluteLayout.Add(viewItem);
+                        }
+                        edtInputText.Placeholder = "EditText";
+                        edtInputText.WidthRequest = 400;
+                        edtInputText.HeightRequest = 100;
+
+                        edtInputText.TextColor = ScadaColor.uxTextColor.ToMauiColor();
+                        edtInputText.BackgroundColor = ScadaColor.uxPopupItemColor.ToMauiColor();
+                        edtInputText.PlaceholderColor = ScadaColor.uxItemColor.ToMauiColor();
+                        edtInputText.FontAttributes = FontAttributes.Bold;
+                        edtInputText.IsVisible = true;
+                        AbsoluteLayout.SetLayoutBounds(edtInputText, new Rect(400, 200, 400, 100));
+                        AbsoluteLayout.SetLayoutFlags(edtInputText, AbsoluteLayoutFlags.None);
+                        edtInputText.TextChanged += OnEditorTextChanged;
+                        edtInputText.Completed += OnEditorCompleted;
+                        absoluteLayout.Add(edtInputText);
+
+
+                        Content = absoluteLayout;
                         break;
 
                     case SKTouchAction.Pressed:
@@ -3183,9 +3303,7 @@ public partial class MainPage : ContentPage
                 SKCanvasPopupViews.Add(btnDots);
             }
 
-           
-
-      
+              
             y = y + 26;
             r++;
         }
@@ -6114,6 +6232,8 @@ public partial class MainPage : ContentPage
                         break;
 
                     case ScadaClasses.uxEditParameterText:
+                        ScadaEditParameterText();
+                        /*
                         x = (Width / 100) * ScadaItem.Left;
                         y = (Height / 100) * ScadaItem.Top;
                         w = (Width / 100) * ScadaItem.Width;
@@ -6173,9 +6293,9 @@ public partial class MainPage : ContentPage
                                             ScadaGlobals.Currentpage = MyDataAccessLayer.GetPageNoByName(edtInputText.Text);
                                             break;
                                     }                            
-                                    /*ScadaClasses.Previouspage = -1;
-                                    ScadaClasses.CurrentScadaPopup = ScadaClasses.PreviousScadaPopup;
-                                    ScadaClasses.Refresh = true;*/
+                                    //ScadaClasses.Previouspage = -1;
+                                    //ScadaClasses.CurrentScadaPopup = ScadaClasses.PreviousScadaPopup;
+                                    //ScadaClasses.Refresh = true;
                                     break;
 
                                 case SKTouchAction.Pressed:
@@ -6203,9 +6323,9 @@ public partial class MainPage : ContentPage
                         SKCanvasPopupViews.Add(btnApplyParamText);
                         CreateCloseButton(x, y, w, h, ScadaGlobals.PreviousScadaPopup);
                         break;
+                        */
 
-
-
+                        break;
                     case ScadaClasses.uxTagsMenu:
                         ScadaTagsMenu();
 
@@ -6823,24 +6943,25 @@ public partial class MainPage : ContentPage
                 edtSvgEditor.Completed += OnEditorCompleted;
                 absoluteLayout.Add(edtSvgEditor);
             }
-
+            
             if ((ScadaGlobals.CurrentScadaPopup == ScadaClasses.uxEditTagText) ||
                 (ScadaGlobals.CurrentScadaPopup == ScadaClasses.uxEditParameterText))
-            {
+            {  /*
                 edtInputText.Placeholder = "EditText";
-                edtInputText.WidthRequest = w - 40;
-                edtInputText.HeightRequest = h/2;
+                edtInputText.WidthRequest = 400;
+                edtInputText.HeightRequest = 100;
 
                 edtInputText.TextColor = ScadaColor.uxTextColor.ToMauiColor();
                 edtInputText.BackgroundColor = ScadaColor.uxPopupItemColor.ToMauiColor();
                 edtInputText.PlaceholderColor = ScadaColor.uxItemColor.ToMauiColor();
                 edtInputText.FontAttributes = FontAttributes.Bold;
                 edtInputText.IsVisible = true;
-                AbsoluteLayout.SetLayoutBounds(edtInputText, new Rect(x+20, y+70, edtInputText.WidthRequest, edtInputText.HeightRequest));
+                AbsoluteLayout.SetLayoutBounds(edtInputText, new Rect(400, 200, 400,100));
                 AbsoluteLayout.SetLayoutFlags(edtInputText, AbsoluteLayoutFlags.None);
                 edtInputText.TextChanged += OnEditorTextChanged;
                 edtInputText.Completed += OnEditorCompleted;
                 absoluteLayout.Add(edtInputText);
+                */
             }
 
             Content = absoluteLayout;

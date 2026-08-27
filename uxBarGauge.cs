@@ -69,6 +69,7 @@ namespace Scada
                         scb.State = 2;
                         MyDataAccessLayer.UpdateTagValue(scb.SV.TagID, scb.SV.Value,0);
                         MyDataAccessLayer.StoreTagValue(scb.SV.TagID, scb.SV.Value);
+                        //MainPage.RefreshGui();
                         //ScadaClasses.Refresh = true;
                         break;
 

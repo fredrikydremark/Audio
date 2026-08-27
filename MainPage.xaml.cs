@@ -1139,6 +1139,9 @@ public partial class MainPage : ContentPage
         SKCanvasPopupViews.Add(popupAlarm);
         CreateCloseButton(x, y, w, h, -1);
 
+
+        DataAccessLayer MyDataAccessLayer = new DataAccessLayer(MainPage.ConnectionString);
+
         double HeaderHeight = 40F;
         y = y + HeaderHeight;
         var TheColor = ScadaColor.uxItemColor;
@@ -1201,6 +1204,16 @@ public partial class MainPage : ContentPage
                 switch (args.ActionType)
                 {
                     case SKTouchAction.Released:
+                        /*ScadaClasses.Telegram oTelegram = new ScadaClasses.Telegram()
+                        {
+                            MessageType = 4,
+                            TagID = ID,
+                            Page = ScadaGlobals.Currentpage,
+                            Action = " "
+                        };*/
+                        MyDataAccessLayer.confirmAlarm(myRowButton.ButtonRow.Id);
+                        RefreshGui();
+                        /*
                         SKCanvasPopupViews.Clear();
 
                         ScadaAlarmPopup(myRowButton.ButtonRow.Id, myRowButton.ButtonRow.TagID, myRowButton.ButtonRow.col2text);
@@ -1210,6 +1223,7 @@ public partial class MainPage : ContentPage
                             absoluteLayout.Add(viewItem);
                         }
                         Content = absoluteLayout;
+                        */
                         break;
 
                     case SKTouchAction.Entered:
@@ -2807,6 +2821,9 @@ public partial class MainPage : ContentPage
                         ScadaGlobals.Previouspage = -1;
                         ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxTagSettings;
                         ScadaGlobals.CurrentTag = myRowButton.ButtonRow.TagID;
+                    
+
+
                         //ScadaClasses.Refresh = true;
                         /*ScadaAlarmPopup(myRowButton.ButtonRow.Id, myRowButton.ButtonRow.TagID, myRowButton.ButtonRow.col2text);
                         foreach (SKCanvasView viewItem in SKCanvasPopupViews)
@@ -3396,7 +3413,7 @@ public partial class MainPage : ContentPage
                         Page = ScadaGlobals.Currentpage,
                         Action = " "
                     };
-                    MyDataAccessLayer.confirmAlarm(oTelegram);
+                    MyDataAccessLayer.confirmAlarm(ID);
                     //ScadaGlobals.Refresh = true;
                     ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxAlarmGrid;
                     //SendMessage(JsonSerializer.Serialize(oTelegram));
@@ -3454,7 +3471,7 @@ public partial class MainPage : ContentPage
                         Action = " "
                     };
                     MyDataAccessLayer.disableAlarm(TagID);
-                    MyDataAccessLayer.confirmAlarm(oTelegram);
+                    MyDataAccessLayer.confirmAlarm(TagID);
                     MyDataAccessLayer.deleteAlarm(oTelegram);
                     ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxAlarmGrid;
                     //SendMessage(JsonSerializer.Serialize(oTelegram));
@@ -7084,6 +7101,10 @@ public partial class MainPage : ContentPage
                 */
             }
 
+
+     
+
+
             if (uxItem is CircularProgress)
             {
                 var dItem = uxItem as CircularProgress;
@@ -7094,6 +7115,8 @@ public partial class MainPage : ContentPage
                 var dItem = uxItem as CircularGauge;
                 dItem.RefreshValues();
             }
+
+        
 
             /*
             if (uxItem is CircularGauge)
@@ -7230,19 +7253,20 @@ public partial class MainPage : ContentPage
 
 
 
-      
+
             if (uxItem is ScadaButton)
             {
                 var dItem = uxItem as ScadaButton;
-               
+               /*
                 foreach (var Item in ScadaItems)
                 {
                     if (dItem.ItemID == Item.ItemID)
                     {
                         dItem.RefreshValues(Item.ItemValues);
+                        dItem.ButtonRow = Item.gridRows[0];
                     }
                 }
-
+                */
                 //Sets Time span Button text                
                 if (dItem.StyleId == "myTimeScaleButton")
                 {
@@ -7273,7 +7297,7 @@ public partial class MainPage : ContentPage
                 
                 
                      
-                /*
+                
                     foreach (var ScadaItem in ScadaItems)
                     {
                         if (dItem != null)
@@ -7323,14 +7347,117 @@ public partial class MainPage : ContentPage
                             }                           
                         }         
                     }              
-                }*/
+                }
             }
         }
-        /*
-        foreach (SKCanvasView uxItem in SKCanvasViews)
+
+
+     
+        var AlarmRows = MyDataAccessLayer.ReadAlarmMessages("All");
+       
+
+        foreach (SKCanvasView uxItem in SKCanvasPopupViews)
         {
+            if (uxItem is ScadaButton)
+            {
+                var dItem = uxItem as ScadaButton;
+                bool isNumeric = int.TryParse(dItem.StyleId, out int iRow);
+                if (isNumeric)
+                {
+                    var emptyrow = new gridRow
+                    {
+                        Status = 5,
+                        col1text = "",
+                        col1width = 0F,
+                        col2text = "",
+                        col2width = 0F,
+                        col3text = "",
+                        col3width = 0F,
+                        col4text = "",
+                        col4width = 0F,
+                        col5text = "",
+                        col5width = 0F,
+                        col6text = "",
+                        col6width = 0F,
+                        TagID = 0,
+                        Row = iRow,
+                        Id = 0
+                    };
+
+                    dItem.ButtonRow = emptyrow;
+                    foreach (gridRow myRow in AlarmRows)
+                    {
+                        if (iRow == myRow.Row)
+                        {
+                            if (dItem.IsVisible == true)
+                            {
+                                dItem.ButtonRow = myRow;
+                                dItem.InvalidateSurface();
+                            }
+                        }
+                    }
+                }
+
+                //dItem.ButtonRow.Row
+
+                /*
+                                foreach (var ScadaItem in ScadaItems)
+                                {
+                                    if (dItem != null)
+                                    {
+                                        if ((ScadaItem.ItemType == ScadaClasses.uxAlarmGrid) ||
+                                            (ScadaItem.ItemType == ScadaClasses.uxTagsGrid) ||
+                                            (ScadaItem.ItemType == ScadaClasses.uxParameters) ||
+                                            //  (ScadaItem.ItemType == ScadaClasses.uxDataSourcesSettings) ||
+                                            (ScadaItem.ItemType == ScadaClasses.uxTagSettings))
+                                        {
+
+                                            bool isNumeric = int.TryParse(dItem.StyleId, out int iRow);
+                                            if (isNumeric)
+                                            {
+                                                var emptyrow = new gridRow
+                                                {
+                                                    Status = 5,
+                                                    col1text = "",
+                                                    col1width = 0F,
+                                                    col2text = "",
+                                                    col2width = 0F,
+                                                    col3text = "",
+                                                    col3width = 0F,
+                                                    col4text = "",
+                                                    col4width = 0F,
+                                                    col5text = "",
+                                                    col5width = 0F,
+                                                    col6text = "",
+                                                    col6width = 0F,
+                                                    TagID = 0,
+                                                    Row = iRow,
+                                                    Id = 0
+                                                };
+
+                                                dItem.ButtonRow = emptyrow;
+                                                foreach (gridRow myRow in ScadaItem.gridRows)
+                                                {
+                                                    if (iRow == myRow.Row)
+                                                    {
+                                                        if (dItem.IsVisible == true)
+                                                        {
+                                                            dItem.ButtonRow = myRow;
+                                                            dItem.InvalidateSurface();
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                */
+            }
+
+
+
         }
-        */
+        
 
     }
 

@@ -422,7 +422,7 @@ end;
         {
             var info = e.Info;
             var canvas = e.Surface.Canvas;
-
+            bool FirstCurve = true;
             float w = e.Info.Width;
             float h = e.Info.Height;
             float MaxScale = 60;
@@ -679,7 +679,11 @@ end;
                                 
                             }
                             oldPoint = thePoint;
-                            var basetick = new SKPoint(x, h);
+
+                            //Only draw Timescale one time..
+                            if (FirstCurve == true)
+                            {                                
+                                var basetick = new SKPoint(x, h);
                                 var shorttick = new SKPoint(x, h - h / 50);
                                 var longtick = new SKPoint(x, h - h / 30);
                                 var textBounds = new SKRect();
@@ -690,14 +694,14 @@ end;
                                     var pText = new SKPoint();
                                     if (LocalValues[0].TimeSpan < 3)
                                     {
-                                       float tw = TextPaint.MeasureText(LocalValues[j].X, ref textBounds);
-                                       pText = new SKPoint(x - tw / 2 - 1, h - h / 25);
+                                        float tw = TextPaint.MeasureText(LocalValues[j].X, ref textBounds);
+                                        pText = new SKPoint(x - tw / 2 - 1, h - h / 25);
                                     }
                                     else
                                     {
-                                       float tw = TextPaint.MeasureText(LocalValues[j].X, ref textBounds);
-                                    
-                                       pText = new SKPoint(x /*- tw / 2 - 1*/, ( h - h / 25) );
+                                        float tw = TextPaint.MeasureText(LocalValues[j].X, ref textBounds);
+
+                                        pText = new SKPoint(x /*- tw / 2 - 1*/, (h - h / 25));
                                     }
                                     canvas.DrawText(LocalValues[j].X, pText, TextPaint);
                                 }
@@ -705,11 +709,13 @@ end;
                                 {
                                     //canvas.DrawLine(basetick, shorttick, TextPaint);
                                 }
+
+                            }
                             
                         }
                         j--;
                     }
-
+                    FirstCurve = false;
                     if (LocalValues[0].TypeOfTag == 3)
                     {
                         //Some tests with Draw as polygon

@@ -3848,9 +3848,7 @@ namespace Scada
         }
 
 
-
-
-        public int confirmAlarm(ScadaClasses.Telegram oTelegram)
+        public int confirmAlarm(int TagID)
         {
             try
             {
@@ -3862,7 +3860,7 @@ namespace Scada
                 string sqlGetData = "UPDATE Alarms SET Confirmed = GetDate()  WHERE ( ID = @ID )";
                 Connection.Open();
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
-                cmdGetData.Parameters.AddWithValue("@ID", oTelegram.TagID);
+                cmdGetData.Parameters.AddWithValue("@ID", TagID);
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
                 Connection.Close();

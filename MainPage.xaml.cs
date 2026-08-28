@@ -2400,6 +2400,9 @@ public partial class MainPage : ContentPage
                             ScadaGlobals.Currentpage = MyDataAccessLayer.GetPageNoByName(edtInputText.Text);
                             break;
                     }
+                    SKCanvasPopupViews.Clear();
+                    RefreshGui();
+
                     //ScadaClasses.Previouspage = -1;
                     //ScadaClasses.CurrentScadaPopup = ScadaClasses.PreviousScadaPopup;
                     //ScadaClasses.Refresh = true;

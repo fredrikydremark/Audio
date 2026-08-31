@@ -6793,7 +6793,7 @@ public partial class MainPage : ContentPage
                 {
                     case SKTouchAction.Released:
                         //ScadaClasses.Previouspage = -1;
-                        //ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxAlarmGrid;                        
+                         ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxAlarmGrid;                        
                         //ScadaClasses.Refresh = true;
 
                         SKCanvasPopupViews.Clear();
@@ -7300,7 +7300,7 @@ public partial class MainPage : ContentPage
                 
                 
                      
-                
+                /*
                     foreach (var ScadaItem in ScadaItems)
                     {
                         if (dItem != null)
@@ -7308,7 +7308,7 @@ public partial class MainPage : ContentPage
                             if ((ScadaItem.ItemType == ScadaClasses.uxAlarmGrid) ||
                                 (ScadaItem.ItemType == ScadaClasses.uxTagsGrid) ||
                                 (ScadaItem.ItemType == ScadaClasses.uxParameters) ||
-                              //  (ScadaItem.ItemType == ScadaClasses.uxDataSourcesSettings) ||
+                         
                                 (ScadaItem.ItemType == ScadaClasses.uxTagSettings))
                             {
                                           
@@ -7349,119 +7349,64 @@ public partial class MainPage : ContentPage
                                 }
                             }                           
                         }         
-                    }              
-                }
+                    }   
+                
+                }*/
             }
         }
 
 
-     
-        var AlarmRows = MyDataAccessLayer.ReadAlarmMessages("All");
-       
 
-        foreach (SKCanvasView uxItem in SKCanvasPopupViews)
+        if (ScadaGlobals.CurrentScadaPopup == ScadaClasses.uxAlarmGrid)
         {
-            if (uxItem is ScadaButton)
+            var AlarmRows = MyDataAccessLayer.ReadAlarmMessages("All");
+            foreach (SKCanvasView uxItem in SKCanvasPopupViews)
             {
-                var dItem = uxItem as ScadaButton;
-                bool isNumeric = int.TryParse(dItem.StyleId, out int iRow);
-                if (isNumeric)
+                if (uxItem is ScadaButton)
                 {
-                    var emptyrow = new gridRow
+                    var dItem = uxItem as ScadaButton;
+                    bool isNumeric = int.TryParse(dItem.StyleId, out int iRow);
+                    if (isNumeric)
                     {
-                        Status = 5,
-                        col1text = "",
-                        col1width = 0F,
-                        col2text = "",
-                        col2width = 0F,
-                        col3text = "",
-                        col3width = 0F,
-                        col4text = "",
-                        col4width = 0F,
-                        col5text = "",
-                        col5width = 0F,
-                        col6text = "",
-                        col6width = 0F,
-                        TagID = 0,
-                        Row = iRow,
-                        Id = 0
-                    };
-
-                    dItem.ButtonRow = emptyrow;
-                    foreach (gridRow myRow in AlarmRows)
-                    {
-                        if (iRow == myRow.Row)
+                        var emptyrow = new gridRow
                         {
-                            if (dItem.IsVisible == true)
+                            Status = 5,
+                            col1text = "",
+                            col1width = 0F,
+                            col2text = "",
+                            col2width = 0F,
+                            col3text = "",
+                            col3width = 0F,
+                            col4text = "",
+                            col4width = 0F,
+                            col5text = "",
+                            col5width = 0F,
+                            col6text = "",
+                            col6width = 0F,
+                            TagID = 0,
+                            Row = iRow,
+                            Id = 0
+                        };
+
+                        dItem.ButtonRow = emptyrow;
+                        foreach (gridRow myRow in AlarmRows)
+                        {
+                            if (iRow == myRow.Row)
                             {
-                                dItem.ButtonRow = myRow;
-                                dItem.InvalidateSurface();
+                                if (dItem.IsVisible == true)
+                                {
+                                    dItem.ButtonRow = myRow;
+                                    dItem.InvalidateSurface();
+                                }
                             }
                         }
                     }
-                }
-
-                //dItem.ButtonRow.Row
-
-                /*
-                                foreach (var ScadaItem in ScadaItems)
-                                {
-                                    if (dItem != null)
-                                    {
-                                        if ((ScadaItem.ItemType == ScadaClasses.uxAlarmGrid) ||
-                                            (ScadaItem.ItemType == ScadaClasses.uxTagsGrid) ||
-                                            (ScadaItem.ItemType == ScadaClasses.uxParameters) ||
-                                            //  (ScadaItem.ItemType == ScadaClasses.uxDataSourcesSettings) ||
-                                            (ScadaItem.ItemType == ScadaClasses.uxTagSettings))
-                                        {
-
-                                            bool isNumeric = int.TryParse(dItem.StyleId, out int iRow);
-                                            if (isNumeric)
-                                            {
-                                                var emptyrow = new gridRow
-                                                {
-                                                    Status = 5,
-                                                    col1text = "",
-                                                    col1width = 0F,
-                                                    col2text = "",
-                                                    col2width = 0F,
-                                                    col3text = "",
-                                                    col3width = 0F,
-                                                    col4text = "",
-                                                    col4width = 0F,
-                                                    col5text = "",
-                                                    col5width = 0F,
-                                                    col6text = "",
-                                                    col6width = 0F,
-                                                    TagID = 0,
-                                                    Row = iRow,
-                                                    Id = 0
-                                                };
-
-                                                dItem.ButtonRow = emptyrow;
-                                                foreach (gridRow myRow in ScadaItem.gridRows)
-                                                {
-                                                    if (iRow == myRow.Row)
-                                                    {
-                                                        if (dItem.IsVisible == true)
-                                                        {
-                                                            dItem.ButtonRow = myRow;
-                                                            dItem.InvalidateSurface();
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                */
+                }      
+               
             }
-
-
 
         }
         
-
     }
 
 }

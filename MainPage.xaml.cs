@@ -1673,24 +1673,7 @@ public partial class MainPage : ContentPage
                         {
                             absoluteLayout.Add(viewItem);
                         }
-                        Content = absoluteLayout;
-
-
-                        /* ScadaClasses.Telegram oTelegram = new ScadaClasses.Telegram()
-                         {
-                             MessageType = ScadaItem.MessageType,
-                             Page = ScadaItem.Nextpage,
-                             ItemType = ScadaItem.ItemType,
-                             ItemID = ScadaGlobals.CurrentItem,
-                             TagID = row.TagID,
-                             TagName = ScadaItem.TagName,
-                             Action = ScadaItem.Action,
-                         };
-                         */
-                        //ScadaClasses.CurrentScadaPopup = ScadaClasses.uxTagsMenu;
-                        //ScadaClasses.Previouspage = -1;
-                        //ScadaClasses.CurrentRow = row.Id;
-                        //ScadaClasses.Refresh = true;                                    
+                        Content = absoluteLayout;                             
                         break;
 
                     case SKTouchAction.Moved:
@@ -1711,11 +1694,8 @@ public partial class MainPage : ContentPage
             AbsoluteLayout.SetLayoutFlags(myItemTagsBtn, AbsoluteLayoutFlags.None);
             SKCanvasPopupViews.Add(myItemTagsBtn);
             y = y + 26;
-
         }
     }
-
-
 
 
     private void ScadaItemSizesMenu()
@@ -2581,13 +2561,14 @@ public partial class MainPage : ContentPage
                         }
 
 
-                        SKCanvasPopupViews.Clear();
-                        //RefreshGui();
+                        // SKCanvasPopupViews.Clear();
+                        // RefreshGui();
+                        // ScadaGlobals.CurrentTag = row.TagID;
 
-                       // ScadaGlobals.CurrentTag = row.TagID;
-                        ScadaGlobals.CurrentScadaPopup = -1;
-                        ScadaGlobals.Previouspage = -1;
-                        RefreshGui();
+                        ScadaGlobals.PreviousScadaPopup = ScadaClasses.uxTagsGrid;
+                        ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxTagsGrid;
+                        //ScadaGlobals.Previouspage = -1;
+                        uxtimer.Interval = 100;
                         break;
 
                     case SKTouchAction.Moved:
@@ -2837,18 +2818,10 @@ public partial class MainPage : ContentPage
                 {
                     case SKTouchAction.Released:
                         ScadaGlobals.Previouspage = -1;
+                        ScadaGlobals.PreviousScadaPopup = ScadaClasses.uxTagsGrid;
                         ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxTagSettings;
                         ScadaGlobals.CurrentTag = myRowButton.ButtonRow.TagID;
-                    
-                        ScadaTagsMenu();
-                        //ScadaClasses.Refresh = true;
-                        /*ScadaAlarmPopup(myRowButton.ButtonRow.Id, myRowButton.ButtonRow.TagID, myRowButton.ButtonRow.col2text);
-                        foreach (SKCanvasView viewItem in SKCanvasPopupViews)
-                        {
-                            absoluteLayout.Add(viewItem);
-                        }
-                        Content = absoluteLayout;
-                        */
+     
                         break;
 
                     case SKTouchAction.Entered:
@@ -4858,14 +4831,6 @@ public partial class MainPage : ContentPage
                                     }
                                     Content = absoluteLayout;
 
-
-                                    //ScadaClasses.CurrentItem = ScadaItem.ItemID;
-
-                                    /*ScadaClasses.CurrentScadaPopup = ScadaClasses.uxTimeSpanMenu;
-                                    ScadaClasses.Previouspage = -1;
-                                    ScadaClasses.CurrentType = ScadaClasses.uxHistoryChart;
-                                    ScadaClasses.Refresh = true;
-                                    */
                                     break;
 
                                 case SKTouchAction.Moved:
@@ -4924,8 +4889,7 @@ public partial class MainPage : ContentPage
                             {
                                 case SKTouchAction.Released:
                                     ChartSetTimeScaleStep(ScadaItem.ItemID, 1);
-                                    RefreshGui();
-                                    //ScadaClasses.Refresh = true;
+                                    RefreshGui();                       
                                     break;
 
                                 case SKTouchAction.Moved:
@@ -4983,7 +4947,6 @@ public partial class MainPage : ContentPage
                                 case SKTouchAction.Released:
                                     ChartSetTimeScaleStep(ScadaItem.ItemID, -1);
                                     RefreshGui();
-                                    //ScadaClasses.Refresh = true;
                                     break;
 
                                 case SKTouchAction.Moved:
@@ -5050,6 +5013,7 @@ public partial class MainPage : ContentPage
                                         ScadaGlobals.CurrentItem = ScadaItem.ItemID;
                                         ScadaGlobals.CurrentTag = myGraph.TagID;
                                         ScadaGlobals.CurrentTagSequence = myTagButton.TagSequence;
+                                        ScadaGlobals.PreviousScadaPopup = ScadaClasses.uxTagsMenu;
                                         ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxTagsMenu;
                                         ScadaGlobals.CurrentType = ScadaClasses.uxHistoryChart;
                                         SKCanvasPopupViews.Clear();
@@ -5058,18 +5022,8 @@ public partial class MainPage : ContentPage
                                         {
                                             absoluteLayout.Add(viewItem);
                                         }
+                                      
                                         Content = absoluteLayout;
-
-                                        /*
-                                        ScadaGlobals.CurrentItem = ScadaItem.ItemID;
-                                        ScadaGlobals.CurrentTag = myGraph.TagID;
-                                        ScadaGlobals.CurrentRow = myTagButton.TagSequence;
-                                        ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxTagsMenu;
-                                        ScadaGlobals.Previouspage = -1;
-                                        ScadaGlobals.CurrentType = ScadaClasses.uxHistoryChart;
-                                        */
-                                        //ScadaClasses.Refresh = true;
-
                                         break;
 
                                     case SKTouchAction.Moved:
@@ -5141,16 +5095,6 @@ public partial class MainPage : ContentPage
                                         absoluteLayout.Add(viewItem);
                                     }
                                     Content = absoluteLayout;
-
-                                    /*
-                                    ScadaGlobals.CurrentItem = ScadaItem.ItemID;
-                                    ScadaGlobals.CurrentTag = 0;
-                                    ScadaGlobals.CurrentRow = btnRow;
-                                    ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxTagsMenu;
-                                    ScadaGlobals.Previouspage = -1;
-                                    ScadaGlobals.CurrentType = ScadaClasses.uxHistoryChart;
-                                    */
-                                    //ScadaClasses.Refresh = true;
 
                                     break;
 
@@ -6401,7 +6345,7 @@ public partial class MainPage : ContentPage
 
                         break;
                     case ScadaClasses.uxTagsMenu:
-                        ScadaTagsMenu();
+                      //  ScadaTagsMenu();
 
                       
                         break;
@@ -7056,6 +7000,9 @@ public partial class MainPage : ContentPage
        
                 switch (ScadaGlobals.CurrentScadaPopup)
                 {
+                    case ScadaClasses.uxAlarmGrid:
+                        ScadaAlarmGrid();
+                    break;
                     case ScadaClasses.uxParameters:
                         ScadaParameters();
                         break;
@@ -7065,23 +7012,22 @@ public partial class MainPage : ContentPage
                     case ScadaClasses.uxProtocols:
                         ScadaProtocols();
                         break;
-                    case ScadaClasses.uxAlarmGrid:
-                        ScadaAlarmGrid();
+                    case ScadaClasses.uxTagsGrid:
+                        ScadaTagsGrid();
+                        break;
+                    case ScadaClasses.uxTagSettings:
+                        ScadaTagsGrid();
+                    //ScadaTagSettings();
                     break;
-                    
-                }
+
+            }
                 foreach (SKCanvasView viewItem in SKCanvasPopupViews)
                 {
                     absoluteLayout.Add(viewItem);
-                }
-                
-                ScadaGlobals.PreviousScadaPopup = ScadaGlobals.CurrentScadaPopup;
-
-               
+                }             
+                ScadaGlobals.PreviousScadaPopup = ScadaGlobals.CurrentScadaPopup;              
                 Content = absoluteLayout;
-
-            //Dispatcher.Dispatch(ScadaAlarmGrid);
-            
+           
         }
        
         

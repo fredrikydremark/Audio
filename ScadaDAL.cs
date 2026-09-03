@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient.Server;
 using System.Globalization;
 using System.Text;
 using static Scada.ScadaClasses;
@@ -1564,11 +1565,12 @@ namespace Scada
         }
 
 
-        public ScadaClasses.Telegram GetItemSize(ScadaClasses.Telegram oTelegram)
-
+        public ScadaClasses.Telegram GetItemSize(int ItemType,int ItemSize)
         {
             try
             {
+                ScadaClasses.Telegram oTelegram = new ScadaClasses.Telegram();
+
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
                 {
                     ConnectionString = sConnection
@@ -1576,9 +1578,11 @@ namespace Scada
                 string sqlGetData = "select Width,Height from ItemSizes where ItemType =@ItemType and nSize =@Size";
                 Connection.Open();
                 var cmdGetData = new Microsoft.Data.SqlClient.SqlCommand(sqlGetData, Connection);
-                cmdGetData.Parameters.AddWithValue("@ItemType", oTelegram.ItemType);
-                cmdGetData.Parameters.AddWithValue("@Size", oTelegram.size);
+                cmdGetData.Parameters.AddWithValue("@ItemType", ItemType);
+                cmdGetData.Parameters.AddWithValue("@Size", ItemSize);
                 var reader = cmdGetData.ExecuteReader();
+
+              
                 while (reader.Read())
                 {
                     if (reader.IsDBNull(0) == false)
@@ -1595,8 +1599,9 @@ namespace Scada
                 cmdGetData = null;
                 Connection.Close();
                 Connection = null;
-
                 return (oTelegram);
+
+
             }
             catch (Exception ex)
             {
@@ -1606,7 +1611,7 @@ namespace Scada
             {
             }
 
-
+           
         }
 
 
@@ -1656,9 +1661,11 @@ namespace Scada
         }
 
 
-        public int SetItemSize(ScadaClasses.Telegram oTelegram)
+        public int SetItemSize(int ItemID,int ItemSize)
         {
-            oTelegram = GetItemSize(oTelegram);
+            //ScadaClasses.Telegram oTelegram = new ScadaClasses.Telegram();
+            
+            var oTelegram = GetItemSize(ItemID,ItemSize);
             try
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
@@ -4395,7 +4402,7 @@ namespace Scada
 
 
 
-        public int copyItem(ScadaClasses.Telegram oTelegram)
+        public int copyItem(int ItemID)
         {
             try
             {
@@ -4409,7 +4416,7 @@ namespace Scada
                                        "where ItemID = @ItemID";
 
                 SqlCommand cmdGetData = new SqlCommand(sqlInsertData, Connection);
-                cmdGetData.Parameters.AddWithValue("@ItemID", oTelegram.ItemID);
+                cmdGetData.Parameters.AddWithValue("@ItemID", ItemID);
                 cmdGetData.ExecuteNonQuery();
                 cmdGetData.Dispose();
                 Connection.Close();

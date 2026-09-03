@@ -268,6 +268,7 @@ namespace Scada
 
         public int Currentpage = 1;
         public int CurrentScadaPopup = -1;
+        
         public  int CurrentItem = 0;
         public  int CurrentRow = 0;
         public  int CurrentType = 0;
@@ -278,7 +279,7 @@ namespace Scada
 
         public  int Previouspage = -1;
         public  int PreviousScadaPopup = -1;
-        //public static bool Refresh = false;
+        
 
         //Parameter categories
         public const int CategoryAdam = 101;

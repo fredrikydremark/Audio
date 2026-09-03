@@ -40,6 +40,7 @@ public partial class MainPage : ContentPage
     int iMenuOffsetRows = 0;
     float RampDirection = 2.0F;
     float StepSignal = 25F;
+    int myDelay=0;
 
     // List<ContentView> ContentViews = new List<ContentView>();
     List<SKCanvasView> SKCanvasViews = new List<SKCanvasView>();
@@ -53,6 +54,7 @@ public partial class MainPage : ContentPage
     protected override void OnSizeAllocated(double width, double height)
     {
         base.OnSizeAllocated(width, height);
+        RefreshGui();
         //ScadaClasses.Previouspage = -1;
         //ScadaClasses.Refresh = true;      
     }
@@ -254,6 +256,7 @@ public partial class MainPage : ContentPage
     {
         try
         {
+            
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 if (!Moving)
@@ -272,7 +275,7 @@ public partial class MainPage : ContentPage
                         bStartup = false;
 
                     }
-
+                    uxtimer.Interval = 5000;
                     RefreshGui();
                   //var Items = new List<ScadaClasses.Telegram> { };              
                   //var Items = MyDataAccessLayer.getItems(ScadaClasses.Currentpage);                    
@@ -933,7 +936,7 @@ public partial class MainPage : ContentPage
                             edtInputText.Text = myRowButton.ButtonRow.col2text;
                             ScadaGlobals.CurrentID = myRowButton.ButtonRow.Id;
                             ScadaGlobals.CurrentType = ScadaClasses.pmParameter;                        
-                            RefreshGui();
+                            //RefreshGui();
                             break;
 
                         case SKTouchAction.Pressed:
@@ -1392,13 +1395,15 @@ public partial class MainPage : ContentPage
                         ScadaGlobals.CurrentCategory = myRowButton.ButtonRow.Id;
                         ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxProtocolSettings;
                         ScadaGlobals.PreviousScadaPopup = ScadaClasses.uxProtocols;
-                        RefreshGui();
-                        /*
+                       
+                        
                         foreach (SKCanvasView viewItem in SKCanvasPopupViews)
                         {
                             absoluteLayout.Remove(viewItem);
                         }
                         SKCanvasPopupViews.Clear();
+                        uxtimer.Interval = 100;
+                        /*
                         ScadaProtocolSettings();
                         foreach (SKCanvasView viewItem in SKCanvasPopupViews)
                         {
@@ -1406,6 +1411,7 @@ public partial class MainPage : ContentPage
                         }
                         Content = absoluteLayout;
                         */
+                        //RefreshGui();
                         break;
 
                     case SKTouchAction.Entered:
@@ -3229,7 +3235,8 @@ public partial class MainPage : ContentPage
                             }
                             ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxParameters;
                             ScadaGlobals.Previouspage = -1;
-                            RefreshGui();                   
+                            uxtimer.Interval = 100;
+                            //RefreshGui();                   
                             break;
 
                         case SKTouchAction.Pressed:
@@ -3275,13 +3282,14 @@ public partial class MainPage : ContentPage
                     switch (args.ActionType)
                     {
                         case SKTouchAction.Released:
-
+                            
                             foreach (SKCanvasView viewItem in SKCanvasPopupViews)
                             {
                                 absoluteLayout.Remove(viewItem);
                             }
 
                             SKCanvasPopupViews.Clear();
+                            
                             switch (myRow.col1text)
                             {
                                 case "Connection string":
@@ -3294,27 +3302,28 @@ public partial class MainPage : ContentPage
                                     break;
                                 case "Signals":
                                       ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxTagsGrid;
-                                      ScadaTagsGrid();
+                                      //ScadaTagsGrid();
                                     break;
                                 case "Pages":
                                       ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxPagesMenu;
-                                      ScadaPages();
+                                      //ScadaPages();
                                     break;
                                 case "Protocols":
                                       ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxProtocols;
-                                      ScadaGlobals.PreviousScadaPopup = ScadaClasses.uxProtocols;
+                                      ScadaGlobals.PreviousScadaPopup = ScadaClasses.uxParameters;
 
-                                      ScadaProtocols();                        
+                                     // ScadaProtocols();                        
                                     break;
                             }
-                        
-                            foreach (SKCanvasView viewItem in SKCanvasPopupViews)
-                            {
-                                absoluteLayout.Add(viewItem);
-                            }
-                            Content = absoluteLayout;
-                            
-                            RefreshGui();
+                            /*
+                                foreach (SKCanvasView viewItem in SKCanvasPopupViews)
+                                {
+                                    absoluteLayout.Add(viewItem);
+                                }
+                                Content = absoluteLayout;
+                                */
+                            //RefreshGui();
+                            uxtimer.Interval = 100;
                             break;
 
                         case SKTouchAction.Pressed:
@@ -3901,11 +3910,16 @@ public partial class MainPage : ContentPage
                                     }
                                     Content = absoluteLayout;
                                     */
+                                    foreach (SKCanvasView viewItem in SKCanvasPopupViews)
+                                    {
+                                        absoluteLayout.Remove(viewItem);
+                                    }
+                                    SKCanvasPopupViews.Clear();
 
                                     ScadaGlobals.CurrentScadaPopup = callerPopup;
-
-
-                                    RefreshGui();
+                                    uxtimer.Interval = 100;
+                                   // Thread.Sleep(500);
+                                    //RefreshGui();
                                  
                                     break;
 
@@ -6833,9 +6847,10 @@ public partial class MainPage : ContentPage
                 {
                     case SKTouchAction.Released:
                         //ScadaClasses.Previouspage = -1;
-                         ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxAlarmGrid;                        
+                        ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxAlarmGrid;
+                        ScadaGlobals.PreviousScadaPopup = -1;
                         //ScadaClasses.Refresh = true;
-
+                        /*
                         SKCanvasPopupViews.Clear();
                         ScadaAlarmGrid();
                         foreach (SKCanvasView viewItem in SKCanvasPopupViews)
@@ -6843,6 +6858,7 @@ public partial class MainPage : ContentPage
                             absoluteLayout.Add(viewItem);
                         }
                         Content = absoluteLayout;
+                        */
                         RefreshGui();
                         break;
 
@@ -6887,15 +6903,17 @@ public partial class MainPage : ContentPage
                 {
                     case SKTouchAction.Released:                     
                         ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxParameters;
-                        ScadaGlobals.PreviousScadaPopup = ScadaClasses.uxParameters;
-                        SKCanvasPopupViews.Clear();
-                        ScadaParameters();
-                        foreach (SKCanvasView viewItem in SKCanvasPopupViews)
-                        {
-                            absoluteLayout.Add(viewItem);
-                        }
-                        Content = absoluteLayout;
-
+                        ScadaGlobals.PreviousScadaPopup = -1;
+                        /*
+                         SKCanvasPopupViews.Clear();
+                         ScadaParameters();
+                         foreach (SKCanvasView viewItem in SKCanvasPopupViews)
+                         {
+                             absoluteLayout.Add(viewItem);
+                         }
+                         Content = absoluteLayout;
+                         */
+                        RefreshGui();
                         break;
 
                     case SKTouchAction.Pressed:
@@ -7034,35 +7052,36 @@ public partial class MainPage : ContentPage
 
 
         if (ScadaGlobals.CurrentScadaPopup != ScadaGlobals.PreviousScadaPopup)
-        {
-            absoluteLayout.BatchBegin();
-            foreach (SKCanvasView viewItem in SKCanvasPopupViews)
-            {
-                absoluteLayout.Remove(viewItem);
-            }
-            Thread.Sleep(300);
-            SKCanvasPopupViews.Clear();
-            switch (ScadaGlobals.CurrentScadaPopup)
-            {
-                case ScadaClasses.uxParameters:
-                    ScadaParameters();
+        {          
+       
+                switch (ScadaGlobals.CurrentScadaPopup)
+                {
+                    case ScadaClasses.uxParameters:
+                        ScadaParameters();
+                        break;
+                    case ScadaClasses.uxProtocolSettings:
+                        ScadaProtocolSettings();
+                        break;
+                    case ScadaClasses.uxProtocols:
+                        ScadaProtocols();
+                        break;
+                    case ScadaClasses.uxAlarmGrid:
+                        ScadaAlarmGrid();
                     break;
-                case ScadaClasses.uxProtocolSettings:
-                    ScadaProtocolSettings();
-                    break;
-                case ScadaClasses.uxProtocols:
-                    ScadaProtocols();
-                    break;
-            }
-            foreach (SKCanvasView viewItem in SKCanvasPopupViews)
-            {
-                absoluteLayout.Add(viewItem);
-            }
-            absoluteLayout.BatchCommit();
-            ScadaGlobals.PreviousScadaPopup = ScadaGlobals.CurrentScadaPopup;
+                    
+                }
+                foreach (SKCanvasView viewItem in SKCanvasPopupViews)
+                {
+                    absoluteLayout.Add(viewItem);
+                }
+                
+                ScadaGlobals.PreviousScadaPopup = ScadaGlobals.CurrentScadaPopup;
 
+               
+                Content = absoluteLayout;
 
-            Content = absoluteLayout;
+            //Dispatcher.Dispatch(ScadaAlarmGrid);
+            
         }
        
         

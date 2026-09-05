@@ -1661,11 +1661,11 @@ namespace Scada
         }
 
 
-        public int SetItemSize(int ItemID,int ItemSize)
+        public int SetItemSize(int ItemID,int ItemType,int ItemSize)
         {
             //ScadaClasses.Telegram oTelegram = new ScadaClasses.Telegram();
             
-            var oTelegram = GetItemSize(ItemID,ItemSize);
+            var oTelegram = GetItemSize(ItemType,ItemSize);
             try
             {
                 var Connection = new Microsoft.Data.SqlClient.SqlConnection
@@ -1676,7 +1676,7 @@ namespace Scada
                 string sqlGetData = "UPDATE Items SET posWidth=@w,posHeight=@h WHERE ( ItemID = @ItemID )";
                 Connection.Open();
                 SqlCommand cmdGetData = new SqlCommand(sqlGetData, Connection);
-                cmdGetData.Parameters.AddWithValue("@ItemID", oTelegram.ItemID);
+                cmdGetData.Parameters.AddWithValue("@ItemID",ItemID);
                 cmdGetData.Parameters.AddWithValue("@w", Convert.ToDouble(oTelegram.Width));
                 cmdGetData.Parameters.AddWithValue("@h", Convert.ToDouble(oTelegram.Height));
 

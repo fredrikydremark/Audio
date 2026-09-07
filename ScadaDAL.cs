@@ -4875,7 +4875,7 @@ namespace Scada
                 {
                     ConnectionString = sConnection
                 };
-                string sqlGetData = "UPDATE Tags SET Value = @Value WHERE TagName = @TagName";
+                string sqlGetData = "UPDATE Tags SET Value = @Value,ValueTime=CURRENT_TIMESTAMP WHERE TagName = @TagName";
                 Connection.Open();
                 var cmdGetData = new SqlCommand(sqlGetData, Connection);
                 cmdGetData.Parameters.AddWithValue("@TagName", sTagName);

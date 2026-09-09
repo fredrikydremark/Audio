@@ -425,7 +425,7 @@ end;
             bool FirstCurve = true;
             float w = e.Info.Width;
             float h = e.Info.Height;
-            float MaxScale = 60;
+            float MaxScale = 100;
             float ScaleFactor = 100 / MaxScale;
 
             var backgroundBar = new SKRoundRect(new SKRect(0, 0, w, h), 5, 5);

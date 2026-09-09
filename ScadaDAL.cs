@@ -2252,14 +2252,15 @@ namespace Scada
                      */
                     TempValues.Add(new ScadaClasses.Value { X = sTimeText, Y = v.sValue, Color = MyTag.Color, TypeOfTag = MyTag.TypeOfTag });
                 }
-                TempValues[TempValues.Count - 1].Y = TempValues[TempValues.Count - 2].Y;
+                //TempValues[TempValues.Count - 1].Y = TempValues[TempValues.Count - 2].Y;
                 reader.Close();
                 cmdGetData.Dispose();
                 Connection.Close();
                 Connection = null;
-                dValue BeyondValue = GetBeyondValue(MyTag);
-                dValue LatestValue = GetLatestValue(MyTag);
+                //dValue BeyondValue = GetBeyondValue(MyTag);
+                //dValue LatestValue = GetLatestValue(MyTag);
 
+                /*
                 double Diff = ((TimeSpan)(DateTime.Now - LatestValue.t)).TotalSeconds;
 
                 if (Diff > 354)
@@ -2272,6 +2273,7 @@ namespace Scada
                     TempValues[0].Y = BeyondValue.v.ToString("0.0");
                     TempValues[TempValues.Count - 1].Y = LatestValue.v.ToString("0.0");
                 }
+                */
                 return (TempValues);
             }
             catch (Exception ex)

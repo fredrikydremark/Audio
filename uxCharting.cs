@@ -569,31 +569,37 @@ end;
                     {
                     }
                     */
+
+
                     int Count = LocalValues.Count;
-                    string sv = "0";
-                    for (int m = 0; m < Count; m++)
+
+                    if (LocalValues[1].TypeOfTag == 1)
                     {
-                        if (LocalValues[m].Y != "")
-                        {
-                            if (Convert.ToDouble(LocalValues[m].Y) > 0.5F)
+                        string sv = "0";
+                        for (int m = 0; m < Count; m++)
+                        {     
+                            if (LocalValues[m].Y != "")
                             {
-                                if (LocalValues[m].TypeOfTag == 1)
+                                if (Convert.ToDouble(LocalValues[m].Y) > 0.5F)
                                 {
-                                    sv = "1,0";
+                                    if (LocalValues[m].TypeOfTag == 1)
+                                    {
+                                        sv = "1,0";
+                                    }
+                                    else
+                                    {
+                                        sv = LocalValues[m].Y;
+                                    }
                                 }
                                 else
                                 {
-                                    sv = LocalValues[m].Y;
+                                    sv = "0,0";
                                 }
                             }
-                            else
-                            {
-                                sv = "0,0";
-                            }
-                        }
-                        //LocalValues[m].Y = sv;
-                    }
+                            LocalValues[m].Y = sv;
 
+                        }
+                    }
                     int j = Count - 1;
                     float x = w;
                     var thePoint = new SKPoint(-1, -1);
@@ -618,7 +624,8 @@ end;
                                     if (LocalValues[0].TypeOfTag == 1)
                                     {
                                         canvas.DrawRect(x - (w / Count) / 2, h - h / 6, (w / Count) * 4F, 5 * -(float)(Convert.ToDouble(LocalValues[j].Y) / 100.0F) * h, myPaint);
-                                        //canvas.DrawLine(oldPoint, thePoint, LinePaint);                                         
+                                        //canvas.DrawLine(oldPoint, thePoint, myPaint);                                         
+                                        //canvas.DrawRect(oldPoint.X, h - h / 6, thePoint.X, 5 * -(float)(Convert.ToDouble(LocalValues[j].Y) / 100.0F) * h, myPaint);
                                         /*
                                         if (Math.Abs(thePoint.Y - oldPoint.Y) > 0.05F)
                                         {

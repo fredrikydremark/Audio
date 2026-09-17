@@ -1041,7 +1041,7 @@ namespace Scada
                 myTagParams.Add(new gridRow
                 {
                     col1text = "Tagname",
-                    col1width = 300,
+                    col1width = 200,
                     col2text = tagname,
                     col2width = 400,
                     col3text = "",
@@ -1055,7 +1055,7 @@ namespace Scada
                 myTagParams.Add(new gridRow
                 {
                     col1text = "Description",
-                    col1width = 300,
+                    col1width = 200,
                     col2text = description,
                     col2width = 400,
                     col3text = "",
@@ -1069,7 +1069,7 @@ namespace Scada
                 myTagParams.Add(new gridRow
                 {
                     col1text = "High limit",
-                    col1width = 300,
+                    col1width = 200,
                     col2text = HL,
                     col2width = 400,
                     col3text = "",
@@ -1083,7 +1083,7 @@ namespace Scada
                 myTagParams.Add(new gridRow
                 {
                     col1text = "Low limit",
-                    col1width = 300,
+                    col1width = 200,
                     col2text = LL,
                     col2width = 400,
                     col3text = "",
@@ -1097,49 +1097,49 @@ namespace Scada
                 myTagParams.Add(new gridRow
                 {
                     col1text = "Color",
-                    col1width = 300,
+                    col1width = 200,
                     col2text = Color,
                     col2width = 400,
                     col3text = "",
                     col4text = "",
                     col5text = "",
                     col6text = "",
-                    DataType = 0,
+                    DataType = 1,
                     Row = 4
                 });
 
                 myTagParams.Add(new gridRow
                 {
                     col1text = "Unit",
-                    col1width = 300,
+                    col1width = 200,
                     col2text = Unit,
                     col2width = 400,
                     col3text = "",
                     col4text = "",
                     col5text = "",
                     col6text = "",
-                    DataType = 0,
+                    DataType = 1,
                     Row = 5
                 });
 
                 myTagParams.Add(new gridRow
                 {
                     col1text = "StoreInterval Sec",
-                    col1width = 300,
+                    col1width = 200,
                     col2text = StoreIntervalSec.ToString(),
                     col2width = 400,
                     col3text = "",
                     col4text = "",
                     col5text = "",
                     col6text = "",
-                    DataType = 0,
+                    DataType = 1,
                     Row = 6
                 });
 
                 myTagParams.Add(new gridRow
                 {
                     col1text = "AlarmEnable",
-                    col1width = 300,
+                    col1width = 200,
                     col2text = AlarmEnable.ToString(),
                     col2width = 400,
                     col3text = "",
@@ -1153,27 +1153,27 @@ namespace Scada
                 myTagParams.Add(new gridRow
                 {
                     col1text = "Type of tag",
-                    col1width = 300,
+                    col1width = 200,
                     col2text = TypeOfTag.ToString(),
                     col2width = 400,
                     col3text = "",
                     col4text = "",
                     col5text = "",
                     col6text = "",
-                    DataType = 0,
+                    DataType = 1,
                     Row = 8
                 });
                 myTagParams.Add(new gridRow
                 {
                     col1text = "Driver",
-                    col1width = 300,
+                    col1width = 200,
                     col2text = Driver.ToString(),
                     col2width = 400,
                     col3text = "",
                     col4text = "",
                     col5text = "",
                     col6text = "",
-                    DataType = 0,
+                    DataType = 1,
                     Row = 9
                 });
 
@@ -2258,7 +2258,14 @@ namespace Scada
                 Connection.Close();
                 Connection = null;
                 //dValue BeyondValue = GetBeyondValue(MyTag);
-                //dValue LatestValue = GetLatestValue(MyTag);
+
+                //No data in charts timespan take latest known value
+                if (i == 0)
+                {
+                    dValue LatestValue = GetLatestValue(MyTag);
+                    TempValues[0].Y = LatestValue.v.ToString("0.0");
+                    TempValues[TempValues.Count - 1].Y = LatestValue.v.ToString("0.0");
+                }
 
                 /*
                 double Diff = ((TimeSpan)(DateTime.Now - LatestValue.t)).TotalSeconds;
@@ -3410,7 +3417,7 @@ namespace Scada
                 SqlDataReader reader = cmdGetData.ExecuteReader();
 
                 var gridRows = new List<gridRow>();
-                int idx = 1;
+                int row = 0;
                 while (reader.Read())
                 {
                     gridRows.Add(new gridRow
@@ -3429,10 +3436,10 @@ namespace Scada
                         col6text = "",
                         col6width = 10F,
                         Status = 5,
-                        Id = idx,
-                        Row = idx
+                        Id = row,
+                        Row = row
                     });
-                    idx++;
+                    row++;
                 }
                 cmdGetData.Dispose();
                 Connection.Close();

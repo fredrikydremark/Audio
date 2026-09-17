@@ -37,7 +37,7 @@ public partial class MainPage : ContentPage
     int iMenuOffsetRows = 0;
     float RampDirection = 2.0F;
     float StepSignal = 25F;
-    int myDelay=0;
+   
 
     // List<ContentView> ContentViews = new List<ContentView>();
     List<SKCanvasView> SKCanvasViews = new List<SKCanvasView>();
@@ -3318,9 +3318,14 @@ public partial class MainPage : ContentPage
             {
                 switch (args.ActionType)
                 {
-                    case SKTouchAction.Released:                      
+                    case SKTouchAction.Released:
+                        foreach (SKCanvasView viewItem in SKCanvasPopupViews)
+                        {
+                            absoluteLayout.Remove(viewItem);
+                        }
+                        SKCanvasPopupViews.Clear();
                         edtInputText.Text = myRow.col1text;
-                        ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxEditParameterText;
+                        ScadaGlobals.CurrentScadaPopup = -1;// ScadaClasses.uxEditParameterText;
                         ScadaGlobals.CurrentType = ScadaClasses.pmPages;
                         ScadaGlobals.CurrentID = myRow.Id;
                         //ScadaGlobals.Previouspage = -1;
@@ -7214,7 +7219,7 @@ public partial class MainPage : ContentPage
         }
 
 
-        if (ScadaGlobals.CurrentScadaPopup != ScadaGlobals.PreviousScadaPopup)
+        if ((ScadaGlobals.CurrentScadaPopup != -1)&&(ScadaGlobals.CurrentScadaPopup != ScadaGlobals.PreviousScadaPopup))
         {          
        
                 switch (ScadaGlobals.CurrentScadaPopup)
@@ -7224,6 +7229,9 @@ public partial class MainPage : ContentPage
                     break;
                     case ScadaClasses.uxParameters:
                         ScadaParameters();
+                    break;
+                    case ScadaClasses.uxPagesMenu:
+                        ScadaPages();
                         break;
                     case ScadaClasses.uxProtocolSettings:
                         ScadaProtocolSettings();

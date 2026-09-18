@@ -2587,7 +2587,10 @@ public partial class MainPage : ContentPage
            case ScadaClasses.pmTagSettingTagname:         
                MyDataAccessLayer.UpdateTagName(tagId, edtInputText.Text);                        
                break;
-           case ScadaClasses.pmTagSettingHL:
+            case ScadaClasses.pmTagSettingDescription:
+                MyDataAccessLayer.UpdateTagDescription(tagId, edtInputText.Text);
+                break;
+            case ScadaClasses.pmTagSettingHL:
                MyDataAccessLayer.UpdateHL(tagId, edtInputText.Text);
                break;
            case ScadaClasses.pmTagSettingLL:
@@ -2596,6 +2599,18 @@ public partial class MainPage : ContentPage
            case ScadaClasses.pmTagSettingAlarmEnable:
                 MyDataAccessLayer.UpdateAlarmEnable(tagId, edtInputText.Text);
                 break;
+            case ScadaClasses.pmTagSettingColor:
+                MyDataAccessLayer.UpdateTagColor(tagId, edtInputText.Text);
+                break;
+            case ScadaClasses.pmTagSettingStorageInterval:
+                MyDataAccessLayer.UpdateStoreInterval(tagId, edtInputText.Text);
+                break;
+            case ScadaClasses.pmTagSettingDriver:
+                //MyDataAccessLayer.UpdateTagDriver(tagId, edtInputText.Text);
+                break;
+
+
+
 
         }
 
@@ -2677,7 +2692,10 @@ public partial class MainPage : ContentPage
                             break;
                     }
                     SKCanvasPopupViews.Clear();              
-                    ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxTagSettings;                   
+                    ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxTagSettings;
+                    ScadaGlobals.PreviousScadaPopup = ScadaClasses.uxEditParameterText;
+                    ScadaGlobals.Previouspage = -1;
+                    uxtimer.Interval = 50;
                     break;
 
                 case SKTouchAction.Pressed:

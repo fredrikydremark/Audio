@@ -1049,6 +1049,7 @@ namespace Scada
                     col5text = "",
                     col6text = "",
                     DataType = 1,
+                    Id = ScadaClasses.pmTagSettingTagname,
                     Row = 0
                 });
 
@@ -1063,6 +1064,7 @@ namespace Scada
                     col5text = "",
                     col6text = "",
                     DataType = 1,
+                    Id = ScadaClasses.pmTagSettingDescription,
                     Row = 1
                 });
 
@@ -1077,6 +1079,7 @@ namespace Scada
                     col5text = "",
                     col6text = "",
                     DataType = 1,
+                    Id = ScadaClasses.pmTagSettingHL,
                     Row = 2
                 });
 
@@ -1091,6 +1094,7 @@ namespace Scada
                     col5text = "",
                     col6text = "",
                     DataType = 1,
+                    Id = ScadaClasses.pmTagSettingLL,
                     Row = 3
                 });
 
@@ -1105,6 +1109,7 @@ namespace Scada
                     col5text = "",
                     col6text = "",
                     DataType = 1,
+                    Id = ScadaClasses.pmTagSettingColor,
                     Row = 4
                 });
 
@@ -1119,6 +1124,7 @@ namespace Scada
                     col5text = "",
                     col6text = "",
                     DataType = 1,
+                    Id= ScadaClasses.pmTagSettingUnit,
                     Row = 5
                 });
 
@@ -1133,6 +1139,7 @@ namespace Scada
                     col5text = "",
                     col6text = "",
                     DataType = 1,
+                    Id=ScadaClasses.pmTagSettingStorageInterval,
                     Row = 6
                 });
 
@@ -1147,6 +1154,7 @@ namespace Scada
                     col5text = "",
                     col6text = "",
                     DataType = 0,
+                    Id=ScadaClasses.pmTagSettingAlarmEnable,
                     Row = 7
                 });
 
@@ -1161,6 +1169,7 @@ namespace Scada
                     col5text = "",
                     col6text = "",
                     DataType = 1,
+                    Id=ScadaClasses.pmTagSettingTypeOfTag,
                     Row = 8
                 });
                 myTagParams.Add(new gridRow
@@ -1174,6 +1183,7 @@ namespace Scada
                     col5text = "",
                     col6text = "",
                     DataType = 1,
+                    Id=ScadaClasses.pmTagSettingDriver,
                     Row = 9
                 });
 

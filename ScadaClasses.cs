@@ -302,6 +302,21 @@ namespace Scada
         public const int pmComputer = 1;
         public const int pmParameter = 2;
         public const int pmPages = 3;
+        public const int pmTagSettingAlarmEnable = 4;
+        public const int pmTagSettingHL = 5;
+        public const int pmTagSettingLL = 6;
+        public const int pmTagSettingTagname = 7;
+        public const int pmTagSetting = 8;
+
+        public const int pmTagSettingDescription = 9;
+        public const int pmTagSettingUnit = 10;
+        public const int pmTagSettingStorageInterval = 11;
+        public const int pmTagSettingDriver = 12;
+        public const int pmTagSettingTagSequence = 13;
+        public const int pmTagSettingTypeOfTag = 14;
+        public const int pmTagSettingColor = 15;
+        
+
 
         public const int chAnalogInput = 1;
         public const int chAnalogOutput = 2;

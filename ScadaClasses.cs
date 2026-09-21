@@ -373,7 +373,7 @@ namespace Scada
         {
             public string X { get; set; }
             public string Y { get; set; }
-            public string Color { get; set; }
+            public string? Color { get; set; }   
             public int TypeOfTag { get; set; }
             public double Max { get; set; }
             public double Min { get; set; }

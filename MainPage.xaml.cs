@@ -7540,7 +7540,7 @@ public partial class MainPage : ContentPage
             }
             */
 
-            /*
+            
             if (uxItem is ScadaRobot)
             {
                 var dItem = uxItem as ScadaRobot;
@@ -7574,7 +7574,7 @@ public partial class MainPage : ContentPage
                     dItem.InvalidateSurface();
                 }
             }
-            */
+            
 
 
 

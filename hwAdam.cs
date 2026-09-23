@@ -71,8 +71,6 @@ namespace Scada
         public void ReadADAM()
         {
             Double Value = 99999;    
-
-
             string sBinary, s, DigitalOutput;
             short Channel=0;
             string message="";

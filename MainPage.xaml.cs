@@ -28,7 +28,6 @@ public partial class MainPage : ContentPage
     bool Moving = false;
     bool bLoginSuccess = false;
     int infoType = ScadaClasses.infoStartup;
-
     double Xpos = 0, Ypos = 0, Xwidth = 0, Yheight = 0;
     double OldXpos = 0, OldYpos = 0;
     double LastXpos = 0, LastYpos = 0;
@@ -50,17 +49,17 @@ public partial class MainPage : ContentPage
 
     protected override void OnSizeAllocated(double width, double height)
     {
-        base.OnSizeAllocated(width, height);
-        RefreshGui();
-        //ScadaClasses.Previouspage = -1;
-        //ScadaClasses.Refresh = true;      
+        base.OnSizeAllocated(width, height); 
+        Window.MinimumWidth = 1100;
+        Window.MinimumHeight = 600;
+
+        ScadaGlobals.Previouspage = -1;
+        RefreshGui();      
     }
 
     public MainPage()
     {
         InitializeComponent();
-
-
         //Local SQL
         //Preferences.Default.Set("ConnectionString", "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true");
 
@@ -661,64 +660,9 @@ public partial class MainPage : ContentPage
          AbsoluteLayout.SetLayoutFlags(t1, AbsoluteLayoutFlags.None);
          SKCanvasPopupViews.Add(t1);
          */
-        var btnPages = new ScadaButton();
-        btnPages.GradientStartColor = ScadaColor.uxItemColor;
-        btnPages.GradientEndColor = ScadaColor.uxItemColor;
-        btnPages.CornerRadius = 15;
-        btnPages.ItemID = 1;
-        btnPages.EnableTouchEvents = true;
-        btnPages.InputTransparent = false;
-        btnPages.HeightRequest = 25;
-        btnPages.WidthRequest = 25;
-        btnPages.SvgBase64 = MyDataAccessLayer.LoadLibItem("Closecross", 1);
-        btnPages.IndicatorType = 3;
-        btnPages.Margin = 0.15F;
-        btnPages.ButtonText = "";
-        btnPages.Touch += (sender, args) =>
-        {
-            switch (args.ActionType)
-            {
-                case SKTouchAction.Released:
-                    /* ScadaControlTelegram oTelegram = new ScadaControlTelegram()
-                     {
-                         MessageType = 22,
-                         Page = ScadaGlobals.Currentpage,
-                         ItemType = 3,
-                         ItemID = 1,
-                         TagID = 1,
-                         TagName = "",
-                         Action = " ",
-                     };
-                     */
-                    ScadaGlobals.Previouspage = -1;
-                    ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxParameters;
-                    //ScadaGlobals.Refresh = true;
 
-                    break;
-
-                case SKTouchAction.Pressed:
-                    break;
-
-                case SKTouchAction.Moved:
-                    btnPages.GradientStartColor = ScadaColor.uxHoverColor;
-                    btnPages.GradientEndColor = ScadaColor.uxHoverColor;
-                    btnPages.IndicatorColor = ScadaColor.uxHoverColor;
-                    break;
-
-                case SKTouchAction.Exited:
-                    btnPages.GradientStartColor = ScadaColor.uxItemColor;
-                    btnPages.GradientEndColor = ScadaColor.uxItemColor;
-                    btnPages.IndicatorColor = ScadaColor.uxItemColor;
-                    break;
-            }
-            args.Handled = true;
-        };
-
-        //x = x + 30;
-        AbsoluteLayout.SetLayoutBounds(btnPages, new Rect(x + gp.WidthRequest - btnPages.WidthRequest - (btnPages.WidthRequest / 4), y + btnPages.HeightRequest / 4, 25, 25));
-        AbsoluteLayout.SetLayoutFlags(btnPages, AbsoluteLayoutFlags.None);
-        SKCanvasPopupViews.Add(btnPages);
-
+        CreateCloseButton(x, y, w, h, ScadaClasses.uxParameters);
+      
         var a1 = new ScadaButton();
         a1.CornerRadius = 10;
         a1.IndicatorType = 1;
@@ -2609,11 +2553,7 @@ public partial class MainPage : ContentPage
                 //MyDataAccessLayer.UpdateTagDriver(tagId, edtInputText.Text);
                 break;
 
-
-
-
         }
-
     }
                   
 
@@ -2679,7 +2619,8 @@ public partial class MainPage : ContentPage
                     {
                         case ScadaClasses.pmComputer:
                             Preferences.Default.Set("ConnectionString", edtInputText.Text);
-                            break;
+                            break; 
+                   
                         case ScadaClasses.pmParameter:
                             MyDataAccessLayer.UpdateParameterValue(ScadaGlobals.CurrentID, edtInputText.Text);
                             break;
@@ -3693,18 +3634,14 @@ public partial class MainPage : ContentPage
                                     ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxUploadMenu;
                                     break;
                                 case "Signals":
-                                      ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxTagsGrid;
-                                      //ScadaTagsGrid();
+                                      ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxTagsGrid;                                 
                                     break;
                                 case "Pages":
-                                      ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxPagesMenu;
-                                      //ScadaPages();
+                                      ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxPagesMenu;                                
                                     break;
                                 case "Protocols":
                                       ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxProtocols;
-                                      ScadaGlobals.PreviousScadaPopup = ScadaClasses.uxParameters;
-
-                                     // ScadaProtocols();                        
+                                      ScadaGlobals.PreviousScadaPopup = ScadaClasses.uxParameters;                     
                                     break;
                             }
                             /*
@@ -4572,8 +4509,6 @@ public partial class MainPage : ContentPage
     {
         Window.MaximumWidth = 4000;
         Window.MaximumHeight = 2000;
-        Window.MinimumWidth = 1280;
-        Window.MinimumHeight = 600;
         Window.IsMaximizable = true;
         
         double x = 0, y = 0, w = 0, h = 0;   
@@ -7228,22 +7163,21 @@ public partial class MainPage : ContentPage
                 edtSvgName.PlaceholderColor = ScadaColor.uxPopupItemColor.ToMauiColor();
                 edtSvgName.FontAttributes = FontAttributes.None;
                 edtSvgName.IsVisible = true;
-                AbsoluteLayout.SetLayoutBounds(edtSvgName, new Rect(x+20, y+40, edtSvgName.WidthRequest, edtSvgName.HeightRequest));
+                AbsoluteLayout.SetLayoutBounds(edtSvgName, new Rect(400, 200, edtSvgName.WidthRequest, edtSvgName.HeightRequest));
                 AbsoluteLayout.SetLayoutFlags(edtSvgName, AbsoluteLayoutFlags.None);
                 edtSvgName.TextChanged += OnEditorTextChanged;
                 edtSvgName.Completed += OnEditorCompleted;
                 absoluteLayout.Add(edtSvgName);
-
-       
+    
                 edtSvgEditor.Placeholder = "Paste your SVG text";
-                edtSvgEditor.WidthRequest = w-40;
-                edtSvgEditor.HeightRequest = h/2F;
+                edtSvgEditor.WidthRequest = 400;
+                edtSvgEditor.HeightRequest = 200;
                 edtSvgEditor.TextColor = ScadaColor.uxTextColor.ToMauiColor();
                 edtSvgEditor.BackgroundColor = ScadaColor.uxPopupItemColor.ToMauiColor();
                 edtSvgEditor.PlaceholderColor = ScadaColor.uxItemColor.ToMauiColor();
                 edtSvgEditor.FontAttributes = FontAttributes.None;
                 edtSvgEditor.IsVisible = true;
-                AbsoluteLayout.SetLayoutBounds(edtSvgEditor, new Rect(x+20, y+75, edtSvgEditor.WidthRequest, edtSvgEditor.HeightRequest));
+                AbsoluteLayout.SetLayoutBounds(edtSvgEditor, new Rect(400, 300, edtSvgEditor.WidthRequest, edtSvgEditor.HeightRequest));
                 AbsoluteLayout.SetLayoutFlags(edtSvgEditor, AbsoluteLayoutFlags.None);
                 edtSvgEditor.TextChanged += OnEditorTextChanged;
                 edtSvgEditor.Completed += OnEditorCompleted;
@@ -7301,9 +7235,16 @@ public partial class MainPage : ContentPage
                     case ScadaClasses.uxTagSettings:
                         ScadaTagSettings();
                     break;
+                    case ScadaClasses.uxUploadMenu:
+                        ScadaUpload();
+                    break;
+                     case ScadaClasses.uxEditParameterText:
+                        ScadaEditParameterText();
+                    break;
 
-                }
-                foreach (SKCanvasView viewItem in SKCanvasPopupViews)
+
+            }
+            foreach (SKCanvasView viewItem in SKCanvasPopupViews)
                 {
                     absoluteLayout.Add(viewItem);
                 }             

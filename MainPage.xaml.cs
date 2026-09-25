@@ -1115,7 +1115,7 @@ public partial class MainPage : ContentPage
                             ScadaGlobals.CurrentID = myRow.Id;
                             SKCanvasPopupViews.Clear();
                             ScadaEditParameterText();
-
+                            /*
                             foreach (SKCanvasView viewItem in SKCanvasPopupViews)
                             {
                                 absoluteLayout.Add(viewItem);
@@ -1133,6 +1133,7 @@ public partial class MainPage : ContentPage
                             edtInputText.TextChanged += OnEditorTextChanged;
                             edtInputText.Completed += OnEditorCompleted;
                             absoluteLayout.Add(edtInputText);
+                            */
                             Content = absoluteLayout;
                             break;
 
@@ -2558,6 +2559,62 @@ public partial class MainPage : ContentPage
         SKCanvasPopupViews.Add(EditParamPanel);
         SKCanvasPopupViews.Add(btnApplyParamText);
         CreateCloseButton(x, y, w, h, ScadaGlobals.PreviousScadaPopup);
+
+        foreach (SKCanvasView viewItem in SKCanvasPopupViews)
+        {
+            absoluteLayout.Add(viewItem);
+        }
+    
+        edtInputText.Placeholder = "EditText";
+        edtInputText.WidthRequest = w - 20;
+        edtInputText.HeightRequest = h / 2;
+        edtInputText.TextColor = ScadaColor.uxTextColor.ToMauiColor();
+        edtInputText.BackgroundColor = ScadaColor.uxItemColor.ToMauiColor();
+        edtInputText.PlaceholderColor = ScadaColor.uxPopupItemColor.ToMauiColor();
+        edtInputText.FontAttributes = FontAttributes.Bold;
+        edtInputText.IsVisible = true;
+        AbsoluteLayout.SetLayoutBounds(edtInputText, new Rect(x + 10, y + 30, w - 20, h / 2));
+        AbsoluteLayout.SetLayoutFlags(edtInputText, AbsoluteLayoutFlags.None);
+        edtInputText.TextChanged += OnEditorTextChanged;
+        edtInputText.Completed += OnEditorCompleted;
+        absoluteLayout.Add(edtInputText);
+
+
+
+
+        /*
+        foreach (SKCanvasView viewItem in SKCanvasPopupViews)
+        {
+            absoluteLayout.Remove(viewItem);
+        }
+        SKCanvasPopupViews.Clear();
+        edtInputText.Text = myRow.col1text;
+        ScadaGlobals.CurrentScadaPopup = -1;
+        ScadaGlobals.CurrentType = ScadaClasses.pmPages;
+        ScadaGlobals.CurrentID = myRow.Id;
+        SKCanvasPopupViews.Clear();
+        ScadaEditParameterText();
+
+        foreach (SKCanvasView viewItem in SKCanvasPopupViews)
+        {
+            absoluteLayout.Add(viewItem);
+        }
+
+        edtInputText.Placeholder = "EditText";
+        edtInputText.WidthRequest = w - 20;
+        edtInputText.HeightRequest = h / 2;
+        edtInputText.TextColor = ScadaColor.uxTextColor.ToMauiColor();
+        edtInputText.BackgroundColor = ScadaColor.uxItemColor.ToMauiColor();
+        edtInputText.PlaceholderColor = ScadaColor.uxPopupItemColor.ToMauiColor();
+        edtInputText.FontAttributes = FontAttributes.Bold;
+        edtInputText.IsVisible = true;
+        AbsoluteLayout.SetLayoutBounds(edtInputText, new Rect(x + 10, yPlaceHolder, w - 20, h / 2));
+        AbsoluteLayout.SetLayoutFlags(edtInputText, AbsoluteLayoutFlags.None);
+        edtInputText.TextChanged += OnEditorTextChanged;
+        edtInputText.Completed += OnEditorCompleted;
+        absoluteLayout.Add(edtInputText);
+        Content = absoluteLayout;
+        */
     }
 
 
@@ -3224,7 +3281,7 @@ public partial class MainPage : ContentPage
                         ScadaGlobals.CurrentID = myRow.Id;                 
                         SKCanvasPopupViews.Clear();
                         ScadaEditParameterText();   
-                       
+                       /*
                         foreach (SKCanvasView viewItem in SKCanvasPopupViews)
                         {
                             absoluteLayout.Add(viewItem);
@@ -3242,6 +3299,7 @@ public partial class MainPage : ContentPage
                         edtInputText.TextChanged += OnEditorTextChanged;
                         edtInputText.Completed += OnEditorCompleted;
                         absoluteLayout.Add(edtInputText);
+                        */
                         Content = absoluteLayout;
                         break;
 
@@ -3510,9 +3568,39 @@ public partial class MainPage : ContentPage
                             switch (myRow.col1text)
                             {
                                 case "Connection string":
+                                   
+                                    foreach (SKCanvasView viewItem in SKCanvasPopupViews)
+                                    {
+                                        absoluteLayout.Remove(viewItem);
+                                    }
+                                    SKCanvasPopupViews.Clear();
                                     edtInputText.Text = ConnectionString;
+                                    ScadaGlobals.CurrentScadaPopup = -1;
                                     ScadaGlobals.CurrentType = ScadaClasses.pmComputer;
-                                    ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxEditParameterText;
+                                    ScadaGlobals.CurrentID = myRow.Id;
+                                    SKCanvasPopupViews.Clear();
+                                    ScadaEditParameterText();
+                                    /*
+                                    foreach (SKCanvasView viewItem in SKCanvasPopupViews)
+                                    {
+                                        absoluteLayout.Add(viewItem);
+                                    }
+                                    edtInputText.Placeholder = "EditText";
+                                    edtInputText.WidthRequest = w - 20;
+                                    edtInputText.HeightRequest = h / 2;
+                                    edtInputText.TextColor = ScadaColor.uxTextColor.ToMauiColor();
+                                    edtInputText.BackgroundColor = ScadaColor.uxItemColor.ToMauiColor();
+                                    edtInputText.PlaceholderColor = ScadaColor.uxPopupItemColor.ToMauiColor();
+                                    edtInputText.FontAttributes = FontAttributes.Bold;
+                                    edtInputText.IsVisible = true;
+                                    AbsoluteLayout.SetLayoutBounds(edtInputText, new Rect(x + 10, y+30, w - 20, h / 2));
+                                    AbsoluteLayout.SetLayoutFlags(edtInputText, AbsoluteLayoutFlags.None);
+                                    edtInputText.TextChanged += OnEditorTextChanged;
+                                    edtInputText.Completed += OnEditorCompleted;
+                                    absoluteLayout.Add(edtInputText);
+                                    */
+                                    Content = absoluteLayout;
+
                                     break;
                                 case "Items":
                                     foreach (SKCanvasView viewItem in SKCanvasPopupViews)
@@ -6401,7 +6489,7 @@ public partial class MainPage : ContentPage
                         break;
 
                     case ScadaClasses.uxEditParameterText:
-                        ScadaEditParameterText();
+                      //  ScadaEditParameterText();
                         /*
                         x = (Width / 100) * ScadaItem.Left;
                         y = (Height / 100) * ScadaItem.Top;
@@ -7082,7 +7170,7 @@ public partial class MainPage : ContentPage
             */
 
 
-            
+            /*
             if (ScadaGlobals.CurrentScadaPopup == ScadaClasses.uxUploadMenu)
             {
                 double panelWith = 0.4;
@@ -7120,7 +7208,8 @@ public partial class MainPage : ContentPage
                 edtSvgEditor.Completed += OnEditorCompleted;
                 absoluteLayout.Add(edtSvgEditor);
             }
-            
+            */
+            /*
             if ((ScadaGlobals.CurrentScadaPopup == ScadaClasses.uxEditTagText) ||
                 (ScadaGlobals.CurrentScadaPopup == ScadaClasses.uxEditParameterText))
             {  
@@ -7137,7 +7226,7 @@ public partial class MainPage : ContentPage
                 edtInputText.TextChanged += OnEditorTextChanged;
                 edtInputText.Completed += OnEditorCompleted;
                 absoluteLayout.Add(edtInputText);        
-            }
+            }*/
 
 
 
@@ -7180,7 +7269,7 @@ public partial class MainPage : ContentPage
                         ScadaUpload();
                     break;
                      case ScadaClasses.uxEditParameterText:
-                        ScadaEditParameterText();
+                      //  ScadaEditParameterText();
                     break;
 
 

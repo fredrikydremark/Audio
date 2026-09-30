@@ -3,7 +3,17 @@ using SkiaSharp;
 using SkiaSharp.Views.Maui;
 using SkiaSharp.Views.Maui.Controls;
 using System.Globalization;
+using System.Reflection.Metadata;
 using System.Text.RegularExpressions;
+using System.Numerics;
+using Plugin.Maui.Audio;
+
+#if WINDOWS
+using Windows.Devices.Enumeration;
+using Windows.Media.Devices;
+#endif
+
+
 using static Scada.ScadaClasses;
 
 namespace Scada;
@@ -38,6 +48,9 @@ public partial class MainPage : ContentPage
     float RampDirection = 2.0F;
     float StepSignal = 25F;
 
+    IAudioRecorder _audioRecorder;
+    IAudioStreamer _audioStreamer;
+
 
     // List<ContentView> ContentViews = new List<ContentView>();
     List<SKCanvasView> SKCanvasViews = new List<SKCanvasView>();
@@ -45,8 +58,240 @@ public partial class MainPage : ContentPage
 
     AbsoluteLayout absoluteLayout = new AbsoluteLayout
     {
-        Margin = new Thickness(0)
+        Margin = new Thickness(0),        
     };
+
+
+
+    #if WINDOWS
+    protected async override void OnAppearing()
+    {
+        base.OnAppearing();
+
+        // Use the async API and await it
+        var devices = await DeviceInformation.FindAllAsync(MediaDevice.GetAudioCaptureSelector());
+
+        foreach (var device in devices)
+        {
+            //Console.WriteLine($"Device Name: {device.Name}, Id: {device.Id}");
+        }
+
+        var stereoMixDevice = devices.FirstOrDefault(d =>
+            d.Name.Contains("Stereo Mix", StringComparison.OrdinalIgnoreCase) ||
+            d.Name.Contains("Stereomix", StringComparison.OrdinalIgnoreCase));
+        
+        if (stereoMixDevice != null)
+        {
+            // If you want to use the device id when creating your recorder, do it here.
+            var options = new AudioRecorderOptions
+            {
+                AudioDeviceId = stereoMixDevice.Id,
+                Encoding = Encoding.Wav,
+                SampleRate = 44100,
+                Channels = ChannelType.Stereo
+            };
+            _audioRecorder = AudioManager.Current.CreateRecorder(options);
+        }
+    }
+    #endif
+
+
+    public static class FastFourierTransform
+    {
+        /// <summary>
+        /// Utför en In-place FFT på en array av komplexa tal.
+        /// Arrayens längd MÅSTE vara en potens av 2 (t.ex. 1024, 2048, 65536).
+        /// </summary>
+        public static void FFT(Complex[] buffer)
+        {
+            int n = buffer.Length;
+            int bits = (int)Math.Log2(n);
+
+            // 1. Bit-reversal permutation
+            for (int i = 0; i < n; i++)
+            {
+                int j = ReverseBits(i, bits);
+                if (j > i)
+                {
+                    (buffer[i], buffer[j]) = (buffer[j], buffer[i]);
+                }
+            }
+
+            // 2. Cooley-Tukey Butterfly beräkningar
+            for (int len = 2; len <= n; len <<= 1)
+            {
+                double angle = -2 * Math.PI / len;
+                Complex wlen = new Complex(Math.Cos(angle), Math.Sin(angle));
+
+                for (int i = 0; i < n; i += len)
+                {
+                    Complex w = Complex.One;
+                    int halfLen = len / 2;
+
+                    for (int j = 0; j < halfLen; j++)
+                    {
+                        Complex u = buffer[i + j];
+                        Complex v = buffer[i + j + halfLen] * w;
+
+                        buffer[i + j] = u + v;
+                        buffer[i + j + halfLen] = u - v;
+
+                        w *= wlen;
+                    }
+                }
+            }
+        }
+
+        private static int ReverseBits(int val, int bits)
+        {
+            int reversed = 0;
+            for (int i = 0; i < bits; i++)
+            {
+                if ((val & (1 << i)) != 0)
+                {
+                    reversed |= (1 << (bits - 1 - i));
+                }
+            }
+            return reversed;
+        }
+    }
+
+    private void OnAudioStreamerCapturedData(object sender, AudioStreamEventArgs e)
+    {
+        byte[] audioData = e.Audio;
+        if (audioData == null || audioData.Length == 0) return;
+
+        double sumLeft = 0;
+        double sumRight = 0;
+        int totalSamplesPerChannel = 0;
+
+#if ANDROID || WINDOWS
+        // 16-bit PCM = 2 bytes per sample. 2 kanaler = 4 bytes per block.
+        int bytesPerSample = 2;
+        int channels = 2;
+        totalSamplesPerChannel = audioData.Length / (bytesPerSample * channels);
+
+        for (int i = 0; i < audioData.Length; i += bytesPerSample * channels)
+        {
+            // Vänster kanal (Kanal 1)
+            short leftSample = BitConverter.ToInt16(audioData, i);
+            double leftNormalized = leftSample / 32768.0;
+            sumLeft += leftNormalized * leftNormalized;
+
+            // Höger kanal (Kanal 2)
+            // Säkerställ att vi inte läser utanför arrayen om datan mot förmodan skulle vara korrupt
+            if (i + bytesPerSample < audioData.Length)
+            {
+                short rightSample = BitConverter.ToInt16(audioData, i + bytesPerSample);
+                double rightNormalized = rightSample / 32768.0;
+                sumRight += rightNormalized * rightNormalized;
+            }
+        }
+#elif IOS || MACCATALYST
+            // 32-bit Float = 4 bytes per sample. 2 kanaler = 8 bytes per block.
+            int bytesPerSample = 4;
+            int channels = 2;
+            totalSamplesPerChannel = audioData.Length / (bytesPerSample * channels);
+
+            for (int i = 0; i < audioData.Length; i += bytesPerSample * channels)
+            {
+                // Vänster kanal (Kanal 1) - Redan normaliserad mellan -1.0 och 1.0
+                float leftSample = BitConverter.ToSingle(audioData, i);
+                sumLeft += leftSample * leftSample;
+
+                // Höger kanal (Kanal 2)
+                if (i + bytesPerSample < audioData.Length)
+                {
+                    float rightSample = BitConverter.ToSingle(audioData, i + bytesPerSample);
+                    sumRight += rightSample * rightSample;
+                }
+            }
+#endif
+
+        if (totalSamplesPerChannel == 0) return;
+
+        // Beräkna RMS (Root Mean Square) separat för varje kanal
+        double rmsLeft = Math.Sqrt(sumLeft / totalSamplesPerChannel);
+        double rmsRight = Math.Sqrt(sumRight / totalSamplesPerChannel);
+
+        // Välj det högsta värdet som den totala volymen (eller ta ett genomsnitt: (rmsLeft + rmsRight) / 2)
+        double rmsTotal = Math.Max(rmsLeft, rmsRight);
+
+        // Omvandla till Decibel (dBFS)
+        double db = 20 * Math.Log10(rmsTotal);
+        if (double.IsInfinity(db) || db < -60) db = -60;
+
+        // Skicka resultatet till gränssnittet trådsäkert
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            // rmsTotal ger ett stabilt värde mellan 0.0 (tystnad) och 1.0 (max)
+            // db ger ett värde mellan -60 dB (tystnad) och 0 dB (maxvolym)
+            System.Diagnostics.Debug.WriteLine($"[Stereo] Vänster: {rmsLeft:P0} | Höger: {rmsRight:P0} | Totalt: {db:F1} dB");
+        });
+
+
+
+        const int FftSize = 2048;
+
+#if ANDROID || WINDOWS
+        int bytesPerBlock = 4; // 2 bytes * 2 kanaler
+        if (audioData.Length < FftSize * bytesPerBlock) return;
+
+        Complex[] fftBuffer = new Complex[FftSize];
+
+        // Fyll FFT-bufferten med data från t.ex. Vänster kanal
+        for (int i = 0; i < FftSize; i++)
+        {
+            int byteIndex = i * bytesPerBlock;
+            short leftSample = BitConverter.ToInt16(audioData, byteIndex);
+            double normalizedSample = leftSample / 32768.0;
+
+            // FFT tar emot komplexa tal (Reell del = ljudamplitud, Imaginär del = 0)
+            fftBuffer[i] = new Complex(normalizedSample, 0);
+        }
+#elif IOS || MACCATALYST
+            int bytesPerBlock = 8; // 4 bytes (float) * 2 kanaler
+            if (audioData.Length < FftSize * bytesPerBlock) return;
+
+            Complex[] fftBuffer = new Complex[FftSize];
+
+            for (int i = 0; i < FftSize; i++)
+            {
+                int byteIndex = i * bytesPerBlock;
+                float leftSample = BitConverter.ToSingle(audioData, byteIndex);
+                fftBuffer[i] = new Complex(leftSample, 0);
+            }
+#endif
+
+
+        // --- KÖR FFT ---
+        FastFourierTransform.FFT(fftBuffer);
+
+        // Efter en FFT är resultatet symmetriskt. Vi behöver bara titta på den första halvan (N/2).
+        // Arrayen innehåller nu frekvenser från 0 Hz upp till Nyquist-frekvensen (SampleRate / 2 = 22050 Hz).
+        int halfSize = FftSize / 2;
+        double[] magnitudes = new double[halfSize];
+
+        double sampleRate = 44100.0;
+        double hzPerBin = sampleRate / FftSize; // Varje index ("bin") motsvarar ~21.5 Hz (44100/2048)
+
+        for (int i = 0; i < halfSize; i++)
+        {
+            // Magnituden (styrkan) på frekvensen beräknas via absolutbeloppet av det komplexa talet
+            magnitudes[i] = fftBuffer[i].Magnitude;
+        }
+
+        // --- EXEMPEL: Hitta bas, mellanregister och diskant ---
+        // Bin 0 till 11 motsvarar ungefär 0 - 250 Hz (Bas)
+        // Bin 12 till 185 motsvarar ungefär 250 - 4000 Hz (Tal/Mellanregister)
+
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            // Här kan du skicka 'magnitudes'-arrayen direkt till en EQ-visualiserare eller mätare!
+            System.Diagnostics.Debug.WriteLine($"FFT klar! Sub-bas styrka (Bin 3, ~65Hz): {magnitudes[3]:F4}");
+        });
+
+    }
 
     protected override void OnSizeAllocated(double width, double height)
     {
@@ -56,11 +301,41 @@ public partial class MainPage : ContentPage
         //ScadaClasses.Refresh = true;      
     }
 
+    private async void StartRecording()
+    {
+        if (!_audioRecorder.IsRecording)
+        {
+            await _audioRecorder.StartAsync();
+
+            _audioStreamer = AudioManager.Current.CreateStreamer();
+            _audioStreamer.OnAudioCaptured += OnAudioStreamerCapturedData;
+            await _audioStreamer.StartAsync();
+
+        }
+        else
+        {
+            var recordedAudio = await _audioRecorder.StopAsync();
+            if (recordedAudio is FileAudioSource fileAudioSource)
+            {
+                string tempFilePath = fileAudioSource.GetFilePath();
+                string targetDirectory = @"c:\temp";
+                string destinationPath = Path.Combine(targetDirectory, "recorded_audio.wav");
+                File.Copy(tempFilePath, destinationPath, overwrite: true);
+            }
+            /*
+            var player = AudioManager.Current.CreatePlayer(recordedAudio.GetAudioStream());
+            player.Play();
+            */
+        }
+    }
+
+
+
+
+
     public MainPage()
     {
         InitializeComponent();
-
-
         //Local SQL
         //Preferences.Default.Set("ConnectionString", "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true");
 
@@ -145,7 +420,7 @@ public partial class MainPage : ContentPage
         uxtimer.Start();
 
         uxtimer.Enabled = true;
-        ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxLoginMenu;
+        ScadaGlobals.CurrentScadaPopup = -1;
 
     }
 
@@ -2609,11 +2884,7 @@ public partial class MainPage : ContentPage
                 //MyDataAccessLayer.UpdateTagDriver(tagId, edtInputText.Text);
                 break;
 
-
-
-
         }
-
     }
                   
 
@@ -4572,8 +4843,8 @@ public partial class MainPage : ContentPage
     {
         Window.MaximumWidth = 4000;
         Window.MaximumHeight = 2000;
-        Window.MinimumWidth = 1280;
-        Window.MinimumHeight = 600;
+       // Window.MinimumWidth = 1280;
+        //Window.MinimumHeight = 600;
         Window.IsMaximizable = true;
         
         double x = 0, y = 0, w = 0, h = 0;   
@@ -4640,33 +4911,10 @@ public partial class MainPage : ContentPage
             SKCanvasViews.Clear();
             //ContentViews.Clear();
 
-            if (Designing == true)
-            {
-                ScadaGrid grdSnap = new ScadaGrid();
-                grdSnap.ItemID = 0;
-                grdSnap.AnchorX = 0;
-                grdSnap.AnchorY = 0;
-                //grdSnap.CornerRadius = 0;
-                grdSnap.BarBackgroundColor = ScadaColor.uxPanelColor;
-                grdSnap.BackgroundColor = ScadaColor.uxPanelColor.ToMauiColor();
-                grdSnap.GridThinColor = ScadaColor.uxGridThinColor;
-                grdSnap.GridFatColor = ScadaColor.uxGridFatColor;
-                grdSnap.WidthRequest = Window.Width;
-                grdSnap.HeightRequest = Window.Height;
-                //grdSnap.AlternativeTextColor = ScadaColor.uxPanelColor;
-                //grdSnap.TextColor = ScadaColor.uxTextColor;
-                grdSnap.IsEnabled = true;
-                grdSnap.IsVisible = true; 
-                AbsoluteLayout.SetLayoutBounds(grdSnap, new Rect(0, 0, Window.Width, Window.Height));            
-                AbsoluteLayout.SetLayoutFlags(grdSnap, AbsoluteLayoutFlags.None);
-                //AbsoluteLayout.SetLayoutBounds(grdSnap, new Rect(0, 0, Width, Height));
-                //AbsoluteLayout.SetLayoutFlags(grdSnap, AbsoluteLayoutFlags.None);
-                SKCanvasViews.Add(grdSnap);
-            }
-
+       
             foreach (var ScadaItem in ScadaItems)
                 switch (ScadaItem.ItemType)
-                {
+                {    /*
                     case ScadaClasses.uxPanel:
                         ScadaPanel SKPanel = new ScadaPanel();
                         SKPanel.Init(wScale, hScale, SKPanel, ScadaItem, ScadaColor);                   
@@ -4682,7 +4930,7 @@ public partial class MainPage : ContentPage
                         AbsoluteLayout.SetLayoutFlags(SKPanel, AbsoluteLayoutFlags.None);
                         SKCanvasViews.Add(SKPanel);
                         break;
-
+                    */
                     case ScadaClasses.uxNumeric:
                         var SKNumeric = new ScadaNumeric();
                         SKNumeric.Init(wScale, hScale, SKNumeric, ScadaItem, ScadaColor);
@@ -4821,43 +5069,9 @@ public partial class MainPage : ContentPage
                         AbsoluteLayout.SetLayoutFlags(SKCircularGauge, AbsoluteLayoutFlags.None);
                         SKCanvasViews.Add(SKCircularGauge);
                         break;
-                    case ScadaClasses.uxDonutChart:
-                        var SKDonut = new DonutChart();
-                        SKDonut.Init(wScale, hScale, SKDonut, ScadaItem, ScadaColor);
-                        if (Designing == true)
-                        {
-                            SKDonut = (DonutChart)AttachDesignEvents(SKDonut, ScadaItem);
-                        }
-                        AbsoluteLayout.SetLayoutBounds(SKDonut, new Rect(wScale * ScadaItem.Left, hScale * ScadaItem.Top, wScale * ScadaItem.Width, hScale * ScadaItem.Height));
-                        AbsoluteLayout.SetLayoutFlags(SKDonut, AbsoluteLayoutFlags.None);
-                        SKCanvasViews.Add(SKDonut);
-                        break;
-
-                    case ScadaClasses.uxBarGraph:
-                        var SKBarGraph = new ScadaBarGraph();
-                        SKBarGraph.Init(wScale, hScale, SKBarGraph, ScadaItem, ScadaColor);
-                        if (Designing == true)
-                        {
-                            SKBarGraph = (ScadaBarGraph)AttachDesignEvents(SKBarGraph, ScadaItem);
-                        }
-                        SKBarGraph.Start();
-                        AbsoluteLayout.SetLayoutBounds(SKBarGraph, new Rect(wScale * ScadaItem.Left, hScale * ScadaItem.Top, wScale * ScadaItem.Width, hScale * ScadaItem.Height));
-                        AbsoluteLayout.SetLayoutFlags(SKBarGraph, AbsoluteLayoutFlags.None);
-                        SKCanvasViews.Add(SKBarGraph);
-                        break;
-
-                    case ScadaClasses.ux3D:
-                        var SK3D = new Scada3D();
-                        SK3D.Init(wScale, hScale, SK3D, ScadaItem, ScadaColor);             
-                        if (Designing == true)
-                        {
-                            SK3D = (Scada3D)AttachDesignEvents(SK3D, ScadaItem);
-                        }
-                        AbsoluteLayout.SetLayoutBounds(SK3D, new Rect(wScale * ScadaItem.Left, hScale * ScadaItem.Top, wScale * ScadaItem.Width, hScale * ScadaItem.Height));
-                        AbsoluteLayout.SetLayoutFlags(SK3D, AbsoluteLayoutFlags.None);                   
-                        SKCanvasViews.Add(SK3D);
-                        break;
-
+               
+                   
+                  
                     case ScadaClasses.uxAlarmGrid:
                         //ScadaAlarmGrid();
                         break;
@@ -4994,28 +5208,7 @@ public partial class MainPage : ContentPage
                         SKCanvasViews.Add(SKButton);
                      break;
 
-                    case ScadaClasses.uxRobot:
-                        var SKRobot = new ScadaRobot();
-                        SKRobot.Init(wScale, hScale, SKRobot, ScadaItem, ScadaColor);
-                        if (Designing == true)
-                        {
-                            SKRobot = (ScadaRobot)AttachDesignEvents(SKRobot, ScadaItem);
-                            SKRobot.EnableTouchEvents = true;
-                            SKRobot.InputTransparent = false;
-                            SKRobot.Stop();
-                        }
-                        else
-                        {
-                            SKRobot.EnableTouchEvents = false;
-                            SKRobot.InputTransparent = true;
-                            SKRobot.Start();
-                        }
-                        AbsoluteLayout.SetLayoutBounds(SKRobot, new Rect(wScale * ScadaItem.Left, hScale * ScadaItem.Top, wScale * ScadaItem.Width, hScale * ScadaItem.Height));
-                        AbsoluteLayout.SetLayoutFlags(SKRobot, AbsoluteLayoutFlags.None);
-                        SKCanvasViews.Add(SKRobot);
-                       
-                        break;
-
+                  
                     case ScadaClasses.uxHistoryChart:
                         var trh = new HistGraph();
                         trh.ItemID = ScadaItem.ItemID;
@@ -5517,137 +5710,9 @@ public partial class MainPage : ContentPage
                         SKCanvasViews.Add(pr);
                         break;
 
-                    case ScadaClasses.uxLine:
-                        var SKLine = new ScadaLine();
-                        SKLine.ItemID = ScadaItem.ItemID;
-                        SKLine.StyleId = ScadaItem.ItemID.ToString();
-                        SKLine.AnchorX = 0;
-                        SKLine.AnchorY = 0;
-                        SKLine.CornerRadius = 10;
-                        SKLine.BarBackgroundColor = ScadaColor.uxBackGroundColor;
-                        SKLine.BackgroundColor = ScadaColor.uxBackGroundColor.ToMauiColor();
-                        SKLine.GradientStartColor = ScadaColor.uxItemColor;
-                        SKLine.GradientEndColor = ScadaColor.uxItemColor;
-                        SKLine.WidthRequest = wScale * ScadaItem.Width;
-                        SKLine.HeightRequest = hScale * ScadaItem.Height;
-                        SKLine.AlternativeTextColor = ScadaColor.uxTextColor;
-                        SKLine.TextColor = ScadaColor.uxTextColor;
-                        SKLine.FontSize = 10;
-                        SKLine.IsEnabled = true;
-                        SKLine.IsVisible = true;            
-                        SKLine.EnableTouchEvents = true;
-                        SKLine.InputTransparent = false;
-                        if (Designing == true)
-                        {
-                            SKLine = (ScadaLine)AttachDesignEvents(SKLine, ScadaItem);
-                        }
-                        AbsoluteLayout.SetLayoutBounds(SKLine, new Rect(wScale * ScadaItem.Left, hScale * ScadaItem.Top, wScale * ScadaItem.Width, hScale * ScadaItem.Height));
-                        AbsoluteLayout.SetLayoutFlags(SKLine, AbsoluteLayoutFlags.None);
-                        SKCanvasViews.Add(SKLine);
-                        break;
-                    case ScadaClasses.uxSimulator:
-                        var sim = new Simulator();
-                        sim.ItemID = ScadaItem.ItemID;
-                        sim.StyleId = ScadaItem.ItemID.ToString();
-                        sim.AnchorX = 0;
-                        sim.AnchorY = 0;
-                        sim.CornerRadius = 10;
-                        sim.BarBackgroundColor = ScadaColor.uxBackGroundColor;
-                        sim.BackgroundColor = ScadaColor.uxBackGroundColor.ToMauiColor();
-                        sim.GradientStartColor = ScadaColor.uxItemColor;
-                        sim.GradientEndColor = ScadaColor.uxItemColor;
-                        sim.WidthRequest = (Width / 100) * ScadaItem.Width;
-                        sim.HeightRequest = (Height / 100) * ScadaItem.Height;
+                
 
-                        sim.IsEnabled = true;
-                        sim.IsVisible = true;
-                        sim.TextColor = ScadaColor.uxTextColor;
-                        sim.IsEnabled = true;
-                        sim.IsVisible = true;
-                        sim.EnableTouchEvents = true;
-                        sim.InputTransparent = false;
-                        sim.PV = new ItemValue();
-                        sim.Acutator = new ItemValue();
-                        var ItemValuesSim = MyDataAccessLayer.ReadItemValues(sim.ItemID);
-                        int simVal = 0;
-                        foreach (var item in ItemValuesSim)
-                        {
-                            if (simVal == 0)
-                            {
-                                sim.PV.TagID = item.TagID;
-                                sim.PV.Value = item.Value;
-                            }
-                            if (simVal == 1)
-                            {
-                                sim.Acutator.TagID = item.TagID;
-                                sim.Acutator.Value = item.Value;
-                            }
-                            simVal++;
-                        }
-                        sim.Start();
-                        if (Designing == true)
-                        {
-                            sim = (Simulator)AttachDesignEvents(sim, ScadaItem);
-                        }
-                        AbsoluteLayout.SetLayoutBounds(sim, new Rect(wScale * ScadaItem.Left, hScale * ScadaItem.Top, wScale * ScadaItem.Width, hScale * ScadaItem.Height));
-                        AbsoluteLayout.SetLayoutFlags(sim, AbsoluteLayoutFlags.None);
-                        SKCanvasViews.Add(sim);
-                        break;
-
-
-                    case ScadaClasses.uxController:
-                        var controller = new Controller();
-                        controller.ItemID = ScadaItem.ItemID;
-                        controller.StyleId = ScadaItem.ItemID.ToString();
-                        controller.AnchorX = 0;
-                        controller.AnchorY = 0;
-                        controller.CornerRadius = 10;
-                        controller.BarBackgroundColor = ScadaColor.uxBackGroundColor;
-                        controller.BackgroundColor = ScadaColor.uxBackGroundColor.ToMauiColor();
-                        controller.GradientStartColor = ScadaColor.uxItemColor;
-                        controller.GradientEndColor = ScadaColor.uxItemColor;
-                        controller.WidthRequest = (Width / 100) * ScadaItem.Width;
-                        controller.HeightRequest = (Height / 100) * ScadaItem.Height;
-
-                        controller.IsEnabled = true;
-                        controller.IsVisible = true;
-                        controller.TextColor = ScadaColor.uxTextColor;
-                        controller.EnableTouchEvents = true;
-                        controller.InputTransparent = false;
-                        controller.PV = new ItemValue();
-                        controller.SV = new ItemValue();
-                        controller.Output = new ItemValue();
-                        var ItemValuesController = MyDataAccessLayer.ReadItemValues(controller.ItemID);
-                        int contrVal = 0;
-                        foreach (var item in ItemValuesController)
-                        {
-                            if (contrVal == 0)
-                            {
-                                controller.PV.TagID = item.TagID;
-                                controller.PV.Value = item.Value;
-                            }
-                            if (contrVal == 1)
-                            {
-                                controller.SV.TagID = item.TagID;
-                                controller.SV.Value = item.Value;
-                            }
-                            if (contrVal == 2)
-                            {
-                                controller.Output.TagID = item.TagID;
-                                controller.Output.Value = item.Value;
-                            }
-                            contrVal++;
-                        }
-                        controller.Start();
-                        if (Designing == true)
-                        {
-                            controller = (Controller)AttachDesignEvents(controller, ScadaItem);
-                        }
-                        AbsoluteLayout.SetLayoutBounds(controller, new Rect(wScale * ScadaItem.Left, hScale * ScadaItem.Top, wScale * ScadaItem.Width, hScale * ScadaItem.Height));
-                        AbsoluteLayout.SetLayoutFlags(controller, AbsoluteLayoutFlags.None);
-                        SKCanvasViews.Add(controller);
-                        break;
-
+                  
                     case ScadaClasses.uxLoginMenu:
                         ScadaLogin(infoType);
                         break;
@@ -7072,19 +7137,8 @@ public partial class MainPage : ContentPage
                 switch (args.ActionType)
                 {
                     case SKTouchAction.Released:
-                        //ScadaClasses.Previouspage = -1;
-                        ScadaGlobals.CurrentScadaPopup = ScadaClasses.uxAlarmGrid;
-                        ScadaGlobals.PreviousScadaPopup = -1;
-                        //ScadaClasses.Refresh = true;
-                        /*
-                        SKCanvasPopupViews.Clear();
-                        ScadaAlarmGrid();
-                        foreach (SKCanvasView viewItem in SKCanvasPopupViews)
-                        {
-                            absoluteLayout.Add(viewItem);
-                        }
-                        Content = absoluteLayout;
-                        */
+                        StartRecording();
+
                         RefreshGui();
                         break;
 
@@ -7267,6 +7321,7 @@ public partial class MainPage : ContentPage
                 edtInputText.Completed += OnEditorCompleted;
                 absoluteLayout.Add(edtInputText);        
             }
+            
             Content = absoluteLayout;
             ScadaGlobals.Previouspage = ScadaGlobals.Currentpage;       
         }
@@ -7342,52 +7397,8 @@ public partial class MainPage : ContentPage
             }
             
             
-            if (uxItem is Controller)
-            {
-                var dItem = uxItem as Controller;
-                var ItemValues = MyDataAccessLayer.ReadItemValues(dItem.ItemID);
-                foreach (var item in ItemValues)
-                {
-                    if (item.TagID == dItem.PV.TagID)
-                    {
-                        dItem.PV.Value = item.Value;
-                    }
-                    if (item.TagID == dItem.SV.TagID)
-                    {
-                        dItem.SV.Value = item.Value;
-                    }
-                    if (item.TagID == dItem.Output.TagID)
-                    {
-                        dItem.Output.Value = item.Value;
-                    }
-                }
-                if (dItem.IsLoaded)
-                {
-                    dItem.InvalidateSurface();
-                }
-            }
             
 
-            if (uxItem is Simulator)
-            {
-                var dItem = uxItem as Simulator;
-                var ItemValues = MyDataAccessLayer.ReadItemValues(dItem.ItemID);
-                foreach (var item in ItemValues)
-                {
-                    if (item.TagID == dItem.PV.TagID)
-                    {
-                        dItem.PV.Value = item.Value;
-                    }
-                    if (item.TagID == dItem.Acutator.TagID)
-                    {
-                        dItem.Acutator.Value = item.Value;
-                    }
-                }
-                if (dItem.IsLoaded)
-                {
-                    dItem.InvalidateSurface();
-                }
-            }
            
             
             if (uxItem is ScadaNumeric)
@@ -7409,25 +7420,7 @@ public partial class MainPage : ContentPage
                   dItem.RefreshValues();
             }
 
-            if (uxItem is ScadaRobot)
-            {
-                var dItem = uxItem as ScadaRobot;
-                if (Designing == false)
-                {
-                    dItem.RefreshValues();
-                }
-                /*
-                foreach (var Item in ScadaItems)
-                {
-                    if (dItem.ItemID == Item.ItemID)
-                    {
-                        dItem.RefreshValues();
-                       // dItem.RefreshValues(Item.ItemValues);
-                    }
-                }
-                */
-            }
-
+       
 
 
             if (uxItem is CircularProgress)
@@ -7541,39 +7534,6 @@ public partial class MainPage : ContentPage
             */
 
             
-            if (uxItem is ScadaRobot)
-            {
-                var dItem = uxItem as ScadaRobot;
-                var ItemValues = MyDataAccessLayer.ReadItemValues(dItem.ItemID);
-
-                if (Designing == false)
-                {
-                    foreach (var item in ItemValues)
-                    {
-                        if (item.TagID == dItem.Gripper.TagID)
-                        {
-                            dItem.Gripper.Value = item.Value;
-                        }
-                        if (item.TagID == dItem.LowerArm.TagID)
-                        {
-                            dItem.LowerArm.Value = item.Value;
-                        }
-                        if (item.TagID == dItem.UpperArm.TagID)
-                        {
-                            dItem.UpperArm.Value = item.Value;
-                        }
-                        if (item.TagID == dItem.XTraverse.TagID)
-                        {
-                            dItem.XTraverse.Value = item.Value;
-                        }
-                        if (item.TagID == dItem.YTraverse.TagID)
-                        {
-                            dItem.YTraverse.Value = item.Value;
-                        }
-                    }
-                    dItem.InvalidateSurface();
-                }
-            }
             
 
 

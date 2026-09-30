@@ -420,11 +420,13 @@ end;
 
         protected override void OnPaintSurface(SKPaintSurfaceEventArgs e)
         {
+            base.OnPaintSurface(e);
+
             var info = e.Info;
             var canvas = e.Surface.Canvas;
             bool FirstCurve = true;
-            float w = e.Info.Width;
-            float h = e.Info.Height;
+            float w = info.Width;
+            float h = info.Height;
             float MaxScale = 100;
             float ScaleFactor = 100 / MaxScale;
 

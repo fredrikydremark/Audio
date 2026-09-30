@@ -553,6 +553,10 @@ namespace Scada
             }
         }
 
+        /// <summary>
+        /// Handles the paint surface event for the SKCanvasView.
+        /// </summary>
+        /// <param name="e">The paint surface event arguments.</param>  
         protected override void OnPaintSurface(SKPaintSurfaceEventArgs e)
         {
             const int cIndicator_0 = 0;
@@ -568,6 +572,7 @@ namespace Scada
             const int cIndicator_10 = 10;
             const int cIndicator_11 = 11;
 
+            base.OnPaintSurface(e);
             var info = e.Info;
             var canvas = e.Surface.Canvas;
             float w = info.Width;

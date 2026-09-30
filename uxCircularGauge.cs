@@ -255,6 +255,7 @@ namespace Scada
 
         protected override void OnPaintSurface(SKPaintSurfaceEventArgs e)
         {
+            base.OnPaintSurface(e);
             var info = e.Info;
             var canvas = e.Surface.Canvas;
             float MaxValue = 100;

@@ -385,6 +385,8 @@ namespace Scada
 
         protected override void OnPaintSurface(SKPaintSurfaceEventArgs e)
         {
+            base.OnPaintSurface(e);
+
             var info = e.Info;
             var canvas = e.Surface.Canvas;          
             float MaxValue = 100;
@@ -410,7 +412,7 @@ namespace Scada
             }
 
             float radius = (info.Height / 2);
-            float frame = radius / 4;
+            float frame = radius / 3;
             float diam = radius * 2.0F;
             var center = new SKPoint(info.Rect.MidX, info.Rect.MidY);
             var degrees = ( PV.Value / 100 ) * 360;

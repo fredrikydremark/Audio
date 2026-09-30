@@ -337,9 +337,6 @@ public partial class MainPage : ContentPage
     public MainPage()
     {
         InitializeComponent();
-    public MainPage()
-    {
-        InitializeComponent();
         //Local SQL
         //Preferences.Default.Set("ConnectionString", "Data Source=PC-5CG5125C24; Initial Catalog=SCADA; Integrated Security=true; TrustServerCertificate=true");
 
@@ -7274,6 +7271,7 @@ public partial class MainPage : ContentPage
                 absoluteLayout.Add(edtSvgEditor);
             }
             */
+
             /*
             if ((ScadaGlobals.CurrentScadaPopup == ScadaClasses.uxEditTagText) ||
                 (ScadaGlobals.CurrentScadaPopup == ScadaClasses.uxEditParameterText))
@@ -7292,6 +7290,7 @@ public partial class MainPage : ContentPage
                 edtInputText.Completed += OnEditorCompleted;
                 absoluteLayout.Add(edtInputText);        
             }
+            */
             Content = absoluteLayout;
             ScadaGlobals.Previouspage = ScadaGlobals.Currentpage;       
             

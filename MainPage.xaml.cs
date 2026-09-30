@@ -316,6 +316,7 @@ public partial class MainPage : ContentPage
         else
         {
             var recordedAudio = await _audioRecorder.StopAsync();
+            await _audioStreamer.StopAsync();
             if (recordedAudio is FileAudioSource fileAudioSource)
             {
                 string tempFilePath = fileAudioSource.GetFilePath();

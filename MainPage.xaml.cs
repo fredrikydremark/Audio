@@ -71,7 +71,7 @@ public partial class MainPage : ContentPage
 
         foreach (var device in devices)
         {
-            //Console.WriteLine($"Device Name: {device.Name}, Id: {device.Id}");
+             //Console.WriteLine($"Device Name: {device.Name}, Id: {device.Id}");
         }
 
         var stereoMixDevice = devices.FirstOrDefault(d =>

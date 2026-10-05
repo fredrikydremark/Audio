@@ -3,7 +3,6 @@ using SkiaSharp;
 using SkiaSharp.Views.Maui;
 using SkiaSharp.Views.Maui.Controls;
 using System.Globalization;
-using System.Reflection.Metadata;
 using System.Text.RegularExpressions;
 using System.Numerics;
 using Plugin.Maui.Audio;
@@ -164,7 +163,7 @@ public partial class MainPage : ContentPage
         double sumRight = 0;
         int totalSamplesPerChannel = 0;
 
-#if ANDROID || WINDOWS
+        #if ANDROID || WINDOWS
         // 16-bit PCM = 2 bytes per sample. 2 kanaler = 4 bytes per block.
         int bytesPerSample = 2;
         int channels = 2;
@@ -186,7 +185,7 @@ public partial class MainPage : ContentPage
                 sumRight += rightNormalized * rightNormalized;
             }
         }
-#elif IOS || MACCATALYST
+        #elif IOS || MACCATALYST
             // 32-bit Float = 4 bytes per sample. 2 kanaler = 8 bytes per block.
             int bytesPerSample = 4;
             int channels = 2;
@@ -205,7 +204,7 @@ public partial class MainPage : ContentPage
                     sumRight += rightSample * rightSample;
                 }
             }
-#endif
+        #endif
 
         if (totalSamplesPerChannel == 0) return;
 
@@ -223,16 +222,29 @@ public partial class MainPage : ContentPage
         // Skicka resultatet till gränssnittet trådsäkert
         MainThread.BeginInvokeOnMainThread(() =>
         {
+            
+            foreach (SKCanvasView uxItem in SKCanvasViews)
+            {
+                if (uxItem is ScadaProgress)
+                {
+                    var dItem = uxItem as ScadaProgress;
+                    dItem.PV.Value = (float)db + 60;
+                   
+                    dItem.InvalidateSurface();
+                    dItem = null;
+                }
+            }
+            
             // rmsTotal ger ett stabilt värde mellan 0.0 (tystnad) och 1.0 (max)
             // db ger ett värde mellan -60 dB (tystnad) och 0 dB (maxvolym)
-            System.Diagnostics.Debug.WriteLine($"[Stereo] Vänster: {rmsLeft:P0} | Höger: {rmsRight:P0} | Totalt: {db:F1} dB");
+            // System.Diagnostics.Debug.WriteLine($"[Stereo] Vänster: {rmsLeft:P0} | Höger: {rmsRight:P0} | Totalt: {db:F1} dB");
         });
 
 
 
-        const int FftSize = 2048;
+        const int FftSize = 32;
 
-#if ANDROID || WINDOWS
+    #if ANDROID || WINDOWS
         int bytesPerBlock = 4; // 2 bytes * 2 kanaler
         if (audioData.Length < FftSize * bytesPerBlock) return;
 
@@ -248,7 +260,7 @@ public partial class MainPage : ContentPage
             // FFT tar emot komplexa tal (Reell del = ljudamplitud, Imaginär del = 0)
             fftBuffer[i] = new Complex(normalizedSample, 0);
         }
-#elif IOS || MACCATALYST
+    #elif IOS || MACCATALYST
             int bytesPerBlock = 8; // 4 bytes (float) * 2 kanaler
             if (audioData.Length < FftSize * bytesPerBlock) return;
 
@@ -260,7 +272,7 @@ public partial class MainPage : ContentPage
                 float leftSample = BitConverter.ToSingle(audioData, byteIndex);
                 fftBuffer[i] = new Complex(leftSample, 0);
             }
-#endif
+    #endif
 
 
         // --- KÖR FFT ---
@@ -283,14 +295,27 @@ public partial class MainPage : ContentPage
         // --- EXEMPEL: Hitta bas, mellanregister och diskant ---
         // Bin 0 till 11 motsvarar ungefär 0 - 250 Hz (Bas)
         // Bin 12 till 185 motsvarar ungefär 250 - 4000 Hz (Tal/Mellanregister)
-
+        /*
         MainThread.BeginInvokeOnMainThread(() =>
         {
-            // Här kan du skicka 'magnitudes'-arrayen direkt till en EQ-visualiserare eller mätare!
-            System.Diagnostics.Debug.WriteLine($"FFT klar! Sub-bas styrka (Bin 3, ~65Hz): {magnitudes[3]:F4}");
-        });
+            foreach (SKCanvasView uxItem in SKCanvasViews)
+            {
+                if (uxItem is ScadaProgress)
+                {
+                    var dItem = uxItem as ScadaProgress;
+                    float mag = (float) magnitudes[0];
+                    dItem.PV.Value = mag * 6.0F;
 
+                    dItem.InvalidateSurface();
+                    dItem = null;
+                }
+            }
+
+            
+        });
+       */
     }
+
 
     protected override void OnSizeAllocated(double width, double height)
     {
@@ -317,6 +342,7 @@ public partial class MainPage : ContentPage
         {
             var recordedAudio = await _audioRecorder.StopAsync();
             await _audioStreamer.StopAsync();
+           
             if (recordedAudio is FileAudioSource fileAudioSource)
             {
                 string tempFilePath = fileAudioSource.GetFilePath();
@@ -324,6 +350,7 @@ public partial class MainPage : ContentPage
                 string destinationPath = Path.Combine(targetDirectory, "recorded_audio.wav");
                 File.Copy(tempFilePath, destinationPath, overwrite: true);
             }
+            
             /*
             var player = AudioManager.Current.CreatePlayer(recordedAudio.GetAudioStream());
             player.Play();
@@ -530,7 +557,6 @@ public partial class MainPage : ContentPage
     {
         try
         {
-
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 if (!Moving)
@@ -5670,7 +5696,7 @@ public partial class MainPage : ContentPage
                         {
                             pr = (ScadaProgress)AttachDesignEvents(pr, ScadaItem);
                         }
-                        pr.Start();
+                        //pr.Start();
                         AbsoluteLayout.SetLayoutBounds(pr, new Rect(wScale * ScadaItem.Left, hScale * ScadaItem.Top, wScale * ScadaItem.Width, hScale * ScadaItem.Height));
                         AbsoluteLayout.SetLayoutFlags(pr, AbsoluteLayoutFlags.None);
                         SKCanvasViews.Add(pr);
@@ -6562,214 +6588,9 @@ public partial class MainPage : ContentPage
                         CreateCloseButton(x, y, w, h, ScadaClasses.uxTagSettings);
                         break;
 
-                    case ScadaClasses.uxEditParameterText:
-                      //  ScadaEditParameterText();
-                        /*
-                        x = (Width / 100) * ScadaItem.Left;
-                        y = (Height / 100) * ScadaItem.Top;
-                        w = (Width / 100) * ScadaItem.Width;
-                        h = (Height / 100) * ScadaItem.Height;
-                        var EditParamPanel = new ScadaButton();
-                        EditParamPanel.ItemID = ScadaItem.ItemID;
-                        EditParamPanel.StyleId = ScadaItem.ItemID.ToString();
-                        EditParamPanel.AnchorX = 0;
-                        EditParamPanel.AnchorY = 0;
-                        EditParamPanel.CornerRadius = 10;
-                        EditParamPanel.BarBackgroundColor = ScadaColor.uxPanelColor;
-                        EditParamPanel.BackgroundColor = ScadaColor.uxPanelColor.ToMauiColor();
-                        EditParamPanel.GradientStartColor = ScadaColor.uxItemBackGroundColor;
-                        EditParamPanel.GradientEndColor = ScadaColor.uxItemBackGroundColor;
-                        EditParamPanel.IndicatorColor = ScadaColor.uxPanelColor;
-                        EditParamPanel.WidthRequest = w;
-                        EditParamPanel.HeightRequest = h;
-                        EditParamPanel.AlternativeTextColor = ScadaColor.uxTextColor;
-                        EditParamPanel.TextColor = ScadaColor.uxTextColor;
-                        EditParamPanel.IsEnabled = true;
-                        EditParamPanel.IsVisible = true;
-                        EditParamPanel.IndicatorType = 0;
+                    
+                   
 
-                        var btnApplyParamText = new ScadaButton();
-                        btnApplyParamText.CornerRadius = 10;
-                        btnApplyParamText.IndicatorType = 1;
-                        btnApplyParamText.BarBackgroundColor = ScadaColor.uxPanelColor;
-                        btnApplyParamText.BackgroundColor = ScadaColor.uxPanelColor.ToMauiColor();
-                        btnApplyParamText.GradientStartColor = ScadaColor.uxPopupItemColor;
-                        btnApplyParamText.GradientEndColor = ScadaColor.uxPopupItemColor;
-                        btnApplyParamText.IndicatorColor = ScadaColor.uxItemColor;
-                        btnApplyParamText.TextColor = ScadaColor.uxTextColor;
-                        btnApplyParamText.ButtonText = "Apply";
-                        btnApplyParamText.WidthRequest = 70;
-                        btnApplyParamText.HeightRequest = 40;
-                        btnApplyParamText.FontSize = 18;
-                        btnApplyParamText.IsEnabled = true;
-                        btnApplyParamText.IsVisible = true;
-                        btnApplyParamText.EnableTouchEvents = true;
-                        btnApplyParamText.InputTransparent = false;
-                        btnApplyParamText.Touch += (sender, args) =>
-                        {
-                            var pt = args.Location;
-                            switch (args.ActionType)
-                            {
-                                case SKTouchAction.Released:
-                                    switch (ScadaGlobals.CurrentType)
-                                    {
-                                        case ScadaClasses.pmComputer:
-                                              Preferences.Default.Set("ConnectionString", edtInputText.Text);
-                                            break;
-                                        case ScadaClasses.pmParameter:
-                                              MyDataAccessLayer.UpdateParameterValue(ScadaGlobals.CurrentID, edtInputText.Text);
-                                            break;
-                                        case ScadaClasses.pmPages:
-                                              MyDataAccessLayer.UpdatePageName(ScadaGlobals.CurrentID, edtInputText.Text);
-                                            ScadaGlobals.Currentpage = MyDataAccessLayer.GetPageNoByName(edtInputText.Text);
-                                            break;
-                                    }                            
-                                    //ScadaClasses.Previouspage = -1;
-                                    //ScadaClasses.CurrentScadaPopup = ScadaClasses.PreviousScadaPopup;
-                                    //ScadaClasses.Refresh = true;
-                                    break;
-
-                                case SKTouchAction.Pressed:
-                                    break;
-
-                                case SKTouchAction.Moved:
-                                    btnApplyParamText.GradientStartColor = ScadaColor.uxHoverColor;
-                                    btnApplyParamText.GradientEndColor = ScadaColor.uxHoverColor;
-                                    break;
-
-                                case SKTouchAction.Exited:
-                                    btnApplyParamText.GradientStartColor = ScadaColor.uxPopupItemColor;
-                                    btnApplyParamText.GradientEndColor = ScadaColor.uxPopupItemColor;
-                                    break;
-                            }
-                            args.Handled = true;
-                        };
-
-                        AbsoluteLayout.SetLayoutBounds(btnApplyParamText, new Rect(x + EditParamPanel.WidthRequest - (EditParamPanel.WidthRequest / 2) - (btnApplyParamText.WidthRequest / 2), y + EditParamPanel.HeightRequest - btnApplyParamText.HeightRequest * 1.5F, btnApplyParamText.WidthRequest, btnApplyParamText.HeightRequest));
-                        AbsoluteLayout.SetLayoutFlags(btnApplyParamText, AbsoluteLayoutFlags.None);
-                        AbsoluteLayout.SetLayoutBounds(EditParamPanel, new Rect((Width / 100) * ScadaItem.Left, (Height / 100) * ScadaItem.Top, (Width / 100) * ScadaItem.Width, (Height / 100) * ScadaItem.Height));
-                        AbsoluteLayout.SetLayoutFlags(EditParamPanel, AbsoluteLayoutFlags.None);
-
-                        SKCanvasPopupViews.Add(EditParamPanel);
-                        SKCanvasPopupViews.Add(btnApplyParamText);
-                        CreateCloseButton(x, y, w, h, ScadaGlobals.PreviousScadaPopup);
-                        break;
-                        */
-
-                        break;
-                    case ScadaClasses.uxTagsMenu:
-                      //  ScadaTagsMenu();
-
-                      
-                        break;
-
-                    case ScadaClasses.uxTimeSpanMenu:
-                        //ScadaTimeSpanMenu();
-
-                        /*
-                        var TimeSpanPanel = new ScadaButton();
-                        TimeSpanPanel.ItemID = ScadaItem.ItemID;
-                        TimeSpanPanel.StyleId = ScadaItem.ItemID.ToString();
-                        TimeSpanPanel.AnchorX = 0;
-                        TimeSpanPanel.AnchorY = 0;
-                        TimeSpanPanel.CornerRadius = 10;
-                        TimeSpanPanel.BarBackgroundColor = ScadaColor.uxBackGroundColor;
-                        TimeSpanPanel.BackgroundColor = ScadaColor.uxBackGroundColor.ToMauiColor();
-                        TimeSpanPanel.GradientStartColor = ScadaColor.uxItemColor;
-                        TimeSpanPanel.GradientEndColor = ScadaColor.uxItemColor;
-                        TimeSpanPanel.IndicatorColor = ScadaColor.uxBackGroundColor;
-                        TimeSpanPanel.WidthRequest = (Width / 100) * ScadaItem.Width;
-                        TimeSpanPanel.HeightRequest = (Height / 100) * ScadaItem.Height;
-                        TimeSpanPanel.AlternativeTextColor = ScadaColor.uxTextColor;
-                        TimeSpanPanel.TextColor = ScadaColor.uxTextColor;
-                        TimeSpanPanel.IsEnabled = true;
-                        TimeSpanPanel.IsVisible = true;
-                        TimeSpanPanel.IndicatorType = 10;
-                        AbsoluteLayout.SetLayoutBounds(TimeSpanPanel, new Rect(
-                            (Width / 100) * ScadaItem.Left,
-                            (Height / 100) * ScadaItem.Top,
-                            (Width / 100) * ScadaItem.Width,
-                            (Height / 100) * ScadaItem.Height));
-                        AbsoluteLayout.SetLayoutFlags(TimeSpanPanel, AbsoluteLayoutFlags.None);
-                        SKCanvasViews.Add(TimeSpanPanel);
-
-                        x = (Width / 100) * ScadaItem.Left;
-                        y = (Height / 100) * ScadaItem.Top;
-
-                        y = y + TimeSpanPanel.CornerRadius + 50;
-                        ScadaItem.gridRows = MyDataAccessLayer.ReadTimeSpans();
-                        foreach (gridRow row in ScadaItem.gridRows)
-                        {
-                            var myButton = new ScadaButton
-                            {
-                                WidthRequest = (Width / 100) * ScadaItem.Width,
-                                HeightRequest = 25,
-                                Background = ScadaColor.uxBackGroundColor.ToMauiColor(),
-                                BarBackgroundColor = ScadaColor.uxBackGroundColor,
-                                IndicatorType = 3,
-                                IndicatorColor = GetStatusColor(row.Status),
-                                GradientStartColor = ScadaColor.uxLightColor,
-                                GradientEndColor = ScadaColor.uxLightColor,
-                                CornerRadius = 0,
-                                TextColor = ScadaColor.uxTextColor,
-                                FontSize = 16.5F,
-                                SvgBase64 = MyDataAccessLayer.LoadLibItem("InputSource", 1)
-                            };
-                            myButton.ButtonRow = row;
-                            myButton.ButtonText = row.col1text;
-                            myButton.EnableTouchEvents = true;
-                            myButton.InputTransparent = false;
-                            myButton.Touch += (sender, args) =>
-                            {
-                                var pt = args.Location;
-                                switch (args.ActionType)
-                                {
-                                    case SKTouchAction.Released:
-                                        ScadaClasses.Telegram oTelegram = new ScadaClasses.Telegram()
-                                        {
-                                            MessageType = ScadaItem.MessageType,
-                                            Page = ScadaItem.Nextpage,
-                                            ItemType = ScadaItem.ItemType,
-                                            ItemID = ScadaItem.ItemID,
-                                            TagID = row.TagID,
-
-                                            TagName = ScadaItem.TagName,
-                                            Action = ScadaItem.Action,
-                                        };
-                                        var myChartSettings = MyDataAccessLayer.GetChartSettings(ScadaItem.ItemID);
-                                        myChartSettings.iSpan = row.Id;
-                                        MyDataAccessLayer.SetChartSettings(myChartSettings, ScadaItem.ItemID);
-
-                                        ScadaClasses.CurrentScadaPopup = -1;
-                                        ScadaClasses.Previouspage = -1;
-                                        ScadaClasses.Refresh = true;
-                                        break;
-
-                                    case SKTouchAction.Moved:
-                                        myButton.GradientStartColor = ScadaColor.uxHoverColor;
-                                        myButton.GradientEndColor = ScadaColor.uxHoverColor;
-                                        myButton.IndicatorColor = GetStatusColor(row.Status);
-                                        break;
-
-                                    case SKTouchAction.Exited:
-                                        myButton.GradientStartColor = ScadaColor.uxLightColor;
-                                        myButton.GradientEndColor = ScadaColor.uxLightColor;
-                                        myButton.IndicatorColor = GetStatusColor(row.Status);
-                                        break;
-                                }
-                                args.Handled = true;
-                            };
-
-                            AbsoluteLayout.SetLayoutBounds(myButton, new Rect(x, y, TimeSpanPanel.WidthRequest, 20));
-                            AbsoluteLayout.SetLayoutFlags(myButton, AbsoluteLayoutFlags.None);
-                            // if (yStart < ((Height / 100) * double.Parse(ScadaItem.Top, CultureInfo.InvariantCulture)) + (Height / 100) * double.Parse(ScadaItem.Height, CultureInfo.InvariantCulture) - 26)
-                            {
-                                SKCanvasViews.Add(myButton);
-                                y = y + 26;
-                            }
-                        }
-                        */
-                        break;
 
                     case ScadaClasses.uxItemTypeMenu:
                         //ScadaItemTypesMenu();

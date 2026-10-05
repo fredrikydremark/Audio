@@ -192,7 +192,7 @@ namespace Scada
             c.DrawRoundRect(RoundRect, Paint);
             return c;
         }
-
+        /*
         public void Start()
         {
             UpdateValue();
@@ -218,7 +218,7 @@ namespace Scada
                 }
             }
         }
-
+        */
       
         protected override void OnPaintSurface(SKPaintSurfaceEventArgs e)
         {
@@ -276,8 +276,6 @@ namespace Scada
                 canvas.DrawRoundRect(progressBar, Barpaint);
 
             }
-
-
 
 
         }

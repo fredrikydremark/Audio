@@ -1,5 +1,5 @@
 <Solution>
-  <Project Path="Scada.csproj">
+  <Project Path="Audio.csproj">
     <BuildType Project="Debug" />
     <Deploy />
   </Project>

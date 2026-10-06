@@ -317,16 +317,6 @@ public partial class MainPage : ContentPage
     }
 
 
-    protected override void OnSizeAllocated(double width, double height)
-    {
-        base.OnSizeAllocated(width, height); 
-        Window.MinimumWidth = 1100;
-        Window.MinimumHeight = 600;
-
-        ScadaGlobals.Previouspage = -1;
-        RefreshGui();      
-    }
-
     private async void StartRecording()
     {
         if (!_audioRecorder.IsRecording)

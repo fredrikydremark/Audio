@@ -380,6 +380,11 @@ namespace Scada
             public int TimeSpan { get; set; }
         }
 
+        public class SpectrumValue
+        {          
+            public float Amplitude { get; set; }         
+        }
+
         public class SystemColors
         {
             public SKColor uxBackGroundColor = new SKColor();

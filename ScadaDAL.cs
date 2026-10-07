@@ -3465,8 +3465,6 @@ namespace Scada
             }
         }
 
-
-
         public List<ScadaClasses.Telegram> getItems(int Page)
         {
             try
@@ -3476,10 +3474,8 @@ namespace Scada
                     ConnectionString = sConnection
                 };
 
-                string sqlGetData = "SELECT itemID,itemtype,posLeft,posTop,posWidth,posHeight,Value,HL,LL,page," +
-                                    "nextpage,unit,Action,text,items.tagID,tags.tagName,tags.Color,radius,tags.StatusQuality " +
+                string sqlGetData = "SELECT itemID,itemtype,posLeft,posTop,posWidth,posHeight,page,nextpage,Action " +
                                     "FROM Items " +
-                                    "LEFT JOIN Tags on tags.tagID = Items.tagID " +
                                     "WHERE ( Page = @Page ) " +
                                     "ORDER BY itemtype asc";
                 Connection.Open();
@@ -3502,7 +3498,7 @@ namespace Scada
                     oTempTele.Width = reader.GetDouble(4);
                     oTempTele.Height = reader.GetDouble(5);
                     oTempTele.ItemValues = ReadItemValues(oTempTele.ItemID);
-
+                    /*
                     if (reader.IsDBNull(7) == false)
                     {
                         oTempTele.HL = reader.GetDouble(7).ToString("0.0").Replace(",", ".");
@@ -3520,11 +3516,12 @@ namespace Scada
                     {
                         oTempTele.LL = "--.-";
                     }
-
+                    */
                     oTempTele.SV = "0.0";
-                    oTempTele.Page = reader.GetInt32(9);
-                    oTempTele.Nextpage = reader.GetInt32(10);
-
+                    oTempTele.Page = reader.GetInt32(6);
+                    oTempTele.Nextpage = reader.GetInt32(7);
+                    oTempTele.Unit = "";
+                    /*
                     if (reader.IsDBNull(11) == false)
                     {
                         oTempTele.Unit = reader.GetString(11);
@@ -3533,8 +3530,9 @@ namespace Scada
                     {
                         oTempTele.Unit = "";
                     }
-
-                    oTempTele.Action = reader.GetString(12);
+                    */
+                    oTempTele.Action = reader.GetString(8);
+                    /*
                     oTempTele.Text = reader.GetString(13);
                     oTempTele.TagID = reader.GetInt32(14);
 
@@ -3555,15 +3553,16 @@ namespace Scada
                     {
                         oTempTele.Color = "rgba(255,255,255,253)";
                     }
-
+                    */
                     oTempTele.Hoover = 0;
                     oTempTele.Fade = 0;
-                    oTempTele.Radius = 1;
-
+                    oTempTele.Radius = 10;
+                    /*
                     if (reader.IsDBNull(17) == false)
                     {
                         oTempTele.Radius = reader.GetDouble(17);
                     }
+                    */
                     if (oTempTele.ItemType == ScadaClasses.uxAlarmGrid)
                     {
                         oTempTele.gridRows = ReadAlarmMessages("All");
@@ -3574,7 +3573,7 @@ namespace Scada
                     }
                     if (oTempTele.ItemType == ScadaClasses.uxParameters)
                     {
-                       // oTempTele.gridRows = ReadParameters("",1,5);
+                        // oTempTele.gridRows = ReadParameters("",1,5);
                     }
 
                     if (oTempTele.ItemType == ScadaClasses.uxHistoryChart)
@@ -3632,6 +3631,7 @@ namespace Scada
             {
             }
         }
+
 
 
         public int DeleteAllTagsFromUxItem(int ItemID)

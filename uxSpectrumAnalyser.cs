@@ -5,10 +5,13 @@ using SkiaSharp.Views.Maui.Controls;
 
 namespace Scada
 {
-    public class ScadaProgress : SKCanvasView
+    public class uxSpectrumAnalyser : SKCanvasView
     {
+        public List<ScadaClasses.SpectrumValue> AudioSpectrum = new List<ScadaClasses.SpectrumValue>() { };
+
+
         public static BindableProperty ItemIDProperty = BindableProperty.Create(nameof(ItemID), typeof(int),
-        typeof(ScadaProgress), 0, BindingMode.OneWay,
+        typeof(uxSpectrumAnalyser), 0, BindingMode.OneWay,
             validateValue: (_, value) => value != null,
         propertyChanged: OnPropertyChangedInvalidate);
 
@@ -19,7 +22,7 @@ namespace Scada
         }
 
         public static BindableProperty PVProperty = BindableProperty.Create(nameof(PV), typeof(ItemValue),
-              typeof(ScadaProgress), null, BindingMode.OneWay,
+              typeof(uxSpectrumAnalyser), null, BindingMode.OneWay,
               validateValue: (_, value) => value != null,
               propertyChanged: OnPropertyChangedInvalidate);
 
@@ -30,7 +33,7 @@ namespace Scada
         }
 
         public static BindableProperty SVProperty = BindableProperty.Create(nameof(SV), typeof(ItemValue),
-           typeof(ScadaProgress), null, BindingMode.OneWay,
+           typeof(uxSpectrumAnalyser), null, BindingMode.OneWay,
            validateValue: (_, value) => value != null,
            propertyChanged: OnPropertyChangedInvalidate);
 
@@ -41,7 +44,7 @@ namespace Scada
         }
 
         public static BindableProperty ButtonRowProperty = BindableProperty.Create(nameof(ButtonRow), typeof(gridRow),
-            typeof(ScadaProgress), null, BindingMode.OneWay,
+            typeof(uxSpectrumAnalyser), null, BindingMode.OneWay,
             validateValue: (_, value) => value != null,
             propertyChanged: OnPropertyChangedInvalidate);
 
@@ -52,7 +55,7 @@ namespace Scada
         }
 
         public static BindableProperty ButtonTextProperty = BindableProperty.Create(nameof(ButtonText), typeof(string),
-        typeof(ScadaProgress), "", BindingMode.OneWay,
+        typeof(uxSpectrumAnalyser), "", BindingMode.OneWay,
         validateValue: (_, value) => value != null,
         propertyChanged: OnPropertyChangedInvalidate);
 
@@ -63,7 +66,7 @@ namespace Scada
         }
 
         public static BindableProperty CornerRadiusProperty = BindableProperty.Create(nameof(CornerRadius), typeof(float),
-            typeof(ScadaProgress), 5f, BindingMode.OneWay,
+            typeof(uxSpectrumAnalyser), 5f, BindingMode.OneWay,
             validateValue: (_, value) => value != null && (float)value >= 0,
             propertyChanged: OnPropertyChangedInvalidate);
 
@@ -74,7 +77,7 @@ namespace Scada
         }
 
         public static BindableProperty BarBackgroundColorProperty = BindableProperty.Create(nameof(BarBackgroundColor), typeof(SKColor),
-            typeof(ScadaProgress), SKColors.White, BindingMode.OneWay,
+            typeof(uxSpectrumAnalyser), SKColors.White, BindingMode.OneWay,
             validateValue: (_, value) => value != null, propertyChanged: OnPropertyChangedInvalidate);
 
         public SKColor BarBackgroundColor
@@ -84,7 +87,7 @@ namespace Scada
         }
 
         public static BindableProperty FontSizeProperty = BindableProperty.Create(nameof(FontSize), typeof(float),
-            typeof(ScadaProgress), 12f, BindingMode.OneWay,
+            typeof(uxSpectrumAnalyser), 12f, BindingMode.OneWay,
             validateValue: (_, value) => value != null && (float)value >= 0,
             propertyChanged: OnPropertyChangedInvalidate);
 
@@ -95,7 +98,7 @@ namespace Scada
         }
 
         public static BindableProperty MarginSizeProperty = BindableProperty.Create(nameof(Padding), typeof(float),
-           typeof(ScadaProgress), 0f, BindingMode.OneWay,
+           typeof(uxSpectrumAnalyser), 0f, BindingMode.OneWay,
            validateValue: (_, value) => value != null && (float)value >= 0,
            propertyChanged: OnPropertyChangedInvalidate);
 
@@ -106,7 +109,7 @@ namespace Scada
         }
 
         public static BindableProperty GradientStartColorProperty = BindableProperty.Create(nameof(GradientStartColor), typeof(SKColor),
-            typeof(ScadaProgress), SKColors.Purple, BindingMode.OneWay,
+            typeof(uxSpectrumAnalyser), SKColors.Purple, BindingMode.OneWay,
             validateValue: (_, value) => value != null, propertyChanged: OnPropertyChangedInvalidate);
 
         public SKColor GradientStartColor
@@ -116,7 +119,7 @@ namespace Scada
         }
 
         public static BindableProperty GradientEndColorProperty = BindableProperty.Create(nameof(GradientEndColor), typeof(SKColor),
-            typeof(ScadaProgress), SKColors.Blue, BindingMode.OneWay,
+            typeof(uxSpectrumAnalyser), SKColors.Blue, BindingMode.OneWay,
             validateValue: (_, value) => value != null, propertyChanged: OnPropertyChangedInvalidate);
 
         public SKColor GradientEndColor
@@ -126,7 +129,7 @@ namespace Scada
         }
 
         public static BindableProperty IndicatorTypeProperty = BindableProperty.Create(nameof(IndicatorType), typeof(int),
-        typeof(ScadaProgress), 1, BindingMode.OneWay,
+        typeof(uxSpectrumAnalyser), 1, BindingMode.OneWay,
          validateValue: (_, value) => value != null, propertyChanged: OnPropertyChangedInvalidate);
 
         public int IndicatorType
@@ -136,7 +139,7 @@ namespace Scada
         }
 
         public static BindableProperty IndicatorColorProperty = BindableProperty.Create(nameof(IndicatorColor), typeof(SKColor),
-        typeof(ScadaProgress), SKColors.Black, BindingMode.OneWay,
+        typeof(uxSpectrumAnalyser), SKColors.Black, BindingMode.OneWay,
             validateValue: (_, value) => value != null, propertyChanged: OnPropertyChangedInvalidate);
 
         public SKColor IndicatorColor
@@ -146,7 +149,7 @@ namespace Scada
         }
 
         public static BindableProperty TextColorProperty = BindableProperty.Create(nameof(TextColor), typeof(SKColor),
-            typeof(ScadaProgress), SKColors.Blue, BindingMode.OneWay,
+            typeof(uxSpectrumAnalyser), SKColors.Blue, BindingMode.OneWay,
             validateValue: (_, value) => value != null, propertyChanged: OnPropertyChangedInvalidate);
 
         public SKColor TextColor
@@ -156,7 +159,7 @@ namespace Scada
         }
 
         public static BindableProperty AlternativeTextColorProperty = BindableProperty.Create(nameof(AlternativeTextColor), typeof(SKColor),
-            typeof(ScadaProgress), SKColors.Blue, BindingMode.OneWay,
+            typeof(uxSpectrumAnalyser), SKColors.Blue, BindingMode.OneWay,
             validateValue: (_, value) => value != null, propertyChanged: OnPropertyChangedInvalidate);
 
         public SKColor AlternativeTextColor
@@ -166,7 +169,7 @@ namespace Scada
         }
 
         public static BindableProperty SvgBase64Property = BindableProperty.Create(nameof(SvgBase64), typeof(string),
-        typeof(ScadaProgress), "", BindingMode.OneWay,
+        typeof(uxSpectrumAnalyser), "", BindingMode.OneWay,
         validateValue: (_, value) => value != null, propertyChanged: OnPropertyChangedInvalidate);
 
         public string SvgBase64
@@ -177,7 +180,7 @@ namespace Scada
 
         private static void OnPropertyChangedInvalidate(BindableObject bindable, object oldvalue, object newvalue)
         {
-            var control = (ScadaProgress)bindable;
+            var control = (uxSpectrumAnalyser)bindable;
             if (oldvalue != newvalue)
                 if (control.IsLoaded == true)
                 {
@@ -276,6 +279,23 @@ namespace Scada
                 canvas.Clear();
                 canvas.DrawRoundRect(backgroundBar, background);
                 canvas.DrawRoundRect(progressBar, Barpaint);
+                var LinePaint = new SKPaint
+                {
+                    IsAntialias = true,
+                    Style = SKPaintStyle.StrokeAndFill,
+                    Color = new SKColor(255, 0, 0, 255),
+                    FilterQuality = SKFilterQuality.High,
+                    StrokeWidth = 1
+                };
+
+                foreach (var AudioBar in AudioSpectrum)
+                {
+                    float x = (AudioBar.Amplitude / MaxValue) * w;
+                    canvas.DrawLine(x, 0, x, h, LinePaint);
+                }
+                    
+                
+
             }
         }
     }

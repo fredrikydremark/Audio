@@ -258,12 +258,12 @@ namespace Scada
                     };
                      */
 
-                h = 12;
+                //h = 12;
 
                 float MaxValue = 100F;
                 float l = (PV.Value / MaxValue) * w;
 
-                var backgroundBar = new SKRoundRect(new SKRect(0, 0, w, h), h / 2, h / 2);
+                var backgroundBar = new SKRoundRect(new SKRect(0, 0, w, h), h / 10, h / 10);
                 var progressBar = new SKRoundRect(new SKRect(1, 2, l, h - 2), h / 10, h / 10);
 
                 var background = new SKPaint { Color = BackgroundColor.ToSKColor(), IsAntialias = true };
@@ -278,7 +278,8 @@ namespace Scada
                 };  
                 canvas.Clear();
                 canvas.DrawRoundRect(backgroundBar, background);
-                canvas.DrawRoundRect(progressBar, Barpaint);
+                //canvas.DrawRoundRect(progressBar, Barpaint);
+              /*
                 var LinePaint = new SKPaint
                 {
                     IsAntialias = true,
@@ -287,15 +288,27 @@ namespace Scada
                     FilterQuality = SKFilterQuality.High,
                     StrokeWidth = 1
                 };
+                */
 
+                /*
+                for (int i = 0; i < 10; i++)
+                {
+                    float amp = (float)(new Random().NextDouble() * 0.5)-0.5F;
+                    var spValue = new ScadaClasses.SpectrumValue();
+                    spValue.Amplitude = amp;
+                    AudioSpectrum.Add(spValue);
+                }
                 foreach (var AudioBar in AudioSpectrum)
                 {
-                    float x = (AudioBar.Amplitude / MaxValue) * w;
-                    canvas.DrawLine(x, 0, x, h, LinePaint);
-                }
-                    
-                
 
+                }
+                */
+                float x = 0;
+                foreach (var AudioBar in AudioSpectrum)
+                {                  
+                    canvas.DrawRect(x, h/2, 5, (AudioBar.Amplitude * 100F) + 20F, Barpaint);
+                    x = x + 10F;
+                }                  
             }
         }
     }

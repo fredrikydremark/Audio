@@ -243,7 +243,7 @@ public partial class MainPage : ContentPage
         });
 
 
-        const int FftSize = 32;
+        const int FftSize = 64;
 
     #if ANDROID || WINDOWS
         int bytesPerBlock = 4; // 2 bytes * 2 kanaler
@@ -295,23 +295,30 @@ public partial class MainPage : ContentPage
         // --- EXEMPEL: Hitta bas, mellanregister och diskant ---
         // Bin 0 till 11 motsvarar ungefär 0 - 250 Hz (Bas)
         // Bin 12 till 185 motsvarar ungefär 250 - 4000 Hz (Tal/Mellanregister)
-        /*
+        
         MainThread.BeginInvokeOnMainThread(() =>
         {
             foreach (SKCanvasView uxItem in SKCanvasViews)
             {
-                if (uxItem is ScadaProgress)
-                {
-                    var dItem = uxItem as ScadaProgress;
-                    float mag = (float) magnitudes[0];
-                    dItem.PV.Value = mag * 6.0F;
-
+                if (uxItem is uxSpectrumAnalyser)
+                {   
+                    var dItem = uxItem as uxSpectrumAnalyser;
+                    //float mag = (float) magnitudes[0];
+                    //dItem.PV.Value = mag * 6.0F;
+                    dItem.AudioSpectrum.Clear();
+                    foreach ( var mag in magnitudes)
+                    {
+                        //float amp = (float)(new Random().NextDouble() * 0.5)-0.5F;
+                        var spValue = new ScadaClasses.SpectrumValue();
+                        spValue.Amplitude = ((float)mag/10F);
+                        dItem.AudioSpectrum.Add(spValue);
+                     }
                     dItem.InvalidateSurface();
                     dItem = null;
                 }
             }          
         });
-       */
+       
     }
 
 
@@ -423,12 +430,13 @@ public partial class MainPage : ContentPage
 
         List<ScadaClasses.Telegram> ScadaItems = new List<ScadaClasses.Telegram>();
 
-        uxtimer.Interval = 5000;
+        uxtimer.Interval = 50;
         uxtimer.Elapsed += uxUpdate;
         uxtimer.Start();
         uxtimer.Enabled = true;
 
         ScadaGlobals.CurrentScadaPopup = -1;
+       // UpdateGui();
     }
 
 
@@ -455,9 +463,9 @@ public partial class MainPage : ContentPage
    
     public void RefreshGui()
     {
-        DataAccessLayer MyDataAccessLayer = new DataAccessLayer(ConnectionString);
-        var Items = MyDataAccessLayer.getItems(ScadaGlobals.Currentpage);
-        UpdateGui(Items);
+        //DataAccessLayer MyDataAccessLayer = new DataAccessLayer(ConnectionString);
+        //var Items = MyDataAccessLayer.getItems(ScadaGlobals.Currentpage);
+        UpdateGui();
 
     }
 
@@ -4701,16 +4709,18 @@ public partial class MainPage : ContentPage
     }
 
 
-    void UpdateGui(List<ScadaClasses.Telegram> ScadaItems)
+    //void UpdateGui(List<ScadaClasses.Telegram> ScadaItems)
+    void UpdateGui()
+
     {
      
         double x = 0, y = 0, w = 0, h = 0;   
-        double wScale = Width / 100;
-        double hScale = Height / 100;
+        double wScale = Window.Width / 100;
+        double hScale = Window.Height / 100;
   
       
 
-        if ((ScadaGlobals.Previouspage != ScadaGlobals.Currentpage) && (ScadaItems.Count > 0))
+        if (ScadaGlobals.Previouspage != ScadaGlobals.Currentpage)
         {
                    
                 ScadaColor.uxBackGroundColor = RGBStringToColor("rgba(5,5,5,255)");
@@ -4933,6 +4943,43 @@ public partial class MainPage : ContentPage
             SKCanvasViews.Add(pr2);
 
 
+            var spA = new uxSpectrumAnalyser();
+            spA.ItemID = 3;
+            spA.StyleId = "2";
+            spA.AnchorX = 0;
+            spA.AnchorY = 0;
+            spA.CornerRadius = 1;
+            spA.BarBackgroundColor = ScadaColor.uxItemColor;
+            spA.BackgroundColor = ScadaColor.uxItemColor.ToMauiColor();
+            spA.GradientStartColor = ScadaColor.uxItemColor;
+            spA.GradientEndColor = ScadaColor.uxItemColor;
+            spA.WidthRequest = wScale * 40;
+            spA.HeightRequest = hScale * 20;
+            spA.PV = new ItemValue();
+            spA.PV.TagID = 3;
+            spA.PV.Value = 0;
+
+            spA.SV = new ItemValue();
+            spA.SV.TagID = 3;
+            spA.SV.Value = 0;
+
+            spA.TextColor = ScadaColor.uxTextColor;
+            spA.IsEnabled = true;
+            spA.IsVisible = true;
+            spA.EnableTouchEvents = true;
+            spA.InputTransparent = false;
+
+            AbsoluteLayout.SetLayoutBounds(spA, new Rect(wScale * 30, hScale * 60, wScale * 40, hScale * 20));
+            AbsoluteLayout.SetLayoutFlags(spA, AbsoluteLayoutFlags.None);
+            SKCanvasViews.Add(spA);
+
+
+            
+
+
+
+
+
             if (ScadaGlobals.CurrentScadaPopup == ScadaClasses.uxLoginMenu)
             {                  
                 ScadaLogin(0);
@@ -4940,6 +4987,7 @@ public partial class MainPage : ContentPage
             }
 
             absoluteLayout.Clear();
+
             foreach (SKCanvasView SKItem in SKCanvasViews)
             {
                 absoluteLayout.Add(SKItem);
@@ -5092,18 +5140,31 @@ public partial class MainPage : ContentPage
 
         foreach (SKCanvasView uxItem in SKCanvasViews)
         {
-            
-                        
-            if (uxItem is ScadaNumeric)
+
+            /*          
+          if (uxItem is ScadaNumeric)
+          {
+              var dItem = uxItem as ScadaNumeric;
+              foreach (var Item in ScadaItems)
+              {
+                  if (dItem.ItemID == Item.ItemID)
+                  {
+                     dItem.RefreshValues(Item.ItemValues);                    
+                  }
+              }
+          }
+            */
+            if (uxItem is uxSpectrumAnalyser)
             {
-                var dItem = uxItem as ScadaNumeric;
-                foreach (var Item in ScadaItems)
-                {
-                    if (dItem.ItemID == Item.ItemID)
-                    {
-                       dItem.RefreshValues(Item.ItemValues);                    
-                    }
-                }
+                var dItem = uxItem as uxSpectrumAnalyser;
+                dItem.InvalidateSurface();
+            }
+
+
+            if (uxItem is ScadaProgress)
+            {
+                var dItem = uxItem as ScadaProgress;
+                dItem.InvalidateSurface();
             }
 
 

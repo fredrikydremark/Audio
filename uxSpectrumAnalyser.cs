@@ -9,7 +9,6 @@ namespace Scada
     {
         public List<ScadaClasses.SpectrumValue> AudioSpectrum = new List<ScadaClasses.SpectrumValue>() { };
 
-
         public static BindableProperty ItemIDProperty = BindableProperty.Create(nameof(ItemID), typeof(int),
         typeof(uxSpectrumAnalyser), 0, BindingMode.OneWay,
             validateValue: (_, value) => value != null,
@@ -245,18 +244,18 @@ namespace Scada
                     },
                     new float[] { 0, 1 },
                     SKShaderTileMode.Clamp);
-                    /*
-                    var NewTextPaint = new SKPaint
-                    {
-                    IsAntialias = true,
-                    Style = SKPaintStyle.StrokeAndFill,
-                    Color = TextColor,
-                    TextSize = FontSize,
-                    SubpixelText = true,
-                    FilterQuality = SKFilterQuality.High,
-                    StrokeWidth = 0.4F
-                    };
-                     */
+                /*
+                var NewTextPaint = new SKPaint
+                {
+                IsAntialias = true,
+                Style = SKPaintStyle.StrokeAndFill,
+                Color = TextColor,
+                TextSize = FontSize,
+                SubpixelText = true,
+                FilterQuality = SKFilterQuality.High,
+                StrokeWidth = 0.4F
+                };
+                 */
 
                 //h = 12;
 
@@ -275,40 +274,56 @@ namespace Scada
                     //BlendMode = SKBlendMode.,
                     FilterQuality = SKFilterQuality.High,
                     StrokeWidth = 1
-                };  
+                };
                 canvas.Clear();
                 canvas.DrawRoundRect(backgroundBar, background);
+
                 //canvas.DrawRoundRect(progressBar, Barpaint);
-              /*
-                var LinePaint = new SKPaint
-                {
-                    IsAntialias = true,
-                    Style = SKPaintStyle.StrokeAndFill,
-                    Color = new SKColor(255, 0, 0, 255),
-                    FilterQuality = SKFilterQuality.High,
-                    StrokeWidth = 1
-                };
-                */
-
                 /*
-                for (int i = 0; i < 10; i++)
-                {
-                    float amp = (float)(new Random().NextDouble() * 0.5)-0.5F;
-                    var spValue = new ScadaClasses.SpectrumValue();
-                    spValue.Amplitude = amp;
-                    AudioSpectrum.Add(spValue);
-                }
-                foreach (var AudioBar in AudioSpectrum)
-                {
-
-                }
+                  var LinePaint = new SKPaint
+                  {
+                      IsAntialias = true,
+                      Style = SKPaintStyle.StrokeAndFill,
+                      Color = new SKColor(255, 0, 0, 255),
+                      FilterQuality = SKFilterQuality.High,
+                      StrokeWidth = 1
+                  };
                 */
-                float x = 0;
-                foreach (var AudioBar in AudioSpectrum)
-                {                  
-                    canvas.DrawRect(x, h/2, 5, (AudioBar.Amplitude * 100F) + 20F, Barpaint);
-                    x = x + 10F;
-                }                  
+
+                int Count = AudioSpectrum.Count;
+                if (Count > 8 )
+                {              
+                    AudioSpectrum.Clear();
+                    for (int i = 0; i < Count - 1; i++)
+                    {
+                        float amp = (float)(new Random().NextDouble() * 0.5) - 0.5F;
+                        var spValue = new ScadaClasses.SpectrumValue();
+                       spValue.Amplitude = amp;
+                       AudioSpectrum.Add(spValue);
+                    }
+                    
+                     float x = 0f;
+                     float mid = h / 2f;
+                     float barWidth = (w/Count)/2;
+                     float spacing = w/Count;
+                     float nBar = 0F;
+                     foreach (var AudioBar in AudioSpectrum)
+                    {
+                        if (nBar > 0)
+                        {
+                            var Bar = new SKRoundRect(new SKRect(x, mid + 2, x + barWidth, mid + (AudioBar.Amplitude * 100F)), barWidth / 2, barWidth / 2);
+                            canvas.DrawRoundRect(Bar, Barpaint);
+
+                            Bar = new SKRoundRect(new SKRect(x, mid - 2, x + barWidth, mid - (AudioBar.Amplitude * 100F)), barWidth / 2, barWidth / 2);
+                            canvas.DrawRoundRect(Bar, Barpaint);
+
+                            //canvas.DrawRect(x, mid, barWidth, (AudioBar.Amplitude * 100F), Barpaint);
+                            //canvas.DrawRect(x, mid, barWidth, -(AudioBar.Amplitude * 100F), Barpaint);
+                        }
+                        x = x + spacing;
+                        nBar = nBar + 1;
+                    }
+                }              
             }
         }
     }

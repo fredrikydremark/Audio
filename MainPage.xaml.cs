@@ -436,7 +436,7 @@ public partial class MainPage : ContentPage
         uxtimer.Enabled = true;
 
         ScadaGlobals.CurrentScadaPopup = -1;
-       // UpdateGui();
+        //UpdateGui();
     }
 
 

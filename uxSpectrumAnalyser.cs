@@ -259,11 +259,11 @@ namespace Scada
 
                 //h = 12;
 
-                float MaxValue = 100F;
-                float l = (PV.Value / MaxValue) * w;
+                //float MaxValue = 100F;
+                //float l = (PV.Value / MaxValue) * w;
 
-                var backgroundBar = new SKRoundRect(new SKRect(0, 0, w, h), h / 10, h / 10);
-                var progressBar = new SKRoundRect(new SKRect(1, 2, l, h - 2), h / 10, h / 10);
+                //var backgroundBar = new SKRoundRect(new SKRect(0, 0, w, h), h / 10, h / 10);
+                //var progressBar = new SKRoundRect(new SKRect(1, 2, l, h - 2), h / 10, h / 10);
 
                 var background = new SKPaint { Color = BackgroundColor.ToSKColor(), IsAntialias = true };
                 var Barpaint = new SKPaint
@@ -276,7 +276,7 @@ namespace Scada
                     StrokeWidth = 1
                 };
                 canvas.Clear();
-                canvas.DrawRoundRect(backgroundBar, background);
+                //canvas.DrawRoundRect(backgroundBar, background);
 
                 //canvas.DrawRoundRect(progressBar, Barpaint);
                 /*
@@ -292,7 +292,8 @@ namespace Scada
 
                 int Count = AudioSpectrum.Count;
                 if (Count > 8 )
-                {              
+                {           
+                    /*
                     AudioSpectrum.Clear();
                     for (int i = 0; i < Count - 1; i++)
                     {
@@ -301,6 +302,7 @@ namespace Scada
                        spValue.Amplitude = amp;
                        AudioSpectrum.Add(spValue);
                     }
+                    */
                     
                      float x = 0f;
                      float mid = h / 2f;
@@ -311,10 +313,10 @@ namespace Scada
                     {
                         if (nBar > 0)
                         {
-                            var Bar = new SKRoundRect(new SKRect(x, mid + 2, x + barWidth, mid + (AudioBar.Amplitude * 100F)), barWidth / 2, barWidth / 2);
+                            var Bar = new SKRoundRect(new SKRect(x, mid , x + barWidth, mid + (AudioBar.Amplitude * 100F)), barWidth / 2, barWidth / 2);
                             canvas.DrawRoundRect(Bar, Barpaint);
 
-                            Bar = new SKRoundRect(new SKRect(x, mid - 2, x + barWidth, mid - (AudioBar.Amplitude * 100F)), barWidth / 2, barWidth / 2);
+                            Bar = new SKRoundRect(new SKRect(x, mid , x + barWidth, mid - (AudioBar.Amplitude * 100F)), barWidth / 2, barWidth / 2);
                             canvas.DrawRoundRect(Bar, Barpaint);
 
                             //canvas.DrawRect(x, mid, barWidth, (AudioBar.Amplitude * 100F), Barpaint);

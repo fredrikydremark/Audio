@@ -6,6 +6,10 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Numerics;
 using Plugin.Maui.Audio;
+using Windows.Media.Core;
+using NAudio.Wave;
+
+
 
 #if WINDOWS
 using Windows.Devices.Enumeration;
@@ -47,7 +51,7 @@ public partial class MainPage : ContentPage
 
     IAudioRecorder _audioRecorder;
     IAudioStreamer _audioStreamer;
-
+    IAudioPlayer _audioPlayer;
 
     List<SKCanvasView> SKCanvasViews = new List<SKCanvasView>();
     List<SKCanvasView> SKCanvasPopupViews = new List<SKCanvasView>();
@@ -85,8 +89,27 @@ public partial class MainPage : ContentPage
             };
             _audioRecorder = AudioManager.Current.CreateRecorder(options);
         }
+        var optionsP = new AudioPlayerOptions
+        {
+           // PreferredOutputDeviceName = ""
+        };     
+        _audioPlayer = AudioManager.Current.CreatePlayer(optionsP);
+
     }
-    #endif
+
+    protected async override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        uxtimer.Enabled = false;
+        uxtimer.Stop();
+        // Use the async API and await it
+        await _audioRecorder.StopAsync();
+        await _audioStreamer.StopAsync();
+       
+    }
+
+
+#endif
 
     public static class FastFourierTransform
     {
@@ -165,13 +188,10 @@ public partial class MainPage : ContentPage
 
         for (int i = 0; i < audioData.Length; i += bytesPerSample * channels)
         {
-            // Vänster kanal (Kanal 1)
             short leftSample = BitConverter.ToInt16(audioData, i);
             double leftNormalized = leftSample / 32768.0;
             sumLeft += leftNormalized * leftNormalized;
 
-            // Höger kanal (Kanal 2)
-            // Säkerställ att vi inte läser utanför arrayen om datan mot förmodan skulle vara korrupt
             if (i + bytesPerSample < audioData.Length)
             {
                 short rightSample = BitConverter.ToInt16(audioData, i + bytesPerSample);
@@ -202,47 +222,13 @@ public partial class MainPage : ContentPage
 
         if (totalSamplesPerChannel == 0) return;
 
-        // Beräkna RMS (Root Mean Square) separat för varje kanal
         double rmsLeft = Math.Sqrt(sumLeft / totalSamplesPerChannel);
         double rmsRight = Math.Sqrt(sumRight / totalSamplesPerChannel);
-
-        // Välj det högsta värdet som den totala volymen (eller ta ett genomsnitt: (rmsLeft + rmsRight) / 2)
-        double rmsTotal = Math.Max(rmsLeft, rmsRight);
-
-        // Omvandla till Decibel (dBFS)
+        double rmsTotal = Math.Max(rmsLeft, rmsRight);      
         double db = 20 * Math.Log10(rmsTotal);
+    
         if (double.IsInfinity(db) || db < -60) db = -60;
-
-        // Skicka resultatet till gränssnittet trådsäkert
-        MainThread.BeginInvokeOnMainThread(() =>
-        {       
-            foreach (SKCanvasView uxItem in SKCanvasViews)
-            {
-                if (uxItem is ScadaProgress)
-                {
-                    var dItem = uxItem as ScadaProgress;
-
-                    if (dItem.PV.TagID == 1)
-                    {
-                        dItem.PV.Value = (float)rmsLeft * 100;
-                    }
-                    if (dItem.PV.TagID == 2)
-                    {
-                        dItem.PV.Value = (float)rmsRight * 100;
-                    }
-
-
-                    dItem.InvalidateSurface();
-                    dItem = null;
-                }
-            }
-            
-            // rmsTotal ger ett stabilt värde mellan 0.0 (tystnad) och 1.0 (max)
-            // db ger ett värde mellan -60 dB (tystnad) och 0 dB (maxvolym)
-            // System.Diagnostics.Debug.WriteLine($"[Stereo] Vänster: {rmsLeft:P0} | Höger: {rmsRight:P0} | Totalt: {db:F1} dB");
-        });
-
-
+        
         const int FftSize = 64;
 
     #if ANDROID || WINDOWS
@@ -303,20 +289,34 @@ public partial class MainPage : ContentPage
                 if (uxItem is uxSpectrumAnalyser)
                 {   
                     var dItem = uxItem as uxSpectrumAnalyser;
-                    //float mag = (float) magnitudes[0];
-                    //dItem.PV.Value = mag * 6.0F;
                     dItem.AudioSpectrum.Clear();
                     foreach ( var mag in magnitudes)
                     {
-                        //float amp = (float)(new Random().NextDouble() * 0.5)-0.5F;
-                        var spValue = new ScadaClasses.SpectrumValue();
-                        spValue.Amplitude = ((float)mag/10F);
+                        var spValue = new SpectrumValue();
+                        spValue.Amplitude = ((float)mag/5F);
                         dItem.AudioSpectrum.Add(spValue);
                      }
                     dItem.InvalidateSurface();
                     dItem = null;
                 }
-            }          
+                if (uxItem is ScadaProgress)
+                {
+                    var dItem = uxItem as ScadaProgress;
+
+                    if (dItem.PV.TagID == 1)
+                    {
+                        dItem.PV.Value = (float)rmsLeft*100F;
+                    }
+                    if (dItem.PV.TagID == 2)
+                    {
+                        dItem.PV.Value = (float)rmsRight*100F;
+                    }
+                    dItem.InvalidateSurface();
+                    dItem = null;
+                }
+
+
+            }
         });
        
     }
@@ -351,6 +351,76 @@ public partial class MainPage : ContentPage
             */
         }
     }
+
+    public async Task PlayAudioAsync()
+    {
+        _audioPlayer = AudioManager.Current.CreatePlayer(await FileSystem.OpenAppPackageFileAsync("ukelele.mp3"));
+
+        _audioPlayer.Play();
+    }
+
+
+
+
+
+    private async Task StartPlaying()
+    {
+        using var audioFile = new AudioFileReader("c:\\temp\\recorded_audio.wav");
+        using var player = new WasapiPlayerBuilder().Build();
+        player.Init(audioFile);
+        player.Play();
+        while (player.PlaybackState == PlaybackState.Playing)
+        {
+            Thread.Sleep(500);  
+        }
+
+
+        /*
+        var page = new ContentPage();
+        var stack = new VerticalStackLayout();
+        var mediaElement = new MediaElement
+        {
+            ShouldAutoPlay = true,
+            Source = MediaSource.FromFile("C:\\Temp\\recorded_audio.wav"),
+        };
+
+        stack.Children.Add(mediaElement);
+        page.Content = stack;
+
+        MainPage = page;
+
+        */
+
+
+        /*
+
+        if (!_audioPlayer.IsPlaying)
+        {
+            string targetDirectory = @"c:\temp";
+            string myPath = Path.Combine(targetDirectory, "recorded_audio.wav");
+
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                
+            });
+            _audioPlayer = AudioManager.Current.CreatePlayer(await FileSystem.OpenAppPackageFileAsync(myPath));
+            _audioPlayer.Play();
+
+            _audioStreamer = AudioManager.Current.CreateStreamer();
+            _audioStreamer.OnAudioCaptured += OnAudioStreamerCapturedData;
+            await _audioStreamer.StartAsync();
+        }
+        else
+        {
+            _audioPlayer.Stop();
+            await _audioStreamer.StopAsync();
+        }
+        */
+
+    }
+
+
+
 
 
     public MainPage()
@@ -4742,7 +4812,79 @@ public partial class MainPage : ContentPage
 
             SKCanvasPopupViews.Clear();
             SKCanvasViews.Clear();
-    
+
+
+            var lpanel = new ScadaPanel();
+            lpanel.ItemID = 1;
+            lpanel.StyleId = "1";
+            lpanel.AnchorX = 0;
+            lpanel.AnchorY = 0;
+            lpanel.CornerRadius = 1;
+            lpanel.BarBackgroundColor = ScadaColor.uxItemColor;
+            lpanel.BackgroundColor = ScadaColor.uxItemColor.ToMauiColor();
+            lpanel.GradientStartColor = ScadaColor.uxItemColor;
+            lpanel.GradientEndColor = ScadaColor.uxItemColor;
+            lpanel.WidthRequest = wScale * 46;
+            lpanel.HeightRequest = hScale * 57;
+          
+            lpanel.TextColor = ScadaColor.uxTextColor;
+            lpanel.IsEnabled = true;
+            lpanel.IsVisible = true;
+            lpanel.EnableTouchEvents = false;
+            lpanel.InputTransparent = false;
+
+            AbsoluteLayout.SetLayoutBounds(lpanel, new Rect(wScale * 3, hScale * 3, wScale * 46, hScale * 57));
+            AbsoluteLayout.SetLayoutFlags(lpanel, AbsoluteLayoutFlags.None);
+            SKCanvasViews.Add(lpanel);
+
+            var rpanel = new ScadaPanel();
+            rpanel.ItemID = 1;
+            rpanel.StyleId = "1";
+            rpanel.AnchorX = 0;
+            rpanel.AnchorY = 0;
+            rpanel.CornerRadius = 1;
+            rpanel.BarBackgroundColor = ScadaColor.uxItemColor;
+            rpanel.BackgroundColor = ScadaColor.uxItemColor.ToMauiColor();
+            rpanel.GradientStartColor = ScadaColor.uxItemColor;
+            rpanel.GradientEndColor = ScadaColor.uxItemColor;
+            rpanel.WidthRequest = wScale * 44;
+            rpanel.HeightRequest = hScale * 57;
+
+            rpanel.TextColor = ScadaColor.uxTextColor;
+            rpanel.IsEnabled = true;
+            rpanel.IsVisible = true;
+            rpanel.EnableTouchEvents = false;
+            rpanel.InputTransparent = false;
+
+            AbsoluteLayout.SetLayoutBounds(rpanel, new Rect(wScale * 51, hScale * 3, wScale * 46, hScale * 57));
+            AbsoluteLayout.SetLayoutFlags(rpanel, AbsoluteLayoutFlags.None);
+            SKCanvasViews.Add(rpanel);
+
+            var spanel = new ScadaPanel();
+            spanel.ItemID = 1;
+            spanel.StyleId = "1";
+            spanel.AnchorX = 0;
+            spanel.AnchorY = 0;
+            spanel.CornerRadius = 1;
+            spanel.BarBackgroundColor = ScadaColor.uxItemColor;
+            spanel.BackgroundColor = ScadaColor.uxItemColor.ToMauiColor();
+            spanel.GradientStartColor = ScadaColor.uxItemColor;
+            spanel.GradientEndColor = ScadaColor.uxItemColor;
+            spanel.WidthRequest = wScale * 93;
+            spanel.HeightRequest = hScale * 25;
+
+            spanel.TextColor = ScadaColor.uxTextColor;
+            spanel.IsEnabled = true;
+            spanel.IsVisible = true;
+            spanel.EnableTouchEvents = false;
+            spanel.InputTransparent = false;
+
+            AbsoluteLayout.SetLayoutBounds(spanel, new Rect(wScale * 3, hScale * 63, wScale * 93, hScale * 27));
+            AbsoluteLayout.SetLayoutFlags(spanel, AbsoluteLayoutFlags.None);
+            SKCanvasViews.Add(spanel);
+
+
+
             //Home (house)
             var btnHome = new ScadaButton();
             btnHome.GradientStartColor = ScadaColor.uxItemColor;
@@ -4751,8 +4893,8 @@ public partial class MainPage : ContentPage
             btnHome.ItemID = 1;
             btnHome.EnableTouchEvents = true;
             btnHome.InputTransparent = false;
-            btnHome.HeightRequest = 25;
-            btnHome.WidthRequest = 25;
+            btnHome.HeightRequest = hScale * 10;
+            btnHome.WidthRequest = wScale * 10;
             btnHome.SvgBase64 = "";//MyDataAccessLayer.LoadLibItem("Home", 1);
             btnHome.IndicatorType = 9;
             btnHome.Margin = 0.15F;
@@ -4762,6 +4904,8 @@ public partial class MainPage : ContentPage
                 switch (args.ActionType)
                 {
                     case SKTouchAction.Released:
+                        StartRecording();
+
                         //ScadaGlobals.Previouspage = -1;
                         ScadaGlobals.Currentpage = 1;
                         ScadaGlobals.CurrentScadaPopup = -1;
@@ -4786,7 +4930,8 @@ public partial class MainPage : ContentPage
                 }
                 args.Handled = true;
             };
-            AbsoluteLayout.SetLayoutBounds(btnHome, new Rect(20 + btnHome.WidthRequest / 5, 20 + btnHome.HeightRequest / 5, 25, 25));
+
+            AbsoluteLayout.SetLayoutBounds(btnHome, new Rect(wScale *23, hScale * 48, wScale * 10, hScale * 10));
             AbsoluteLayout.SetLayoutFlags(btnHome, AbsoluteLayoutFlags.None);
             SKCanvasViews.Add(btnHome);
 
@@ -4798,8 +4943,8 @@ public partial class MainPage : ContentPage
             btnAlarmbell.ItemID = 1;
             btnAlarmbell.EnableTouchEvents = true;
             btnAlarmbell.InputTransparent = false;
-            btnAlarmbell.HeightRequest = 25;
-            btnAlarmbell.WidthRequest = 25;
+            btnAlarmbell.HeightRequest = hScale * 10;
+            btnAlarmbell.WidthRequest = wScale * 10;
             btnAlarmbell.SvgBase64 = "";// MyDataAccessLayer.LoadLibItem("Alarmbell", 1);
             btnAlarmbell.IndicatorType = 9;
             btnAlarmbell.Margin = 0.15F;
@@ -4809,8 +4954,8 @@ public partial class MainPage : ContentPage
                 switch (args.ActionType)
                 {
                     case SKTouchAction.Released:
-                        StartRecording();
-
+                       
+                        StartPlaying();
                         RefreshGui();
                         break;
 
@@ -4831,11 +4976,12 @@ public partial class MainPage : ContentPage
                 }
                 args.Handled = true;
             };
-            AbsoluteLayout.SetLayoutBounds(btnAlarmbell, new Rect(20 + btnAlarmbell.WidthRequest / 5, 60 + btnAlarmbell.HeightRequest / 5, 25, 25));
+            AbsoluteLayout.SetLayoutBounds(btnAlarmbell, new Rect(wScale*71, hScale*48, wScale*10, hScale*10));
             AbsoluteLayout.SetLayoutFlags(btnAlarmbell, AbsoluteLayoutFlags.None);
             SKCanvasViews.Add(btnAlarmbell);
 
             //Settings Cogwheel
+            /*
             var btnSettings = new ScadaButton();
             btnSettings.GradientStartColor = ScadaColor.uxItemColor;
             btnSettings.GradientEndColor = ScadaColor.uxItemColor;
@@ -4879,7 +5025,7 @@ public partial class MainPage : ContentPage
             AbsoluteLayout.SetLayoutBounds(btnSettings, new Rect(20 + btnSettings.WidthRequest / 5, Height - 50 + btnSettings.HeightRequest / 5, 25, 25));
             AbsoluteLayout.SetLayoutFlags(btnSettings, AbsoluteLayoutFlags.None);
             SKCanvasViews.Add(btnSettings);
-
+            */
 
             var pr = new ScadaProgress();
             pr.ItemID = 1;
@@ -4891,7 +5037,7 @@ public partial class MainPage : ContentPage
             pr.BackgroundColor = ScadaColor.uxItemColor.ToMauiColor();
             pr.GradientStartColor = ScadaColor.uxItemColor;
             pr.GradientEndColor = ScadaColor.uxItemColor;
-            pr.WidthRequest = wScale * 20;
+            pr.WidthRequest = wScale * 15;
             pr.HeightRequest = hScale * 2;
             pr.PV = new ItemValue();
             pr.PV.TagID = 1;
@@ -4906,7 +5052,7 @@ public partial class MainPage : ContentPage
             pr.EnableTouchEvents = true;
             pr.InputTransparent = false;
   
-            AbsoluteLayout.SetLayoutBounds(pr, new Rect(wScale *30, hScale *20, wScale * 20, hScale * 2));
+            AbsoluteLayout.SetLayoutBounds(pr, new Rect(wScale * 10, hScale * 30, wScale * 15, hScale * 2));
             AbsoluteLayout.SetLayoutFlags(pr, AbsoluteLayoutFlags.None);
             SKCanvasViews.Add(pr);
 
@@ -4921,7 +5067,7 @@ public partial class MainPage : ContentPage
             pr2.BackgroundColor = ScadaColor.uxItemColor.ToMauiColor();
             pr2.GradientStartColor = ScadaColor.uxItemColor;
             pr2.GradientEndColor = ScadaColor.uxItemColor;
-            pr2.WidthRequest = wScale * 20;
+            pr2.WidthRequest = wScale * 15;
             pr2.HeightRequest = hScale * 2;
             pr2.PV = new ItemValue();
             pr2.PV.TagID = 2;
@@ -4938,7 +5084,7 @@ public partial class MainPage : ContentPage
             pr2.EnableTouchEvents = true;
             pr2.InputTransparent = false;
 
-            AbsoluteLayout.SetLayoutBounds(pr2, new Rect(wScale * 30, hScale * 30, wScale * 20, hScale * 2));
+            AbsoluteLayout.SetLayoutBounds(pr2, new Rect(wScale * 10, hScale * 35, wScale * 15, hScale * 2));
             AbsoluteLayout.SetLayoutFlags(pr2, AbsoluteLayoutFlags.None);
             SKCanvasViews.Add(pr2);
 
@@ -4953,8 +5099,8 @@ public partial class MainPage : ContentPage
             spA.BackgroundColor = ScadaColor.uxItemColor.ToMauiColor();
             spA.GradientStartColor = ScadaColor.uxItemColor;
             spA.GradientEndColor = ScadaColor.uxItemColor;
-            spA.WidthRequest = wScale * 40;
-            spA.HeightRequest = hScale * 20;
+            spA.WidthRequest = wScale * 90;
+            spA.HeightRequest = hScale * 22;
             spA.PV = new ItemValue();
             spA.PV.TagID = 3;
             spA.PV.Value = 0;
@@ -4969,7 +5115,7 @@ public partial class MainPage : ContentPage
             spA.EnableTouchEvents = true;
             spA.InputTransparent = false;
 
-            AbsoluteLayout.SetLayoutBounds(spA, new Rect(wScale * 30, hScale * 60, wScale * 40, hScale * 20));
+            AbsoluteLayout.SetLayoutBounds(spA, new Rect(wScale * 3, hScale * 68, wScale * 90, hScale * 22));
             AbsoluteLayout.SetLayoutFlags(spA, AbsoluteLayoutFlags.None);
             SKCanvasViews.Add(spA);
 

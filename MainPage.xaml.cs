@@ -95,6 +95,9 @@ public partial class MainPage : ContentPage
         };     
         _audioPlayer = AudioManager.Current.CreatePlayer(optionsP);
 
+        _audioStreamer = AudioManager.Current.CreateStreamer();
+        _audioStreamer.OnAudioCaptured += OnAudioStreamerCapturedData;
+
     }
 
     protected async override void OnDisappearing()
@@ -103,8 +106,15 @@ public partial class MainPage : ContentPage
         uxtimer.Enabled = false;
         uxtimer.Stop();
         // Use the async API and await it
-        await _audioRecorder.StopAsync();
-        await _audioStreamer.StopAsync();
+        if (_audioRecorder.IsRecording == true)
+        {
+            await _audioRecorder.StopAsync();
+        }
+        if (_audioStreamer.IsStreaming == true)
+        {
+            await _audioStreamer.StopAsync();
+        }
+        
        
     }
 
@@ -328,8 +338,6 @@ public partial class MainPage : ContentPage
         {
             await _audioRecorder.StartAsync();
 
-            _audioStreamer = AudioManager.Current.CreateStreamer();
-            _audioStreamer.OnAudioCaptured += OnAudioStreamerCapturedData;
             await _audioStreamer.StartAsync();
 
         }

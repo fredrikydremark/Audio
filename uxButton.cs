@@ -4,6 +4,7 @@ using SkiaSharp.Views.Maui;
 using SkiaSharp.Views.Maui.Controls;
 using Svg.Skia;
 using System.Text;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrayNotify;
 
 
 namespace Scada
@@ -804,6 +805,26 @@ namespace Scada
                     //Draw Circle
                     var circlePaint = new SKPaint { Color = GradientStartColor, TextSize = FontSize, FilterQuality = SKFilterQuality.High, IsAntialias = true };
                     canvas.DrawCircle(center, radius, circlePaint);
+                    // calc render for PV Processvalue
+                    var pathStroke3 = new SKPaint
+                    {
+                        IsAntialias = true,
+                        Style = SKPaintStyle.StrokeAndFill,
+                        Color = new SKColor(3, 156, 35, 255),
+                        StrokeWidth = 1
+                    };
+
+                    float pixPV = ((50 / 100.0F) * h);
+                    var path3 = new SKPath { FillType = SKPathFillType.EvenOdd };
+                    path3.MoveTo(50, h - pixPV);
+                    path3.LineTo(20, h - pixPV + 20);
+                    path3.LineTo(20, h - pixPV - 20);
+                    path3.LineTo(50, h - pixPV);
+                    path3.Close();
+
+                    
+                 
+                    canvas.DrawPath(path3, pathStroke3);
 
                     if (SvgBase64 == "") return;
               

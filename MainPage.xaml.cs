@@ -9,13 +9,10 @@ using Plugin.Maui.Audio;
 using Windows.Media.Core;
 using NAudio.Wave;
 
-
-
 #if WINDOWS
 using Windows.Devices.Enumeration;
 using Windows.Media.Devices;
 #endif
-
 
 using static Scada.ScadaClasses;
 

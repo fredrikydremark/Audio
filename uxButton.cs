@@ -554,6 +554,120 @@ namespace Scada
             }
         }
 
+
+        private SKPoint Lerp(SKPoint start, SKPoint end, float t)
+        {
+            return new SKPoint(
+                start.X + (end.X - start.X) * t,
+                start.Y + (end.Y - start.Y) * t
+            );
+        }
+
+        private void DrawRoundedCorner(SKCanvas canvas, SKPoint angularPoint, SKPoint p1, SKPoint p2, float radius)
+        {
+            // 1. Räkna ut vektordelta (behövs för vinkelberäkningen)
+            double dx1 = angularPoint.X - p1.X;
+            double dy1 = angularPoint.Y - p1.Y;
+            double dx2 = angularPoint.X - p2.X;
+            double dy2 = angularPoint.Y - p2.Y;
+
+            // Angle between vector 1 and vector 2 divided by 2
+            double angle = (Math.Atan2(dy1, dx1) - Math.Atan2(dy2, dx2)) / 2;
+
+            // The length of segment between angular point and the
+            // points of intersection with the circle of a given radius
+            double tan = Math.Abs(Math.Tan(angle));
+            double segment = radius / tan;
+
+            // 2. Använd SkiaSharps inbyggda avståndsberäkning istället for GetLength
+            float length1 = SKPoint.Distance(angularPoint, p1);
+            float length2 = SKPoint.Distance(angularPoint, p2);
+            float minLength = Math.Min(length1, length2);
+
+            if (segment > minLength)
+            {
+                segment = minLength;
+                radius = (float)(minLength * tan);
+            }
+
+            // 3. Hitta skärningspunkterna med SKPoint.Lerp (ersätter GetProportionPoint)
+            // Lerp tar en faktor mellan 0.0 (angularPoint) och 1.0 (p1/p2)
+            float t1 = (float)(segment / length1);
+            float t2 = (float)(segment / length2);
+
+            SKPoint p1Cross = Lerp(angularPoint, p1, t1);
+            SKPoint p2Cross = Lerp(angularPoint, p2, t2);
+
+            // 4. Beräkna cirkelns centrum
+            double dx = angularPoint.X * 2 - p1Cross.X - p2Cross.X;
+            double dy = angularPoint.Y * 2 - p1Cross.Y - p2Cross.Y;
+
+            // Använd en tillfällig SKPoint för att mäta längden på centrumvektorn
+            SKPoint centerVector = new SKPoint((float)dx, (float)dy);
+            float L = centerVector.Length;
+            float d = (float)Math.Sqrt(segment * segment + radius * radius);
+
+            // Hitta cirkelns mittpunkt med Lerp från angularPoint längs center-vektorn
+            SKPoint targetVectorPoint = new SKPoint(angularPoint.X - (float)dx, angularPoint.Y - (float)dy);
+            SKPoint circlePoint = Lerp(angularPoint, targetVectorPoint, d / L);
+
+            // StartAngle and EndAngle of arc
+            var startAngle = Math.Atan2(p1Cross.Y - circlePoint.Y, p1Cross.X - circlePoint.X);
+            var endAngle = Math.Atan2(p2Cross.Y - circlePoint.Y, p2Cross.X - circlePoint.X);
+
+            // Sweep angle
+            var sweepAngle = endAngle - startAngle;
+
+            // Some additional checks
+            if (sweepAngle < 0)
+            {
+                startAngle = endAngle;
+                sweepAngle = -sweepAngle;
+            }
+
+            if (sweepAngle > Math.PI)
+                sweepAngle = Math.PI - sweepAngle;
+
+            // 5. Konfigurera SkiaSharp Paint-objektet
+            using var pen = new SKPaint
+            {
+                IsAntialias = true,
+                Style = SKPaintStyle.Stroke, // Ändrat till Stroke då StrokeAndFill fyller hela tårtbiten
+                Color = new SKColor(100, 120, 140, 170),
+                StrokeWidth = 1F,
+                FilterQuality = SKFilterQuality.High
+            };
+
+            // 6. Rita upp geometri på canvasen
+            canvas.DrawLine(p1, p1Cross, pen);
+            canvas.DrawLine(p2, p2Cross, pen);
+
+            // SkiaSharp kräver en SKRect (Vänster, Topp, Höger, Botten) för DrawArc
+            var arcRect = new SKRect(
+                circlePoint.X - radius,
+                circlePoint.Y - radius,
+                circlePoint.X + radius,
+                circlePoint.Y + radius
+            );
+
+            double degreeFactor = 180 / Math.PI;
+
+            // useCenter: false ritar bara kurvan, true ritar en "pajbit" in till cirkelns mitt
+            canvas.DrawArc(arcRect,
+                           (float)(startAngle * degreeFactor),
+                           (float)(sweepAngle * degreeFactor),
+                           useCenter: false,
+                           pen);
+        }
+
+
+
+
+
+
+
+
+
         /// <summary>
         /// Handles the paint surface event for the SKCanvasView.
         /// </summary>
@@ -825,6 +939,8 @@ namespace Scada
                     
                  
                     canvas.DrawPath(path3, pathStroke3);
+
+                    //DrawRoundedCorner()
 
                     if (SvgBase64 == "") return;
               
